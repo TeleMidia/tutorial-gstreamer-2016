@@ -1,0 +1,117 @@
+\documentclass{SBCbookchapter}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english,brazilian]{babel}
+\usepackage{graphicx}
+
+\title{Desenvolvimento de aplicações multimídia usando GStreamer}
+\author{XXX, YYY, ZZZ}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+\begin{otherlanguage}{english}
+\end{otherlanguage}
+\end{abstract}
+
+\begin{resumo}
+\end{resumo}
+
+
+\section{Motivação}
+
+GStreamer é um dos principais \emph{frameworks} de código aberto para o
+desenvolvimento de aplicações multimídia.  Há pouca documentação atualizada
+disponível.  Além disso, a maior parte dessa documentação está em Inglês.
+[Colocar mais coisa aqui, e.g., disponibilidade, flexibilidade, controle
+  fino, base para aplicações mais complexas, etc.]
+
+
+\section{Público-alvo}
+
+Programadores, alunos de graduação e pós-graduação interessados em
+desenvolver aplicações multimídia usando o GStreamer~\cite{?}.  Os alunos
+devem possuir conhecimento básico da linguagem~C~\cite{?} e estarem
+familiarizados com algum ambiente de desenvolvimento para essa linguagem.
+
+
+\section{Sumário}
+\begin{enumerate}
+\item\emph{Introdução ao GStreamer}.  Apresentamos o \emph{framework}
+  multimídia GStreamer: histórico, arquitetura básica, licença, quem usa,
+  dependências, formatos e plataformas suportadas.  E discutimos brevemente
+  o seu modelo de programação, viz., \emph{dataflow} (ou \emph{pipeline})
+  multimídia~\cite{?}.
+
+\item\emph{Hello-world: Tocando um vídeo}.  Apresentamos uma aplicação
+  GStreamer básica que toca um vídeo e termina.  Esse exemplo utiliza a API
+  de alto-nível~\texttt{GstPlayer}---atualmente a forma mais simples de se
+  reproduzir um áudio ou vídeo no GStreamer.
+
+\item\emph{Conceitos básicos: Destrinchando o exemplo anterior}.  Discutimos
+  o que está por trás do código aparentemente simples do exemplo anterior.
+  Começamos mostrando o \emph{pipeline} que a API~\texttt{GstPlayer} usa
+  para reproduzir o vídeo e aproveitamos esse exemplo para introduzir cada
+  um dos conceitos básicos do \emph{framework}:  \emph{element}, \emph{pad},
+  \emph{caps}, \emph{clock}, \emph{buffer}, \emph{event}, \emph{message},
+  \emph{bus}, \emph{bin} e \emph{pipeline}.  Após discutir os conceitos,
+  voltamos à pratica e reimplementamos o exemplo do tópico anterior usando a
+  API básica do GStreamer.  (Apesar da API~\texttt{GstPlayer} simplificar a
+  programação de reprodutores de mídia, ela é inflexível e limita os
+  possíveis usos do framework.  Dessa forma, é importante que os alunos do
+  minicurso conheçam a API básica do GStreamer e seu modo de operação.)
+  Ainda neste tópico, discutimos as ferramentas~\texttt{gst-inspect}, que
+  consulta os elementos instalados no sistema, e ~\texttt{gst-launch}, que
+  constrói um \emph{pipeline} na linha de comando.
+
+\item\emph{Entrada e saída}.  Adicionamos suporte à entrada do usuário
+  (teclado e mouse) ao exemplo anterior, e discutimos como os
+  elementos~\texttt{appsrc} e~\texttt{appsink} podem ser utilizados para
+  injetar ou obter dados do \emph{pipeline}.  Concluímos o tópico mostrando
+  como renderizar os quadros produzidos no exemplo numa
+  janela~GTK+~\cite{?}.
+
+\item\emph{Filtros}.  Apresentamos os principais filtros de aúdio e vídeo
+  disponíveis no GStreamer e discutimos como integrá-los ao exemplo.  Nesse
+  ponto, apresentamos o resultado da combinação do exemplo original com
+  diferentes filtros, e discutimos como os parâmetros dos filtros podem ser
+  alterados dinamicamente em tempo de execução.
+
+\item\emph{Pause, seek, fast-forward, rewind e step}.  Discutimos o
+  funcionamento e implementamos as operações \emph{pause}, \emph{seek},
+  \emph{fast-forward}, \emph{rewind} e \emph{frame stepping} no exemplo.
+  Analisamos os problemas envolvidos em cada uma dessas operações destacando
+  as situações em que elas podem falhar.
+
+\item\emph{Plugins}.  Apresentamos brevemente a arquitetura de
+  \emph{plugins} do GStreamer e discutimos a implementação de um filtro de
+  vídeo simples.  O filtro utiliza a biblioteca de desenho vetorial
+  Cairo~\cite{?} para desenhar sobre quadros de vídeo.  Além do código,
+  mostramos como gerar um \emph{plugin} com esse filtro, instalá-lo, e
+  utilizá-lo em conjunto com o exemplo original.
+
+\item\emph{Conclusão}.  Terminamos o minicurso discutindo brevidente alguns
+  tópicos avançados que não foram abordados---e.g., alterações na topologia
+  do \emph{pipeline} em tempo de execução, \emph{mixers}, sincronização de
+  pipelines, captura de áudio e vídeo, transmissão na rede, \emph{bindings}
+  em outras linguagens, etc.---e listando nossas referências.
+\end{enumerate}
+
+
+\section{Currículo dos autores}
+
+\noindent\emph{Guilherme F.~Lima}
+
+\noindent\emph{Rodrigo Costa}
+
+\noindent\emph{Roberto Gerson}
+
+
+\section{Apresentador do minicurso}
+
+
+\section{Recursos necessários}
+
+
+\section*{Referências}
+\end{document}
