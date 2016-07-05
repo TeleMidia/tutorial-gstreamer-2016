@@ -25,17 +25,17 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.55884655"
-     inkscape:cx="862.6081"
-     inkscape:cy="18.641348"
+     inkscape:zoom="1.1176931"
+     inkscape:cx="361.13218"
+     inkscape:cy="29.029972"
      inkscape:document-units="px"
      inkscape:current-layer="boxes"
      showgrid="true"
-     inkscape:window-width="1366"
-     inkscape:window-height="715"
-     inkscape:window-x="-8"
-     inkscape:window-y="-8"
-     inkscape:window-maximized="1"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
@@ -594,14 +594,14 @@
    style="fill:#993300">queue</tspan>)</tspan></text>
     <path
        sodipodi:nodetypes="cc"
-       style="fill:none;stroke:#204a87;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2MendEK)"
-       d="m 119,280.2056 26.5698,0"
+       style="fill:none;stroke:#204a87;stroke-width:2.84357142;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2MendEK)"
+       d="m 119.63265,280.2056 23.87119,0"
        id="path222190"
        inkscape:connector-curvature="0" />
     <use
        height="540"
        width="960"
-       transform="translate(138.33333,-0.17678)"
+       transform="matrix(0.91864433,0,0,1,148.6473,-0.17678)"
        id="use277127"
        xlink:href="#path222190"
        y="0"
@@ -611,13 +611,13 @@
        y="0"
        xlink:href="#path222190"
        id="use277129"
-       transform="translate(414.99994,-70.2056)"
+       transform="matrix(0.89966139,0,0,1.0028625,428.10536,-71.207977)"
        width="960"
        height="540" />
     <use
        height="540"
        width="960"
-       transform="translate(414.99994,69.7944)"
+       transform="matrix(0.89966139,0,0,1.0028625,428.10536,69.192772)"
        id="use277131"
        xlink:href="#path222190"
        y="0"
@@ -627,13 +627,13 @@
        y="0"
        xlink:href="#path222190"
        id="use277133"
-       transform="translate(553.33325,69.7944)"
+       transform="matrix(0.92498625,0,0,1.0001064,562.9008,69.772036)"
        width="960"
        height="540" />
     <use
        height="540"
        width="960"
-       transform="translate(691.66653,69.7944)"
+       transform="matrix(0.91864433,0,0,1,701.9805,69.7944)"
        id="use277135"
        xlink:href="#path222190"
        y="0"
@@ -641,30 +641,30 @@
     <path
        inkscape:connector-curvature="0"
        id="path277137"
-       d="m 672.33331,210 165.0698,0"
-       style="fill:none;stroke:#204a87;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2MendEn)"
+       d="m 672.97422,209.99255 162.28314,0"
+       style="fill:none;stroke:#204a87;stroke-width:2.97472787;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2MendEn)"
        sodipodi:nodetypes="cc" />
     <path
        sodipodi:nodetypes="cc"
-       style="fill:none;stroke:#204a87;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2MendEa)"
-       d="M 396.18586,271.72032 C 464.4266,271.72032 349.62331,210 425.99994,210"
+       style="fill:none;stroke:#204a87;stroke-width:2.72888756;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-end:url(#Arrow2MendEa)"
+       d="m 396.55012,271.67907 c 56.1723,0 -38.32792,-62.04095 24.54143,-62.04095"
        id="path277155"
        inkscape:connector-curvature="0" />
     <text
        sodipodi:linespacing="125%"
        id="text277147"
        y="237.55695"
-       x="397.65466"
+       x="380.88947"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none"
        xml:space="preserve"><tspan
          y="237.55695"
-         x="397.65466"
+         x="380.88947"
          id="tspan277149"
          sodipodi:role="line">video</tspan></text>
     <use
        height="540"
        width="960"
-       transform="matrix(1,0,0,-1,0.17677997,559.32033)"
+       transform="matrix(1,0,0,-1,0.14551626,559.32033)"
        id="use277159"
        xlink:href="#path277155"
        y="0"
@@ -672,13 +672,13 @@
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:10px;line-height:125%;font-family:Sans;-inkscape-font-specification:'Sans Bold';text-align:center;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none"
-       x="412.78992"
+       x="380.75031"
        y="325.34982"
        id="text277151"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan277153"
-         x="412.78992"
+         x="380.75031"
          y="325.34982">audio</tspan></text>
     <text
        xml:space="preserve"
@@ -692,6 +692,6 @@
          x="894.64636"
          y="231">(<tspan
    id="tspan3096"
-   style="fill:#993300">TIDmaiVideoSink</tspan>)</tspan></text>
+   style="fill:#993300">xvimagesink</tspan>)</tspan></text>
   </g>
 </svg>
