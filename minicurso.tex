@@ -4,7 +4,7 @@
 \usepackage[english,brazilian]{babel}
 \usepackage{graphicx}
 
-\title{Desenvolvimento de aplicações multimídia usando GStreamer}
+\title{Desenvolvimento de aplicações multimídia usando o framework GStreamer}
 \author{XXX, YYY, ZZZ}
 
 \begin{document}
@@ -17,22 +17,13 @@
 \begin{resumo}
 \end{resumo}
 
-
-\section{Motivação}
-
-GStreamer é um dos principais \emph{frameworks} de código aberto para o
-desenvolvimento de aplicações multimídia.  Há pouca documentação atualizada
-disponível.  Além disso, a maior parte dessa documentação está em Inglês.
-[Colocar mais coisa aqui, e.g., disponibilidade, flexibilidade, controle
-  fino, base para aplicações mais complexas, etc.]
-
-
 \section{Público-alvo}
-
 Programadores, alunos de graduação e pós-graduação interessados em
-desenvolver aplicações multimídia usando o GStreamer~\cite{?}.  Os alunos
-devem possuir conhecimento básico da linguagem~C~\cite{?} e estarem
+desenvolver aplicações multimídia usando o framekwork GStreamer~\cite{?}.  
+Os alunos devem possuir conhecimento básico da linguagem~C~\cite{?} e estarem
 familiarizados com algum ambiente de desenvolvimento para essa linguagem.
+Como o minicurso será ministrado em um ambiente Linux, é desejável
+que o público tenha conhecimento básico de alguma distribuição.  
 
 
 \section{Sumário}
@@ -98,6 +89,47 @@ familiarizados com algum ambiente de desenvolvimento para essa linguagem.
 \end{enumerate}
 
 
+\section{Justificativa do interesse do curso para o público alvo}
+
+GStreamer~\cite{?} é um \emph{framework} multimídia escrito em C. Possui
+uma arquitetura modularizada facilmente extensível por plugins, 
+tornando-o bastante flexível. Atualmente é um dos principais \emph{frameworks} 
+de código aberto para o desenvolvimento de aplicações multimídia, sendo
+utilizado como backend em diversos softwares como Totem~\cite{?}, AmaroK~\cite{?},
+Rhythmbox~\cite{?}, GNOME Videos~\cite{?}, entre outros.
+
+O GStreamer usa a abstração de pipeline por onde os dados fluem 
+a partir de uma fonte de dados, são processados por diversos componentes 
+intermediários até finalmente serem renderizados, salvos em disco ou
+enviados pela rede. Desenvolver aplicações usando o GStreamer pode ser
+descrito basicamente como a especificação da composição dos componentes
+de um pipeline que processam o conteúdo multimídia. O \emph{framework} 
+suporta a sincronização de múltiplos objetos de mídia em uma apresentação
+multimídia unificada.  
+
+O \emph{framework} pode ser dividido em três partes: \emph{core}, \emph{plugins}
+e ferramentas. O \emph{core} implementa a arquitetura base que suporta o
+fluxo de dados em um pipeline composto por diversos \emph{plugins}. 
+\emph{Plugins} são interligados entre si e processam o conteúdo multimídia
+(i.e., de/codificação, de/multiplexação, filtros, renderização, etc).
+Finalmente, diversas ferramentas estão disponíveis para facilitar
+o uso do \emph{framework}. Exemplos de ferramentas são o 
+\emph{gst-inspector} (lista os plugins instalados) e o \emph{gst-launch} 
+(utilizado para construir pipelines simples via linha de comando).
+
+Atualmente há pouca documentação atualizada disponível e a maior parte
+está em inglês. Este minicurso visa disseminar o uso do GStreamer na comunidade 
+brasileira de multimídia, apresentando os conceitos básicos do 
+\emph{framework}. Espera-se ao final do minicurso que o público
+consiga criar aplicações multimídia compostas por vídeos e áudios,
+adicionando efeitos sobre os mesmos. Espera-se também que a audiência
+consiga estender o \emph{framework} criando \emph{plugins} simples.
+
+%Além disso, a maior parte dessa documentação está em Inglês.
+%[Colocar mais coisa aqui, e.g., disponibilidade, flexibilidade, controle
+%  fino, base para aplicações mais complexas, etc.]
+
+
 \section{Currículo dos autores}
 
 \noindent\emph{Guilherme F.~Lima}
@@ -111,6 +143,10 @@ familiarizados com algum ambiente de desenvolvimento para essa linguagem.
 
 
 \section{Recursos necessários}
+\begin{itemize}
+  \item Computadores com ambiente Linux instalado para os alunos
+  \item Projeto multimídia 
+\end{itemize}
 
 
 \section*{Referências}
