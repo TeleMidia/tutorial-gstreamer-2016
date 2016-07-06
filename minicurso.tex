@@ -12,26 +12,30 @@
 \usepackage[colorinlistoftodos,prependcaption,textsize=tiny]{todonotes}
 \newcommand{\rg}[1]{\todo[linecolor=blue,backgroundcolor=blue!25]{RG: #1}}
 
-\title{Programando aplicações multimídia no GStreamer}
-\author{Guilherme F.~Lima, Rodrigo C.\,M.~Santos e Roberto G.\,A.~Azevedo}
+\title{Programando aplicações multimídia no GStreamer~\rg{Prefiro o título
+anterior: ``Desenvolvimento de aplicações multimídia usando o GStreamer''}}
+\author{Guilherme F.~Lima, Rodrigo C.\,M.~Santos e Roberto
+G.\,~de~A.~Azevedo~\rg{Esta ordem tem que ser a ordem dos autores. Estou bem no
+último lugar, mas acho que é bom vocês converseram e decidirem quem será o
+primeiro autor (e terá o maior trabalho de escrita).}}
 
 \begin{document}
 \maketitle
 \begin{abstract}
 \begin{otherlanguage}{english}
-This mini-course is an introduction to GStreamer, one of the main
+This short course is an introduction to GStreamer, one of the main
 free/open-source frameworks for multimedia processing.  We start presenting
-GStreamer, its architecture and dataflow programming model, and then adopt a
-hands-on approach.  Starting with an example, a simple video player, we
+GStreamer, its architecture and the dataflow programming model, and then adopt
+a hands-on approach.  Starting with an example, a simple video player, we
 introduce each concept of GStreamer's basic C~API and implement it over the
 initial example incrementally, so that at the end of the course we get a
 complete video player, with support for the usual playback operations
 (start, stop, pause, seek, fast-forward, and rewind).  We also discuss
 sample filters---elements that manipulate audio and video samples.  We
-present the various filters available in GStreamer and show how one can
-extend the framework by creating a plugin with a custom filter that rotates
-video samples.  The only prerequisite we assume is a basic knowledge of
-the~C programming language.  At the end of the mini-course, we expect that
+present the various filters nativelly available in GStreamer and show how one
+can extend the framework by creating a plugin with a custom filter that rotates
+video samples.  The only prerequisite for the short course is a basic knowledge
+of the~C programming language.  At the end of the short course, we expect that
 participants acquire a general view of GStreamer, and be able to create
 simple applications and explore its more advanced features.
 \end{otherlanguage}
@@ -45,17 +49,15 @@ programação baseado em \emph{dataflow}, e em seguida, adotamos uma abordagem
 prática.  Partindo de um exemplo inicial, um \emph{player} de vídeo,
 introduzimos cada conceito da API~C básica do GStreamer e o implementamos
 sobre o exemplo, incrementando-o, de forma que ao final do minicurso obtemos
-um \emph{player} interativo completo, com completo suporte às operações
-usuais de reprodução de vídeo (\emph{start}, \emph{stop}, \emph{seek},
-\emph{fast-forward} e~\emph{rewind}).  Discutimos também filtros de
-amostras---elementos que manipulam as amostras de áudio e vídeo.
-Apresentamos os diversos filtros disponíveis no GStreamer e mostramos como
-estender o \emph{framework} criando um \emph{plugin} com um filtro simples
-que rotaciona amostras de vídeo.  O único pré-requisito que assumimos é um
-conhecimento básico da linguagem~C.  Ao final do minicurso, esperamos que os
-participantes tenham uma visão geral do GStreamer, e estejam aptos a criar
-aplicações simples e explorar os recursos mais avançados do
-\emph{framework}.
+um \emph{player} de vídeo interativo completo, com completo suporte às
+operações usuais de reprodução de vídeo (\emph{start}, \emph{stop},
+\emph{seek}, \emph{fast-forward} e~\emph{rewind}).  Discutimos também filtros
+de amostras---elementos que manipulam as amostras de áudio e vídeo.
+Apresentamos os diversos filtros disponíveis no GStreamer nativamente e
+mostramos como estender o \emph{framework} criando um \emph{plugin} com um
+filtro simples que rotaciona amostras de vídeo.  O único pré-requisito para o
+minicurso é um conhecimento básico da linguagem~C.  Ao final do minicurso,
+esperamos que os participantes tenham uma visão geral do GStreamer, e estejam
 \end{resumo}
 
 
@@ -186,12 +188,12 @@ Maranhão (2013).  Atualmente é pesquisador do laboratório TeleMídia/PUC-Rio
 e colaborador do laboratório LAWS/UFMA, atuando principalmente na área de
 sistemas multimídia.
 
-\noindent\emph{Roberto G.\,A.~Azevedo} possui graduação em Ciência da
-Computação pela Universidade Federal do Maranhão (2008) e mestrado (em 2010)
-e doutorado (em 2015) em Informática pela Pontifícia Universidade Católica
-do Rio de Janeiro. Tem experiência em Ciência da Computação, com ênfase em
-Sistemas Hipermídia e TV Digital, atuando principalmente em Representação e
-autoria de cenas Multimídia/Hipermídia, Vídeo 3D e TV e Vídeos Interativos.
+\noindent\emph{Roberto G.\, de A.~Azevedo} é pesquisador associado do
+Laboratório TeleMídia da PUC-Rio. Possui doutorado (2015) e mestrado (2010) em
+Informática pela PUC-Rio e é Bacharel em Ciência da Computação pela
+Universidade Federal do Maranhão (2008). Seus interesses de pesquisa incluem:
+representação e autoria de cenas multimídia interativas; e representação,
+codificação, transmissão e renderização de vídeos 3D.
 
 
 \section{Apresentador do minicurso}
@@ -201,9 +203,9 @@ Rodrigo C.\,M.~Santos.
 
 \section{Recursos necessários}
 
-Precisamos apenas de um projetor multimídia e de uma rede sem fio.  Os
-participantes, se quiserem, podem implementar os exemplos em seus
-computadores pessoais.
+Precisamos apenas de um projetor multimídia e de uma rede sem fio\rg{Com
+internet?}.  Os participantes, se quiserem, podem desenvolver os exemplos em
+seus computadores pessoais.
 
 
 \bibliographystyle{plain}
