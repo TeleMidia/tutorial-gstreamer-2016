@@ -2,7 +2,34 @@
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[english,brazilian]{babel}
-
+%
+\makeatletter
+\def\bibsize#1{\def\@bibsize{#1}}
+\def\thebibliography#1{%
+\ifnum\addauflag=0\addauthorsection\global\addauflag=1\fi
+    \subsection*{REFERENCES}
+    \@bibsize
+    \list{[\arabic{enumi}]}{%
+        \settowidth\labelwidth{[#1]}%
+        \leftmargin\labelwidth
+        \advance\leftmargin\labelsep
+        \advance\leftmargin\bibindent
+        \parsep=0pt plus 1pt
+        \itemsep=0pt plus 1pt
+        \itemindent -\bibindent
+        \listparindent \itemindent
+        \usecounter{enumi}
+    }%
+    \let\newblock\@empty
+    \sloppy
+    \clubpenalty4000
+    \@clubpenalty \clubpenalty
+    \widowpenalty4000%
+    \sfcode`\.=1000\relax
+}
+\bibsize{\normalsize}
+\makeatother
+%
 \begin{document}
 %
 \CopyrightYear{2016}%
@@ -78,7 +105,96 @@ Roberto Gerson de Albuquerque Azevedo\\
   Video player.
 }
 
-\vfill
+
+\section*{THE SHORT COURSE}
+
+\noindent
+GStreamer is currently one of the main free/open-source frameworks for
+multimedia processing.  It is flexible and robust, supports a large number
+of audio and video formats, and is widely used in both academy and
+industry~\cite{gstreamer-apps}.  In this short course, we present the
+conceptual part and the practical part of GStreamer.  In the conceptual
+part, we discuss framework's programming model, namely, the dataflow
+pipeline, which is the model adopted by most systems for serious multimedia
+processing, e.g., Pure Data~\cite{Puckette-M-S-2007},
+CLAM~\cite{Amatriain-X-2008}, DirectShow~\cite{Chatterjee-A-1997}, etc.
+Under the dataflow model, a multimedia application is structured as a
+directed graph (or pipeline) in which nodes are the processing elements and
+edges represent connections between elements over which audio and video
+samples, and control data flow.  The dataflow model is particularly
+attractive for multimedia processing because it supports implementations
+that are naturally parallel, modular, and scalable~\cite{Yviquel-H-2014}.
+
+In the practical part, we present the main concepts of GStreamer's C~API and
+illustrate their use by constructing a simple video player.  Though here we
+are mainly interested in video playback, i.e., decoding and presentation,
+this same API can be used to capture, encode, and transmit audio and video
+streams.  GStreamer natively supports a great variety of components to deal
+with each of the these processing phases, and can thus be used in the
+construction of applications ranging from audio and video editors,
+transcoders, and transmitters, to media players.
+
+For this reason, we believe that not only programmers, but any person
+interested in multimedia processing might benefit from this short course.
+The only requirements are a basic knowledge of the C~programming
+language~\cite{Kernighan-B-W-1988} and familiarity with some developing
+environment.  The course examples assume a GNU/Linux environment, thus some
+basic Unix knowledge is also desirable though not mandatory.
+
+The short course consists of the following eight parts.
+\begin{description}
+\item[Introduction to GStreamer.] We give an overall presentation of
+  GStreamer---its history, architecture, software license, notable users,
+  and dependencies, plus the supported formats and platforms---and also
+  discuss its programming model: the pipeline dataflow.
+\item[Hello world: A video player.]  We present the first version of the
+  video player example which serves as a basis for the rest of the topics
+  addressed in the course.  This first version is built upon the high-level
+  \texttt{playbin} API, which is one of the simplest ways to implement an
+  audio or video player in GStreamer.
+\item[Basic concepts: Analyzing the previous example.] We discuss what is
+  behind the apparently simple code of the previous example.  We begin by
+  showing the pipeline constructed and maintained internally by the
+  \texttt{playbin} element, and use this pipeline as a model to introduce
+  the basic concepts of GStreamer: element, pad, caps, clock, buffer, event,
+  message, bus, bin, and pipeline.  After presenting each of these concepts,
+  we get back to coding and re-implement the same video player example but
+  this time using GStreamer's core API.  Though one can generally rely on
+  \texttt{playbin} to implement simple media players, complex applications
+  demand a deep knowledge of the core API.  For this reason, from this point
+  on we focus on the core API syntax and operation model.  Finally, we
+  discuss the tools \texttt{gst-inspect} and \texttt{gst-launch}.  The
+  former can be used to query the elements available in a particular
+  installation, and the latter can be used to construct a pipeline directly
+  on the command-line.
+\item[Filter elements.] We present the main audio and filters available in
+  the standard GStreamer installation and discuss how these can be
+  integrated into the video player example.  At this point, we present the
+  result of combining the example with different filters, and also discuss
+  how filter parameters can be modified dynamically at run-time.
+\item[Input and output.]  We add support to keyboard and mouse input to the
+  video player example, and also show how to redirect the output video
+  samples to a specific OS-level window---up to this point, the example was
+  rendering on a new window created automatically by one of the pipeline
+  elements.
+\item[Pause, seek, fast-forward and rewind.]  We discuss the theory and
+  implementation (over the video player example) of the usual playback
+  operations: pause, seek, fast-forward and rewind.  We also discuss the
+  problems involved in supporting each of these operations and the
+  situations in which they may fail.
+\item[Plugins.]  We preset GStreamer's plugin architecture and implement a
+  custom video filter element.  Besides show\-ing its code, we discuss how
+  the custom element can be wrapped into a plugin and installed in the
+  system, and how it can be used by other GStreamer applications, in
+  particular, how it can be used by the original video player example.
+\item[Conclusion.]  We discuss briefly some advanced topics, such as dynamic
+  changes in pipeline topology, the implementation of sample mixers,
+  inter-pipeline synchronization, audio and video capturing, encoding and
+  decoding, transmission on network, and language bindings, and conclude the
+  course by pointing out references for further study.
+\end{description}
+
+
 \section*{BIO}
 
 \noindent\emph{Guilherme F.~Lima} is an associate researcher at the TeleMídia
@@ -104,4 +220,7 @@ Computer Scientist from the Federal University of Maranhão (UFMA)
 (2008). His research interests include authoring and representation of
 multimedia scenes; and 3D video representation, coding, transmission, and
 rendering.
+
+\bibliographystyle{plain}
+\bibliography{bib}
 \end{document}
