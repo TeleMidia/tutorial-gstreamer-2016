@@ -114,7 +114,7 @@ multimedia processing.  It is flexible and robust, supports a large number
 of audio and video formats, and is widely used in both academy and
 industry~\cite{gstreamer-apps}.  In this short course, we present the
 conceptual part and the practical part of GStreamer.  In the conceptual
-part, we discuss framework's programming model, namely, the dataflow
+part, we discuss the framework's programming model, namely, the dataflow
 pipeline, which is the model adopted by most systems for serious multimedia
 processing, e.g., Pure Data~\cite{Puckette-M-S-2007},
 CLAM~\cite{Amatriain-X-2008}, DirectShow~\cite{Chatterjee-A-1997}, etc.
@@ -143,7 +143,7 @@ basic Unix knowledge is also desirable though not mandatory.
 
 The short course consists of the following eight parts.
 \begin{description}
-\item[Introduction to GStreamer.] We give an overall presentation of
+\item[Introduction to GStreamer.]  We give an overall presentation of
   GStreamer---its history, architecture, software license, notable users,
   and dependencies, plus the supported formats and platforms---and also
   discuss its programming model: the pipeline dataflow.
@@ -152,7 +152,7 @@ The short course consists of the following eight parts.
   addressed in the course.  This first version is built upon the high-level
   \texttt{playbin} API, which is one of the simplest ways to implement an
   audio or video player in GStreamer.
-\item[Basic concepts: Analyzing the previous example.] We discuss what is
+\item[Basic concepts: Analyzing the previous example.]  We discuss what is
   behind the apparently simple code of the previous example.  We begin by
   showing the pipeline constructed and maintained internally by the
   \texttt{playbin} element, and use this pipeline as a model to introduce
@@ -167,11 +167,11 @@ The short course consists of the following eight parts.
   former can be used to query the elements available in a particular
   installation, and the latter can be used to construct a pipeline directly
   on the command-line.
-\item[Filter elements.] We present the main audio and filters available in
+\item[Filter elements.]  We present the main audio and filters available in
   the standard GStreamer installation and discuss how these can be
   integrated into the video player example.  At this point, we present the
   result of combining the example with different filters, and also discuss
-  how filter parameters can be modified dynamically at run-time.
+  how filter parameters can be dynamically modified, at run-time.
 \item[Input and output.]  We add support to keyboard and mouse input to the
   video player example, and also show how to redirect the output video
   samples to a specific OS-level window---up to this point, the example was
@@ -182,9 +182,9 @@ The short course consists of the following eight parts.
   operations: pause, seek, fast-forward and rewind.  We also discuss the
   problems involved in supporting each of these operations and the
   situations in which they may fail.
-\item[Plugins.]  We preset GStreamer's plugin architecture and implement a
+\item[Plugins.]  We present GStreamer's plugin architecture and implement a
   custom video filter element.  Besides show\-ing its code, we discuss how
-  the custom element can be wrapped into a plugin and installed in the
+  a custom element can be wrapped into a plugin and installed in the
   system, and how it can be used by other GStreamer applications, in
   particular, how it can be used by the original video player example.
 \item[Conclusion.]  We discuss briefly some advanced topics, such as dynamic
@@ -214,10 +214,10 @@ programming and multimedia programming languages.
 
 \vskip\baselineskip
 \noindent\emph{Roberto Gerson de Albuquerque Azevedo} is an associate
-researcher at TeleMídia Lab/PUC-Rio. He earned his Ph.D. (2015) and Masters
-(2010) degrees in Informatics from PUC-Rio. He also received the degree of
+researcher at TeleMídia Lab/PUC-Rio.  He earned his Ph.D. (2015) and Masters
+(2010) degrees in Informatics from PUC-Rio.  He also received the degree of
 Computer Scientist from the Federal University of Maranhão (UFMA)
-(2008). His research interests include authoring and representation of
+(2008).  His research interests include authoring and representation of
 multimedia scenes; and 3D video representation, coding, transmission, and
 rendering.
 
