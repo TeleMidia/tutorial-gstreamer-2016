@@ -1,4 +1,4 @@
-TARGETS= minicurso.pdf minicurso_bio.pdf
+TARGETS= minicurso_proposal.pdf minicurso_bio.pdf
 
 .PHONY: all
 all: $(TARGETS)
