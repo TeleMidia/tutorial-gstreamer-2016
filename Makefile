@@ -1,4 +1,4 @@
-TARGETS= minicurso_proposal.pdf minicurso_bio.pdf
+TARGETS= minicurso.pdf minicurso_proposal.pdf minicurso_bio.pdf
 
 .PHONY: all
 all: $(TARGETS)
@@ -9,4 +9,4 @@ clean:
 
 .SUFFIXES: .pdf .tex
 .tex.pdf:
-	latexmk -pdf $<
+	latexmk -pdf -shell-escape $<
