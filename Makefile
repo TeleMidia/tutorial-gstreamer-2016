@@ -1,11 +1,12 @@
-TARGETS= minicurso.pdf minicurso_proposal.pdf minicurso_bio.pdf
+TARGETS= bio.pdf proposal.pdf chapter.pdf
 
 .PHONY: all
 all: $(TARGETS)
 
 .PHONY: clean
 clean:
-	latexmk -C
+	-latexmk -C
+	-rm -f *.bbl
 
 .SUFFIXES: .pdf .tex
 .tex.pdf:
