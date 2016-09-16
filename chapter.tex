@@ -238,22 +238,32 @@ e consumidores apenas consomem dados.
   \label{fig:pipeline-tipico}
 \end{figure}
 
-Na figura anterior, há um elemento produtor (``filesrc''), três
-processadores (``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois
-consumidores (``alsasink'' e ``ximagesink'').  O elemento ``filesrc'' possui
-uma única \en{source pad} que está conectada à \en{sink pad} do elemento
-subsequente, ``oggdemux'', ou seja, os dados produzidos pelo elemento
-``filesrc'' fluem através da sua \en{source pad} para a \en{sink pad} do
-elemento ``oggdemux''.  No diagrama essa conexão é representada pela aresta
-direcionada entre os elementos ``filesrc'' e ``oggdemux''.  De fato, cada
-aresta do diagrama denota uma conexão entre uma \en{source pad} e uma
-\en{sink pad}.
+Na figura acima, há um elemento produtor (``filesrc''), três processadores
+(``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois consumidores
+(``alsasink'' e ``ximagesink'').  O elemento ``filesrc'' possui uma única
+\en{source pad} que está conectada à \en{sink pad} do elemento subsequente,
+``oggdemux'', ou seja, os dados produzidos pelo elemento ``filesrc'' fluem
+através da sua \en{source pad} para a \en{sink pad} do elemento
+``oggdemux''.  No diagrama a conexão entre as \en{pads} é representada pela
+aresta direcionada entre os elementos ``filesrc'' e ``oggdemux''.
+Similarmente, as demais arestas do diagrama denotam conexões entre
+\en{source pads} e \en{sink pads}.
 
+% Construir uma aplicação GStreamer é ``montar''
 
+O \en{pipeline} da Figura~\ref{fig:pipeline-tipico} opera da seguinte forma.
+O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de arquivos e
+escreve o fluxo de bytes resultantes na sua \en{source pad}.  Ogg é um
+formato para multiplexação de fluxos de áudio, vídeo e texto.
 
 
 \section{Olá mundo: Tocando um vídeo}
 \label{sec:ola}
+
+% Nesta seção...  Poderíamos usar implementar pipeline da figura para fazer
+% nosso "olá mundo"---e é exatamente isso que vamos fazer na seção 3---mas
+% há um jeito mais fácil.  Elementos encapsulam
+% funcionalidade... gst-inspect
 
 
 \section{Dissecando o exemplo anterior}
