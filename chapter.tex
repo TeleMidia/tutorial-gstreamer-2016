@@ -10,6 +10,7 @@
 \usepackage{amssymb}
 \usepackage{amsthm}
 \usepackage{mathtools}
+\usepackage{float}
 \usepackage{natbib}
 \setlength{\bibsep}{0.0pt}
 %%
@@ -189,14 +190,24 @@ nos atores e pode ser reusada em diversos pontos do \en{dataflow};
 e~(iii)~escalável porque a estrutura é naturalmente composicional---um
 \en{dataflow} pode ser visto como um ator e vice versa.
 
-A Figura~\ref{?} apresenta o leiaute de um \en{pipeline} típico para
-processamento multimídia.  O leiaute nesse caso é de um pipeline de uma
-aplicação GStreamer que decodifica e reproduz um vídeo em tempo real.  Os
-nós representam atores---elementos na terminologia do GStreamer---e as
-arestas representam as conexões por onde fluem as amostras de áudio e vídeo
-e informações de controle.
+A Figura~\ref{fig:pipeline-tipico} apresenta o leiaute de um \en{pipeline}
+típico para processamento multimídia.  O leiaute nesse caso é de um pipeline
+de uma aplicação GStreamer que decodifica e reproduz um vídeo em tempo real.
+Os nós representam atores e as arestas representam as conexões por onde
+fluem as amostras de áudio e vídeo e informações de controle.  Na
+terminologia do GStreamer os atores do são chamados de ``elementos'' e as
+portas de~``\en{pads}''.  Há dois tipos de \en{pads}, \en{sink pads} e
+\en{source pads}.  As \en{sink pads} são as portas de entrada através das
+quais o elemento consome dados, e as \en{source pads} são as portas de saída
+através das quais o elemento produz dados.  Os elementos são classificados
+de acordo com o tipo de suas \en{pads}.  Elementos produtores (\en{sources})
+possuem apenas \en{source pads}, elementos processadores possuem ambos os
+tipos, \en{source pads} e \en{sink pads}, e elementos consumidores
+(\en{sinks}) possuem apenas \en{sink pads}.  Consequentemente, produtores
+apenas produzem dados, processadores consomem e produzem dados resultantes,
+e consumidores apenas consomem dados.
 
-\begin{figure}[h]
+\begin{figure}[H]
   \centering
   \begin{tikzpicture}
     \node (filesrc) [element] {filesrc};
@@ -227,11 +238,18 @@ e informações de controle.
   \label{fig:pipeline-tipico}
 \end{figure}
 
+Na figura anterior, há um elemento produtor (``filesrc''), três
+processadores (``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois
+consumidores (``alsasink'' e ``ximagesink'').  O elemento ``filesrc'' possui
+uma única \en{source pad} que está conectada à \en{sink pad} do elemento
+subsequente, ``oggdemux'', ou seja, os dados produzidos pelo elemento
+``filesrc'' fluem através da sua \en{source pad} para a \en{sink pad} do
+elemento ``oggdemux''.  No diagrama essa conexão é representada pela aresta
+direcionada entre os elementos ``filesrc'' e ``oggdemux''.  De fato, cada
+aresta do diagrama denota uma conexão entre uma \en{source pad} e uma
+\en{sink pad}.
 
-No GStreamer, elementos podem ser de três tipos:  (1)~produtores
-(\en{sources}), que apenas produzem dados; (2)~processadores, que consomem,
-operam e produzem dados; e~(3) consumidores (\en{sinks}), que apenas
-consomem dados.
+
 
 
 \section{Olá mundo: Tocando um vídeo}
