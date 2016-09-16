@@ -13,11 +13,13 @@
 \usepackage{natbib}
 \setlength{\bibsep}{0.0pt}
 %%
+\def\en#1{\foreignlanguage{english}{\emph{#1}}}
+%%
 \title{Programando aplicações multimídia no GStreamer}
 \author{%
-  Guilherme F.~Lima,
-  Rodrigo C.\,M.~Santos,
-  Roberto G.\,~de~A.~Azevedo
+  Guilherme F\null.~Lima,
+  Rodrigo C\null.\,M.~Santos,
+  Roberto G\null.\,~de~A.~Azevedo
 }
 \begin{document}
 \maketitle
@@ -45,122 +47,143 @@
 \end{abstract}
 \begin{resumo}
   Este minicurso é uma introdução ao GStreamer, um dos principais
-  \emph{frameworks} de código livre/aberto para processamento de dados
+  \en{frameworks} de código livre/aberto para processamento de dados
   multimídia.  Começamos apresentando o GStreamer, sua arquitetura e modelo
-  de programação baseado em \emph{dataflow}, e em seguida, adotamos uma
-  abordagem prática.  Partindo de um exemplo inicial, um \emph{player} de
+  de programação baseado em \en{dataflow}, e em seguida, adotamos uma
+  abordagem prática.  Partindo de um exemplo inicial, um \en{player} de
   vídeo, introduzimos cada conceito da API~C básica do GStreamer e o
   implementamos sobre o exemplo, incrementando-o, de forma que ao final do
-  minicurso obtemos um \emph{player} de vídeo interativo completo, com
-  suporte às operações usuais de reprodução de vídeo (\emph{start},
-  \emph{stop}, \emph{seek}, \emph{fast-forward} e~\emph{rewind}).
-  Discutimos também filtros de amostras---elementos que manipulam as
-  amostras de áudio e vídeo.  Apresentamos os diversos filtros disponíveis
-  nativamente no GStreamer e mostramos como estender o \emph{framework}
-  criando um \emph{plugin} com um filtro simples que manipula amostras de
-  vídeo.  O único pré-requisito para o minicurso é um conhecimento básico da
-  linguagem de programação~C.  Ao final do minicurso, esperamos que os
-  participantes tenham uma visão geral do GStreamer, e estejam aptos a criar
-  aplicações simples e explorar os recursos mais avançados do
-  \emph{framework}.
+  minicurso obtemos um \en{player} de vídeo interativo completo, com suporte
+  às operações usuais de reprodução de vídeo (\en{start}, \en{stop},
+  \en{seek}, \en{fast-forward} e~\en{rewind}).  Discutimos também filtros de
+  amostras---elementos que manipulam as amostras de áudio e vídeo.
+  Apresentamos os diversos filtros disponíveis nativamente no GStreamer e
+  mostramos como estender o \en{framework} criando um \en{plugin} com um
+  filtro simples que manipula amostras de vídeo.  O único pré-requisito para
+  o minicurso é um conhecimento básico da linguagem de programação~C\null.
+  Ao final do minicurso, esperamos que os participantes tenham uma visão
+  geral do GStreamer, e estejam aptos a criar aplicações simples e explorar
+  os recursos mais avançados do \en{framework}.
 \end{resumo}
 
 
 \section{Introdução}
-\label{sc:intro}
+\label{sec:intro}
 
-O GStreamer~\cite{gstreamer} é um dos principais \emph{frameworks} de código
+O GStreamer~\cite{gstreamer} é um dos principais \en{frameworks} de código
 livre/aberto para processamento de dados multimídia.  Além de robusto e
 flexível, ele suporta diversos formatos de áudio e vídeo, e é amplamente
-utilizado na indústria e academia~\cite{gstreamer-apps}.  O \emph{framework}
-em si consiste de um conjunto de bibliotecas~C e ferramentas relacionadas.
-Neste minicurso, apresentamos tanto a base conceitual quanto a parte prática
-do \emph{framework}.
+utilizado na indústria e na academia~\cite{gstreamer-apps}.
+O \en{framework} em si consiste de um conjunto de bibliotecas~C e
+ferramentas relacionadas.  Neste minicurso, apresentamos tanto a parte
+conceitual quanto a prática do \en{framework}.
 
-Na parte conceitual, discutimos o modelo de computação \emph{dataflow} no
-qual o GStreamer se baseia, e que também é adotado por outros
-\emph{frameworks} multimídia, por exemplo, Pure
-Data~\cite{Puckette-M-S-2007}, CLAM~\cite{Amatriain-X-2008},
-DirectShow~\cite{Chatterjee-A-1997}, etc.  Nesse modelo, uma aplicação
-multimídia estrutura-se como um grafo (\emph{pipeline}) em que os nós são
-elementos processadores e as arestas representam conexões entre elementos
-por onde fluem as amostras de áudio e vídeo e dados de controle.  O modelo
-de \emph{dataflow} é particularmente interessante para multimídia porque
-possibilita implementações naturalmente paralelas, modulares e
+Na parte conceitual, discutimos o modelo de computação \en{dataflow} no qual
+o GStreamer se baseia, e que também é adotado por outros \en{frameworks} e
+linguagens multimídia, por exemplo, DirectShow~\cite{Chatterjee-A-1997},
+Pure Data~\cite{Puckette-M-S-2007}, CLAM~\cite{Amatriain-X-2008},
+ChucK~\cite{Wang-G-2003}, Faust~\cite{Orlarey-Y-2009}, etc.  Nesse modelo,
+uma aplicação multimídia estrutura-se como um grafo (\en{pipeline}) em que
+os nós são elementos processadores e as arestas representam conexões entre
+elementos por onde fluem as amostras de áudio e vídeo e dados de controle.
+O modelo de \en{dataflow} é particularmente interessante para multimídia
+porque possibilita implementações naturalmente paralelas, modulares e
 escaláveis~\cite{Yviquel-H-2014}.
 
 Na parte prática, apresentamos os principais conceitos da API~C básica do
-GStreamer~1.8, sua versão estável mais atual, e ilustramos o uso dessa API a
-partir da construção de um \emph{player} de vídeo.  Apesar de aqui estarmos
-interessados apenas na reprodução (isto é, decodificação e apresentação) de
-fluxos de mídia, essa mesma API pode ser utilizada para capturar fluxos de
-áudio e vídeo, codificá-los e transmiti-los na rede.  O GStreamer suporta
-nativamente uma grande variedade de componentes para tratar cada uma dessas
-fases de processamento e, portanto, pode ser usado para construir diversos
-tipos de aplicações multimídia, tais como editores de vídeo,
-\emph{transcorders}, transmissores de fluxos de mídia, \emph{players} de
-mídia, e \emph{players} de linguagens multimídia.
+GStreamer~1.10, sua versão estável mais atual, e ilustramos o uso dessa API
+a partir da construção de um reprodutor (\en{player}) de vídeo.  Apesar de
+aqui estarmos interessados apenas na reprodução (decodificação e
+apresentação) de fluxos de mídia, essa mesma API pode ser utilizada para
+capturar fluxos de áudio e vídeo, codificá-los e transmiti-los na rede.
+O GStreamer suporta nativamente uma grande variedade de componentes para
+tratar cada uma dessas fases de processamento e, portanto, pode ser usado
+para construir diversos tipos de aplicações multimídia tais como editores de
+vídeo, transcodificadores, transmissores de fluxos de mídia, \en{players} de
+mídia, e motores de renderização de linguagens multimídia.
 
-%% Organização do capítulo.
+O restante do capítulo está organizado da seguinte forma.  Na
+Seção~\ref{sec:ola} apresentamos uma versão preliminar do exemplo base do
+minicurso: um \en{player} de vídeo simples porém funcional.  Na
+Seção~\ref{sec:dissec} discutimos o que está por trás do código
+aparentemente simples do exemplo anterior e reconstruímos o mesmo exemplo
+usando a API básica (baixo nível) do GStreamer---a versão reconstruída é o
+ponto de partida dos incrementos posteriores.  Na Seção~\ref{sec:filtros}
+apresentamos os principais filtros de áudio e vídeo disponíveis no GStreamer
+e discutimos como integrá-los ao exemplo.  Na Seção~\ref{sec:e/s}
+adicionamos suporte à eventos de teclado e mouse ao \en{player} de vídeo, e
+mostramos como injetar ou extrair amostras de uma aplicação GStreamer.  Na
+Seção~\ref{sec:ops} discutimos a teoria por trás das operações usuais de
+controle de reprodução (\en{pause}, \en{seek}, \en{fast-foward}
+e~\en{rewind}) e implementamos suporte a cada uma delas no exemplo.  Na
+Seção~\ref{sec:plugins} apresentamos a arquitetura de \en{plugins} do
+GStreamer e mostramos como implementar e integrar ao exemplo um
+\emph{plugin} simples contendo um elemento que manipula amostras de vídeo.
+Finalmente, na Seção~\ref{sec:conclusao} discutimos brevemente algumas
+funcionalidades avançadas do \en{framework} e apresentamos nossas
+considerações finais.
+
+Antes de ``mergulhar'' no código porém, é preciso entender o modelo
+conceitual de computação no qual o GStreamer se baseia.  No restante dessa
+seção apresentamos esse modelo, \emph{dataflow}, e discutimos a sua
+instanciação particular no GStreamer.
 
 
-\subsection*{Histórico}
-%% Breve histórico: InfoPipes, versões, quem usa
-
-
-\subsection*{O modelo \emph{dataflow}}
+\subsection*{O modelo \en{dataflow} e sua instanciação no GStreamer}
 %% Dataflow
 
-No modelo de computação \emph{dataflow} os dados são processados enquanto
+No modelo de computação \en{dataflow} os dados são processados enquanto
 ``fluem'' através de uma rede.  Essa rede estrutura-se como um grafo
 dirigido em que os nós representam elementos de processamento, ou atores, e
 as arestas representam conexões por onde fluem os dados.  Os atores recebem
 dados através de suas portas de entrada e emitem dados através de suas porta
 de saída.  Além disso, conceitualmente, atores são ativados por entrada,
 isto é, executam sempre que os dados necessários estão disponíveis em suas
-portas de entrada.  Um \emph{pipeline} é um \emph{dataflow} em que os dados
-fluem através das arestas na mesma ordem em que foram produzidos.  O modelo
-de computação \emph{dataflow}, e em especial, o modelo de \emph{pipeline} é
-interessante para multimídia porque aproxima a estrutura real do sistema da
-sua descrição abstrata, idealizada na forma de diagrama de fluxo.  Além
-disso, o modelo de \emph{dataflow} induz implementações flexíveis e
-eficientes já que ele é naturalmente paralelo, modular e escalável.
+portas de entrada.
 
-A Figura~\ref{?} apresenta o leiaute de um \emph{pipeline} típico para
+Um \en{pipeline} é um \en{dataflow} em que os dados fluem através das
+arestas na mesma ordem em que foram produzidos.  O modelo de computação
+\en{dataflow}, e em especial, o modelo de \en{pipeline} é interessante para
+multimídia porque aproxima a estrutura real do sistema da sua descrição
+abstrata, idealizada na forma de diagrama de fluxo.  Além disso, o modelo de
+\en{dataflow} induz implementações flexíveis e eficientes já que ele é
+naturalmente paralelo, modular e escalável: (1)~paralelo porque
+conceitualmente os atores executam independentemente uns dos outros;
+(2)~modular porque a lógica de processamento está encapsulada nos atores e
+pode ser reusada em diversos pontos do \en{dataflow}; e~(3)~escalável porque
+a estrutura é naturalmente composicional---um \en{dataflow} pode ser visto
+como um ator e vice versa.
+
+A Figura~\ref{?} apresenta o leiaute de um \en{pipeline} típico para
 processamento multimídia.  O leiaute nesse caso é de um pipeline de uma
 aplicação GStreamer que decodifica e reproduz um vídeo em tempo real.  Os
 nós representam atores e as arestas representam as conexões por onde fluem
 as amostras de áudio e vídeo e informações de controle.
 
 No GStreamer, os atores---ou elementos na terminologia do
-\emph{framework}---podem ser de três tipos:  (1)~produtores
-(\emph{sources}), que apenas produzem dados; (2)~processadores, que
-consomem, operam e produzem dados; e~(3) consumidores (\emph{sinks}), que
-apenas consomem dados.
-
-
-\subsection*{Pré-requisitos}
-%% Arquitetura; versão, plataforma, etc.
+\en{framework}---podem ser de três tipos:  (1)~produtores (\en{sources}),
+que apenas produzem dados; (2)~processadores, que consomem, operam e
+produzem dados; e~(3) consumidores (\en{sinks}), que apenas consomem dados.
 
 
 \section{Olá mundo: Tocando um vídeo}
 \label{sec:ola}
 
 
-\section{Conceitos básicos}
-\label{sec:conceitos}
-
-
-\section{Entrada e saída}
-\label{sec:e/s}
+\section{Dissecando o exemplo anterior}
+\label{sec:dissec}
 
 
 \section{Filtros}
 \label{sec:filtros}
 
 
-\section{\emph{Pause}, \emph{seek},
-  \emph{fast-forward} e~\emph{rewind}}
+\section{Entrada e saída}
+\label{sec:e/s}
+
+
+\section{\en{Pause}, \en{seek}, \en{fast-forward}
+  e~\en{rewind}}
 \label{sec:ops}
 
 
@@ -171,10 +194,10 @@ apenas consomem dados.
 \section{Conclusão}
 \label{sec:conclusao}
 
-
 
 \bibliographystyle{plain}
 \bibliography{bib}
 \end{document}
 % LocalWords:  GStreamer LocalWords mutiplexadores demultiplexadores sinks
-%  LocalWords:  dataflow sources
+%  LocalWords:  dataflow sources framework frameworks DirectShow Pure seek
+%  LocalWords:  player players fast-foward rewind plugins

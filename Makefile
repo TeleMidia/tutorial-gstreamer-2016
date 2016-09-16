@@ -1,4 +1,4 @@
-TARGETS= bio.pdf proposal.pdf chapter.pdf
+TARGETS= chapter.pdf
 
 .PHONY: all
 all: $(TARGETS)
