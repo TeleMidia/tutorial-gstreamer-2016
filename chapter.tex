@@ -13,6 +13,42 @@
 \usepackage{natbib}
 \setlength{\bibsep}{0.0pt}
 %%
+\usepackage{tikz}
+\usetikzlibrary{arrows,calc,positioning}
+\newdimen\hdim                  % element height
+\newdimen\wdim                  % element width
+\newdimen\odim                  % offset distance
+\hdim=2.25em
+\wdim=2.36\hdim
+\odim=\hdim
+\tikzstyle{element}=[
+    draw=black!60,
+  font={\scriptsize\sffamily},
+  inner sep=0pt,
+  minimum height=\hdim,
+  minimum width=\wdim,
+  outer sep=0pt,
+  rectangle,
+  rounded corners=\wdim/10,
+  text centered,
+  thick,
+  top color=white,
+  bottom color=black!20,
+]
+\tikzstyle{arrow}=[
+  ->,
+  >=stealth,
+  color=black!60,
+  draw=black!60,
+  shorten >=.5pt,
+  thick,
+]
+\tikzstyle{arrowlabel}=[
+  color=black!60,
+  font={\tiny\sffamily\bfseries},
+]
+\tikzset{node distance=\wdim+\odim}
+%%
 \def\en#1{\foreignlanguage{english}{\emph{#1}}}
 %%
 \title{Programando aplicações multimídia no GStreamer}
@@ -88,7 +124,7 @@ os nós são elementos processadores e as arestas representam conexões entre
 elementos por onde fluem as amostras de áudio e vídeo e dados de controle.
 O modelo de \en{dataflow} é particularmente interessante para multimídia
 porque possibilita implementações naturalmente paralelas, modulares e
-escaláveis~\cite{Yviquel-H-2014}.
+escaláveis.
 
 Na parte prática, apresentamos os principais conceitos da API~C básica do
 GStreamer~1.10, sua versão estável mais atual, e ilustramos o uso dessa API
@@ -139,31 +175,63 @@ as arestas representam conexões por onde fluem os dados.  Os atores recebem
 dados através de suas portas de entrada e emitem dados através de suas porta
 de saída.  Além disso, conceitualmente, atores são ativados por entrada,
 isto é, executam sempre que os dados necessários estão disponíveis em suas
-portas de entrada.
-
-Um \en{pipeline} é um \en{dataflow} em que os dados fluem através das
-arestas na mesma ordem em que foram produzidos.  O modelo de computação
+portas de entrada.  Um \en{pipeline} é um \en{dataflow} em que os dados
+fluem através das arestas na mesma ordem em que foram
+produzidos~\cite{Kahn-G-1977,Lee-E-A-1995}.  O modelo de computação
 \en{dataflow}, e em especial, o modelo de \en{pipeline} é interessante para
 multimídia porque aproxima a estrutura real do sistema da sua descrição
-abstrata, idealizada na forma de diagrama de fluxo.  Além disso, o modelo de
-\en{dataflow} induz implementações flexíveis e eficientes já que ele é
-naturalmente paralelo, modular e escalável: (1)~paralelo porque
-conceitualmente os atores executam independentemente uns dos outros;
-(2)~modular porque a lógica de processamento está encapsulada nos atores e
-pode ser reusada em diversos pontos do \en{dataflow}; e~(3)~escalável porque
-a estrutura é naturalmente composicional---um \en{dataflow} pode ser visto
-como um ator e vice versa.
+abstrata, idealizada na forma de diagrama de fluxo~\cite{Yviquel-H-2014}.
+Além disso, o modelo de \en{dataflow} induz implementações flexíveis e
+eficientes já que ele é naturalmente paralelo, modular e escalável:
+(i)~paralelo porque conceitualmente os atores executam independentemente uns
+dos outros; (ii)~modular porque a lógica de processamento está encapsulada
+nos atores e pode ser reusada em diversos pontos do \en{dataflow};
+e~(iii)~escalável porque a estrutura é naturalmente composicional---um
+\en{dataflow} pode ser visto como um ator e vice versa.
 
 A Figura~\ref{?} apresenta o leiaute de um \en{pipeline} típico para
 processamento multimídia.  O leiaute nesse caso é de um pipeline de uma
 aplicação GStreamer que decodifica e reproduz um vídeo em tempo real.  Os
-nós representam atores e as arestas representam as conexões por onde fluem
-as amostras de áudio e vídeo e informações de controle.
+nós representam atores---elementos na terminologia do GStreamer---e as
+arestas representam as conexões por onde fluem as amostras de áudio e vídeo
+e informações de controle.
 
-No GStreamer, os atores---ou elementos na terminologia do
-\en{framework}---podem ser de três tipos:  (1)~produtores (\en{sources}),
-que apenas produzem dados; (2)~processadores, que consomem, operam e
-produzem dados; e~(3) consumidores (\en{sinks}), que apenas consomem dados.
+\begin{figure}[h]
+  \centering
+  \begin{tikzpicture}
+    \node (filesrc) [element] {filesrc};
+    \node [coordinate, above=.5\hdim of filesrc] (A) {};
+    \node [coordinate, below=.5\hdim of filesrc] (B) {};
+    %%
+    \node (oggdemux) [element, right of=filesrc] {oggdemux};
+    \node [coordinate, right of=oggdemux] (C) {};
+    %%
+    \node (vorbisdec) [element] at (C|-A) {vorbisdec};    
+    \node (alsasink) [element, right of=vorbisdec] {alsasink};
+    \node (theoradec) [element] at (C|-B) {theoradec};
+    \node (ximagesink) [element, right of=theoradec] {ximagesink};
+    %%
+    \draw [arrow] (filesrc) -- (oggdemux);
+    \node [coordinate] (X) at ($(oggdemux.east)+(0,.25\hdim)$) {};
+    \node [coordinate] (Y) at ($(oggdemux.east)+(0,-.25\hdim)$) {};
+    \draw [arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+                      -- ($(vorbisdec.west)-(\odim/3,0)$)
+                      -- (vorbisdec.west);
+    \draw [arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+                      -- ($(theoradec.west)-(\odim/3,0)$)
+                      -- (theoradec.west);
+    \draw [arrow] (vorbisdec) -- (alsasink);
+    \draw [arrow] (theoradec) -- (ximagesink);
+  \end{tikzpicture}
+  \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
+  \label{fig:pipeline-tipico}
+\end{figure}
+
+
+No GStreamer, elementos podem ser de três tipos:  (1)~produtores
+(\en{sources}), que apenas produzem dados; (2)~processadores, que consomem,
+operam e produzem dados; e~(3) consumidores (\en{sinks}), que apenas
+consomem dados.
 
 
 \section{Olá mundo: Tocando um vídeo}
