@@ -7,8 +7,6 @@
 \usepackage{hyperref}
 \hypersetup{colorlinks=true,allcolors=black}
 \usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{amsthm}
 \usepackage{mathtools}
 \usepackage{float}
 \usepackage{natbib}
@@ -166,7 +164,6 @@ a forma como ele é instanciado no GStreamer.
 
 
 \subsection*{O modelo \en{dataflow} e sua instanciação no GStreamer}
-%% Dataflow
 
 No modelo de computação \en{dataflow} os dados são processados enquanto
 ``fluem'' através de uma rede.  Essa rede estrutura-se como um grafo
@@ -191,20 +188,20 @@ e~(iii)~escalável porque a estrutura é naturalmente composicional---um
 
 A Figura~\ref{fig:pipeline-tipico} apresenta o leiaute de um \en{pipeline}
 típico para processamento multimídia.  O \en{pipeline} nesse caso é o de uma
-aplicação GStreamer que reproduz um vídeo Ogg em tempo real.  Os nós da
-figura representam atores e as arestas representam as conexões por onde
-fluem as amostras de áudio e vídeo e dados de controle.  Na terminologia do
-GStreamer os atores do são chamados de ``elementos'' e as portas
-de~``\en{pads}''.  Há dois tipos de \en{pads}, \en{sink pads} e \en{source
-  pads}.  As \en{sink pads} são as portas de entrada através das quais o
-elemento consome dados, e as \en{source pads} são as portas de saída através
-das quais o elemento produz dados.  Os elementos são classificados de acordo
-com o tipo de suas \en{pads}.  Elementos produtores (\en{sources}) possuem
-apenas \en{source pads}, elementos processadores possuem ambos os tipos,
-\en{source pads} e \en{sink pads}, e elementos consumidores (\en{sinks})
-possuem apenas \en{sink pads}.  Consequentemente, produtores apenas produzem
-dados, processadores consomem e produzem dados, e consumidores apenas
-consomem dados.
+aplicação GStreamer que reproduz um vídeo em tempo real.  Os nós da figura
+representam atores e as arestas representam as conexões por onde fluem as
+amostras de áudio e vídeo e dados de controle.  Na terminologia do GStreamer
+os atores do são chamados de ``elementos'' e as portas de~``\en{pads}''.  Há
+dois tipos de \en{pads}, \en{sink pads} e \en{source pads}.  As \en{sink
+  pads} são as portas de entrada através das quais o elemento consome dados,
+e as \en{source pads} são as portas de saída através das quais o elemento
+produz dados.  Os elementos são classificados de acordo com o tipo de suas
+\en{pads}.  Elementos produtores (\en{sources}) possuem apenas \en{source
+  pads}, elementos processadores possuem ambos os tipos, \en{source pads} e
+\en{sink pads}, e elementos consumidores (\en{sinks}) possuem apenas
+\en{sink pads}.  Consequentemente, produtores apenas produzem dados,
+processadores consomem e produzem dados, e consumidores apenas consomem
+dados.
 
 \begin{figure}[H]
   \centering
@@ -253,17 +250,93 @@ estático (cuja topologia não muda em tempo de execução) é relativamente
 simples.  Basta instanciar os elementos necessários, interconectar suas
 \en{pads} e iniciar \en{pipeline} resultante.  O \en{pipeline} da
 Figura~\ref{fig:pipeline-tipico}, por exemplo, após iniciado opera da
-seguinte forma.  O elemento ``filesrc'' lê um arquivo Ogg armazenado no
-sistema de arquivos e escreve o fluxo de bytes resultantes na sua \en{source
-  pad}.  Ogg é um formato para multiplexação de fluxos de áudio, vídeo e
-texto.
+seguinte forma.
+\begin{itemize}
+\item O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de
+  arquivos e escreve o fluxo de bytes resultantes na sua \en{source pad}.
+  Ogg~\cite{ogg-rfc-3533} é um formato para multiplexação de fluxos de
+  áudio, vídeo e texto.  Vamos assumir que arquivo Ogg nesse caso contém
+  apenas dois fluxos multiplexados: um fluxo de áudio (sequência de amostras
+  de áudio) codificado no formato Vorbis~\cite{vorbis}, e um fluxo de vídeo
+  (sequência de quadros de imagem) codificado no formato
+  Theora~\cite{theora}.
+\item O elemento ``oggdemux'' lê da sua \en{sink pad} um fluxo de bytes
+  codificado no formato Ogg, demultiplexa-o e escreve os fluxos Vorbis
+  (áudio) e Theora (vídeo) resultantes nas \en{source pads} correspondentes.
+  Na figura~\ref{fig:pipeline-tipico}, a \en{source pad} que recebe o fluxo
+  de áudio codificado possui o rótulo~``A'' e a \en{source pad} que recebe o
+  fluxo de vídeo codificado possui o rótulo~``V''.
+\item O elemento ``vorbisdec'' lê da sua \en{sink pad} um fluxo de bytes
+  codificado no formato Vorbis, decodifica-o e escreve o fluxo de áudio~PCM
+  resultante na sua \en{source pad}.  Um fluxo de áudio PCM é o que chamamos
+  de áudio descomprimido (\en{raw}), ou seja, é uma sequência de amostras
+  obtidas via \en{pulse-code modulation} que representa o sinal analógico
+  original.
+\item O elemento ``theoradec'' opera de maneira análoga.  Ele lê da sua
+  \en{sink pad} um fluxo de bytes codificado no formato Theora, decodifica-o
+  e escreve o fluxo de vídeo descomprimido (\en{raw}) resultante na sua
+  \en{source pad}.  Um fluxo de vídeo descomprimido é uma sequência de
+  amostras (quadros) de vídeo em cada quadro é uma matriz de \en{pixels}
+  codificados em algum modelo de cor.  No modelo de cor RGB
+  (\en{red-green-blue}), por exemplo, cada \en{pixel} é codificado como uma
+  sequência de três inteiros que representam tonalidades de vermelho, verde
+  e azul.
+\item O elemento ``alsasink'' lê um fluxo de áudio descomprimido da sua
+  \en{sink pad} e utiliza a biblioteca ALSA~\cite{alsa} para reproduzir as
+  amostras do fluxo nos alto-falantes.
+\item O elemento ``ximagesink'' lê um fluxo de vídeo descomprimido da sua
+  \en{sink pad} e utiliza a biblioteca X11~\cite{x11} para reproduzir os
+  quadros do fluxo na tela.
+\end{itemize}
+
+O \en{pipeline} anterior, portanto, lê um arquivo Ogg, demultiplexa-o,
+decodifica os fluxos de áudio e vídeo resultantes, e reproduz os fluxos
+decodificados nos dispositivos de saída correspondentes (alto-falantes e
+tela).  A função de um \en{pipeline}---o que ele faz ou computa---é o
+resultado da combinação da função dos seus elementos que, conceitualmente,
+operam em paralelo.  Dessa forma, no \en{pipeline} anterior enquanto os
+\en{sinks} ``alsasink'' e ``ximagesink'' estão exibindo amostras, o
+\en{source} ``filesrc'' está lendo bytes do disco, o demultiplexador
+``oggdemux'' está decodificando dados Ogg, e os decodificadores
+``vorbisdec'' e ``theoradec'' estão decodificando dados Vorbis e Theora.
+
+\clearpage
+Essa descrição seria suficiente se estivéssemos interessados apenas em
+exibir as amostras decodificadas o mais rápido possível.  Mas esse não é
+caso.  Queremos ``tocar'' o vídeo original em tempo real, ou seja,
+reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Nesse
+caso, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
+e vídeo devem ser exibidas na taxa correta.  Valores típicos para essas
+taxas são 44100Hz para amostras de áudio e 30Hz para amostras de vídeo.  Ou
+seja, a cada 22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
+dispositivo de saída de áudio, e a cada 33{,}33ms uma nova amostra de vídeo
+deve ser enviada ao dispositivo de saída de vídeo.  No GStreamer, em geral,
+são os elementos \en{sink} os responsáveis por controlar essas taxas de
+exibição.
+
+No \en{pipeline} da Figura~\ref{fig:pipeline-tipico}, por exemplo, para
+manter a taxa de reprodução necessária, os \en{sinks} ``alsasink'' e
+``ximagesink'' mantém as amostras recebidas em um \en{buffer} interno, e
+exibem-nas (consomem-nas) apenas no momento adequado.  Já os outros
+elementos operam livres---consomem e produzem dados na taxa que quiserem, em
+geral, o mais rápido possível.  Se durante a execução os elementos
+anteriores ao \en{sinks} (também chamados de \en{upstream}) operarem rápido
+o bastante, os \en{buffers} dos \en{sinks} nunca ficarão vazios e todas as
+amostras serão exibidas no momento correto.
+
+No entanto, se os elementos anteriores operarem abaixo da taxa de exibição e
+acontecer de o \en{buffer} de um dos \en{sinks} esvaziar,~$\dots$
+
+Ou ainda, se os elementos \en{upstream} operarem rápido demais
+
+
 
 
 \section{Olá mundo: Tocando um vídeo}
 \label{sec:ola}
 
 % Nesta seção...  Poderíamos usar implementar pipeline da figura para fazer
-% nosso "olá mundo"---e é exatamente isso que vamos fazer na seção 3---mas
+% nosso "olá mundo"---e é exatamente isso que vamos fazer na seção~3---mas
 % há um jeito mais fácil.  Elementos encapsulam
 % funcionalidade... gst-inspect
 
@@ -298,4 +371,5 @@ texto.
 \end{document}
 % LocalWords:  GStreamer LocalWords mutiplexadores demultiplexadores sinks
 %  LocalWords:  dataflow sources framework frameworks DirectShow Pure seek
-%  LocalWords:  player players fast-foward rewind plugins
+%  LocalWords:  player players fast-foward rewind plugins demultiplexa
+%  LocalWords:  demultiplexa-o demultiplexador
