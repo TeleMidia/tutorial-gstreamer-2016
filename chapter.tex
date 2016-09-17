@@ -320,15 +320,16 @@ manter a taxa de reprodução necessária, os \en{sinks} ``alsasink'' e
 exibem-nas (consomem-nas) apenas no momento adequado.  Já os outros
 elementos operam livres---consomem e produzem dados na taxa que quiserem, em
 geral, o mais rápido possível.  Se durante a execução os elementos
-anteriores ao \en{sinks} (também chamados de \en{upstream}) operarem rápido
-o bastante, os \en{buffers} dos \en{sinks} nunca ficarão vazios e todas as
-amostras serão exibidas no momento correto.
+anteriores ao \en{sinks} operarem rápido o bastante, os \en{buffers} dos
+\en{sinks} nunca ficarão vazios e todas as amostras serão exibidas no
+momento correto.
 
-No entanto, se os elementos anteriores operarem abaixo da taxa de exibição e
-acontecer de o \en{buffer} de um dos \en{sinks} esvaziar,~$\dots$
+No entanto, caso os elementos fluxo acima operem abaixo da taxa de
+reprodução pode ser que o \en{buffer} de um dos \en{sinks} esvazie; ou seja,
+pode ser que chegue o momento de exibir uma amostra e o \en{sink}
+simplesmente não tenha o que exibir.  Nesse caso,
 
 Ou ainda, se os elementos \en{upstream} operarem rápido demais
-
 
 
 
