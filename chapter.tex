@@ -120,12 +120,11 @@ o GStreamer se baseia, e que também é adotado por outros \en{frameworks} e
 linguagens multimídia, por exemplo, DirectShow~\cite{Chatterjee-A-1997},
 Pure Data~\cite{Puckette-M-S-2007}, CLAM~\cite{Amatriain-X-2008},
 ChucK~\cite{Wang-G-2003}, Faust~\cite{Orlarey-Y-2009}, etc.  Nesse modelo,
-uma aplicação multimídia estrutura-se como um grafo (\en{pipeline}) em que
-os nós são elementos processadores e as arestas representam conexões entre
-elementos por onde fluem as amostras de áudio e vídeo e dados de controle.
-O modelo de \en{dataflow} é particularmente interessante para multimídia
-porque possibilita implementações naturalmente paralelas, modulares e
-escaláveis.
+uma aplicação multimídia estrutura-se como um grafo em que os nós são
+elementos processadores e as arestas representam conexões entre elementos
+por onde fluem as amostras de áudio e vídeo e dados de controle.  O modelo
+de \en{dataflow} é particularmente interessante para multimídia porque
+possibilita implementações naturalmente paralelas, modulares e escaláveis.
 
 Na parte prática, apresentamos os principais conceitos da API~C básica do
 GStreamer~1.10, sua versão estável mais atual, e ilustramos o uso dessa API
@@ -133,11 +132,11 @@ a partir da construção de um reprodutor (\en{player}) de vídeo.  Apesar de
 aqui estarmos interessados apenas na reprodução (decodificação e
 apresentação) de fluxos de mídia, essa mesma API pode ser utilizada para
 capturar fluxos de áudio e vídeo, codificá-los e transmiti-los na rede.
-O GStreamer suporta nativamente uma grande variedade de componentes para
-tratar cada uma dessas fases de processamento e, portanto, pode ser usado
-para construir diversos tipos de aplicações multimídia tais como editores de
-vídeo, transcodificadores, transmissores de fluxos de mídia, \en{players} de
-mídia, e motores de renderização de linguagens multimídia.
+O GStreamer suporta uma grande variedade de componentes para tratar cada uma
+dessas fases de processamento e, portanto, pode ser usado para construir
+diversos tipos de aplicações multimídia tais como editores de vídeo,
+transcodificadores, transmissores de fluxos de mídia, \en{players} de mídia,
+e motores de renderização de linguagens multimídia.
 
 O restante do capítulo está organizado da seguinte forma.  Na
 Seção~\ref{sec:ola} apresentamos uma versão preliminar do exemplo base do
@@ -160,10 +159,10 @@ Finalmente, na Seção~\ref{sec:conclusao} discutimos brevemente algumas
 funcionalidades avançadas do \en{framework} e apresentamos nossas
 considerações finais.
 
-Antes de ``mergulhar'' no código porém, é preciso entender o modelo
-conceitual de computação no qual o GStreamer se baseia.  No restante dessa
-seção apresentamos esse modelo, \emph{dataflow}, e discutimos a sua
-instanciação particular no GStreamer.
+Antes de programar nossa primeira aplicação GStreamer porém, é preciso
+entender o modelo de computação no qual o \en{framework} se baseia.  No
+restante dessa seção apresentamos esse modelo, \emph{dataflow}, e discutimos
+a forma como ele é instanciado no GStreamer.
 
 
 \subsection*{O modelo \en{dataflow} e sua instanciação no GStreamer}
@@ -172,12 +171,12 @@ instanciação particular no GStreamer.
 No modelo de computação \en{dataflow} os dados são processados enquanto
 ``fluem'' através de uma rede.  Essa rede estrutura-se como um grafo
 dirigido em que os nós representam elementos de processamento, ou atores, e
-as arestas representam conexões por onde fluem os dados.  Os atores recebem
-dados através de suas portas de entrada e emitem dados através de suas porta
-de saída.  Além disso, conceitualmente, atores são ativados por entrada,
-isto é, executam sempre que os dados necessários estão disponíveis em suas
-portas de entrada.  Um \en{pipeline} é um \en{dataflow} em que os dados
-fluem através das arestas na mesma ordem em que foram
+as arestas representam conexões unidirecionais por onde fluem os dados.  Os
+atores recebem dados através de suas portas de entrada e emitem dados
+através de suas porta de saída.  Além disso, conceitualmente, atores são
+ativados por entrada, isto é, executam sempre que os dados necessários estão
+disponíveis em suas portas de entrada.  Um \en{pipeline} é um \en{dataflow}
+em que os dados fluem através das arestas na mesma ordem em que foram
 produzidos~\cite{Kahn-G-1977,Lee-E-A-1995}.  O modelo de computação
 \en{dataflow}, e em especial, o modelo de \en{pipeline} é interessante para
 multimídia porque aproxima a estrutura real do sistema da sua descrição
@@ -191,21 +190,21 @@ e~(iii)~escalável porque a estrutura é naturalmente composicional---um
 \en{dataflow} pode ser visto como um ator e vice versa.
 
 A Figura~\ref{fig:pipeline-tipico} apresenta o leiaute de um \en{pipeline}
-típico para processamento multimídia.  O leiaute nesse caso é de um pipeline
-de uma aplicação GStreamer que decodifica e reproduz um vídeo em tempo real.
-Os nós representam atores e as arestas representam as conexões por onde
-fluem as amostras de áudio e vídeo e informações de controle.  Na
-terminologia do GStreamer os atores do são chamados de ``elementos'' e as
-portas de~``\en{pads}''.  Há dois tipos de \en{pads}, \en{sink pads} e
-\en{source pads}.  As \en{sink pads} são as portas de entrada através das
-quais o elemento consome dados, e as \en{source pads} são as portas de saída
-através das quais o elemento produz dados.  Os elementos são classificados
-de acordo com o tipo de suas \en{pads}.  Elementos produtores (\en{sources})
-possuem apenas \en{source pads}, elementos processadores possuem ambos os
-tipos, \en{source pads} e \en{sink pads}, e elementos consumidores
-(\en{sinks}) possuem apenas \en{sink pads}.  Consequentemente, produtores
-apenas produzem dados, processadores consomem e produzem dados resultantes,
-e consumidores apenas consomem dados.
+típico para processamento multimídia.  O \en{pipeline} nesse caso é o de uma
+aplicação GStreamer que reproduz um vídeo Ogg em tempo real.  Os nós da
+figura representam atores e as arestas representam as conexões por onde
+fluem as amostras de áudio e vídeo e dados de controle.  Na terminologia do
+GStreamer os atores do são chamados de ``elementos'' e as portas
+de~``\en{pads}''.  Há dois tipos de \en{pads}, \en{sink pads} e \en{source
+  pads}.  As \en{sink pads} são as portas de entrada através das quais o
+elemento consome dados, e as \en{source pads} são as portas de saída através
+das quais o elemento produz dados.  Os elementos são classificados de acordo
+com o tipo de suas \en{pads}.  Elementos produtores (\en{sources}) possuem
+apenas \en{source pads}, elementos processadores possuem ambos os tipos,
+\en{source pads} e \en{sink pads}, e elementos consumidores (\en{sinks})
+possuem apenas \en{sink pads}.  Consequentemente, produtores apenas produzem
+dados, processadores consomem e produzem dados, e consumidores apenas
+consomem dados.
 
 \begin{figure}[H]
   \centering
@@ -237,24 +236,27 @@ e consumidores apenas consomem dados.
   \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
   \label{fig:pipeline-tipico}
 \end{figure}
+\vskip-\baselineskip
 
-Na figura acima, há um elemento produtor (``filesrc''), três processadores
+Na figura acima há um elemento produtor (``filesrc''), três processadores
 (``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois consumidores
 (``alsasink'' e ``ximagesink'').  O elemento ``filesrc'' possui uma única
 \en{source pad} que está conectada à \en{sink pad} do elemento subsequente,
-``oggdemux'', ou seja, os dados produzidos pelo elemento ``filesrc'' fluem
+``oggdemux''; ou seja, os dados produzidos pelo elemento ``filesrc'' fluem
 através da sua \en{source pad} para a \en{sink pad} do elemento
-``oggdemux''.  No diagrama a conexão entre as \en{pads} é representada pela
-aresta direcionada entre os elementos ``filesrc'' e ``oggdemux''.
-Similarmente, as demais arestas do diagrama denotam conexões entre
-\en{source pads} e \en{sink pads}.
+``oggdemux''.  No diagrama essa conexão entre as \en{pads} é representada
+pela aresta entre os elementos ``filesrc'' e ``oggdemux''.  Similarmente, as
+demais arestas denotam conexões entre \en{source pads} e \en{sink pads}.
 
-% Construir uma aplicação GStreamer é ``montar''
-
-O \en{pipeline} da Figura~\ref{fig:pipeline-tipico} opera da seguinte forma.
-O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de arquivos e
-escreve o fluxo de bytes resultantes na sua \en{source pad}.  Ogg é um
-formato para multiplexação de fluxos de áudio, vídeo e texto.
+O processo de desenvolvimento de uma aplicação GStreamer com \en{pipeline}
+estático (cuja topologia não muda em tempo de execução) é relativamente
+simples.  Basta instanciar os elementos necessários, interconectar suas
+\en{pads} e iniciar \en{pipeline} resultante.  O \en{pipeline} da
+Figura~\ref{fig:pipeline-tipico}, por exemplo, após iniciado opera da
+seguinte forma.  O elemento ``filesrc'' lê um arquivo Ogg armazenado no
+sistema de arquivos e escreve o fluxo de bytes resultantes na sua \en{source
+  pad}.  Ogg é um formato para multiplexação de fluxos de áudio, vídeo e
+texto.
 
 
 \section{Olá mundo: Tocando um vídeo}
