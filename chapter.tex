@@ -130,10 +130,10 @@ a partir da construção de um reprodutor (\en{player}) de vídeo.  Apesar de
 aqui estarmos interessados apenas na reprodução (decodificação e
 apresentação) de fluxos de mídia, essa mesma API pode ser utilizada para
 capturar fluxos de áudio e vídeo, codificá-los e transmiti-los na rede.
-O GStreamer suporta uma grande variedade de componentes para tratar cada uma
+O GStreamer possui uma grande variedade de componentes para tratar cada uma
 dessas fases de processamento e, portanto, pode ser usado para construir
 diversos tipos de aplicações multimídia tais como editores de vídeo,
-transcodificadores, transmissores de fluxos de mídia, \en{players} de mídia,
+transcodificadores, transmissores de fluxos de mídia, \en{players} de mídia
 e motores de renderização de linguagens multimídia.
 
 O restante do capítulo está organizado da seguinte forma.  Na
@@ -141,21 +141,21 @@ Seção~\ref{sec:ola} apresentamos uma versão preliminar do exemplo base do
 minicurso: um \en{player} de vídeo simples porém funcional.  Na
 Seção~\ref{sec:dissec} discutimos o que está por trás do código
 aparentemente simples do exemplo anterior e reconstruímos o mesmo exemplo
-usando a API básica (baixo nível) do GStreamer---a versão reconstruída é o
+usando a API básica (baixo nível) do GStreamer; essa versão reconstruída é o
 ponto de partida dos incrementos posteriores.  Na Seção~\ref{sec:filtros}
 apresentamos os principais filtros de áudio e vídeo disponíveis no GStreamer
 e discutimos como integrá-los ao exemplo.  Na Seção~\ref{sec:e/s}
-adicionamos suporte à eventos de teclado e mouse ao \en{player} de vídeo, e
+adicionamos suporte a eventos de teclado e mouse ao \en{player} de vídeo, e
 mostramos como injetar ou extrair amostras de uma aplicação GStreamer.  Na
 Seção~\ref{sec:ops} discutimos a teoria por trás das operações usuais de
 controle de reprodução (\en{pause}, \en{seek}, \en{fast-foward}
-e~\en{rewind}) e implementamos suporte a cada uma delas no exemplo.  Na
+e~\en{rewind}) e implementamos o suporte a cada uma delas no exemplo.  Na
 Seção~\ref{sec:plugins} apresentamos a arquitetura de \en{plugins} do
 GStreamer e mostramos como implementar e integrar ao exemplo um
 \emph{plugin} simples contendo um elemento que manipula amostras de vídeo.
-Finalmente, na Seção~\ref{sec:conclusao} discutimos brevemente algumas
-funcionalidades avançadas do \en{framework} e apresentamos nossas
-considerações finais.
+Finalmente, na Seção~\ref{sec:conclusao} discutimos funcionalidades
+avançadas do \en{framework} e listamos algumas referências para estudos
+posteriores.
 
 Antes de programar nossa primeira aplicação GStreamer porém, é preciso
 entender o modelo de computação no qual o \en{framework} se baseia.  No
@@ -177,31 +177,31 @@ em que os dados fluem através das arestas na mesma ordem em que foram
 produzidos~\cite{Kahn-G-1977,Lee-E-A-1995}.  O modelo de computação
 \en{dataflow}, e em especial, o modelo de \en{pipeline} é interessante para
 multimídia porque aproxima a estrutura real do sistema da sua descrição
-abstrata, idealizada na forma de diagrama de fluxo~\cite{Yviquel-H-2014}.
+abstrata, idealizada na forma de diagrama de blocos~\cite{Yviquel-H-2014}.
 Além disso, o modelo de \en{dataflow} induz implementações flexíveis e
 eficientes já que ele é naturalmente paralelo, modular e escalável:
 (i)~paralelo porque conceitualmente os atores executam independentemente uns
 dos outros; (ii)~modular porque a lógica de processamento está encapsulada
 nos atores e pode ser reusada em diversos pontos do \en{dataflow};
-e~(iii)~escalável porque a estrutura é naturalmente composicional---um
-\en{dataflow} pode ser visto como um ator e vice versa.
+e~(iii)~escalável porque a estrutura é naturalmente composicional (um
+\en{dataflow} pode ser visto como um ator e vice versa).
 
 A Figura~\ref{fig:pipeline-tipico} apresenta o leiaute de um \en{pipeline}
-típico para processamento multimídia.  O \en{pipeline} nesse caso é o de uma
-aplicação GStreamer que reproduz um vídeo em tempo real.  Os nós da figura
-representam atores e as arestas representam as conexões por onde fluem as
-amostras de áudio e vídeo e dados de controle.  Na terminologia do GStreamer
-os atores do são chamados de ``elementos'' e as portas de~``\en{pads}''.  Há
-dois tipos de \en{pads}, \en{sink pads} e \en{source pads}.  As \en{sink
-  pads} são as portas de entrada através das quais o elemento consome dados,
-e as \en{source pads} são as portas de saída através das quais o elemento
-produz dados.  Os elementos são classificados de acordo com o tipo de suas
-\en{pads}.  Elementos produtores (\en{sources}) possuem apenas \en{source
-  pads}, elementos processadores possuem ambos os tipos, \en{source pads} e
-\en{sink pads}, e elementos consumidores (\en{sinks}) possuem apenas
-\en{sink pads}.  Consequentemente, produtores apenas produzem dados,
-processadores consomem e produzem dados, e consumidores apenas consomem
-dados.
+típico para processamento multimídia.  O leiaute nesse caso é uma
+simplificação do \en{pipeline} de uma aplicação GStreamer que reproduz um
+vídeo.  Os nós da figura representam atores e as arestas representam as
+conexões por onde fluem as amostras de áudio e vídeo e dados de controle.
+Na terminologia do GStreamer os atores do são chamados de ``elementos'' e as
+portas de~``\en{pads}''.  Há dois tipos de \en{pads}, \en{sink pads} e
+\en{source pads}.  As \en{sink pads} são as portas de entrada através das
+quais o elemento consome dados, e as \en{source pads} são as portas de saída
+através das quais o elemento produz dados.  Os elementos são classificados
+de acordo com o tipo de suas \en{pads}.  Elementos produtores (\en{sources})
+possuem apenas \en{source pads}, elementos processadores possuem ambos os
+tipos, \en{source pads} e \en{sink pads}, e elementos consumidores
+(\en{sinks}) possuem apenas \en{sink pads}.  Consequentemente, produtores
+apenas produzem dados, processadores consomem e produzem dados, e
+consumidores apenas consomem dados.
 
 \begin{figure}[H]
   \centering
@@ -216,7 +216,7 @@ dados.
     \node (vorbisdec) [element] at (C|-A) {vorbisdec};    
     \node (alsasink) [element, right of=vorbisdec] {alsasink};
     \node (theoradec) [element] at (C|-B) {theoradec};
-    \node (ximagesink) [element, right of=theoradec] {ximagesink};
+    \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
     %%
     \draw [arrow] (filesrc) -- (oggdemux);
     \node [coordinate] (X) at ($(oggdemux.east)+(0,.25\hdim)$) {};
@@ -228,7 +228,7 @@ dados.
                       -- ($(theoradec.west)-(\odim/3,0)$)
                       -- (theoradec.west);
     \draw [arrow] (vorbisdec) -- (alsasink);
-    \draw [arrow] (theoradec) -- (ximagesink);
+    \draw [arrow] (theoradec) -- (xvimagesink);
   \end{tikzpicture}
   \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
   \label{fig:pipeline-tipico}
@@ -237,9 +237,9 @@ dados.
 
 Na figura acima há um elemento produtor (``filesrc''), três processadores
 (``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois consumidores
-(``alsasink'' e ``ximagesink'').  O elemento ``filesrc'' possui uma única
+(``alsasink'' e ``xvimagesink'').  O elemento ``filesrc'' possui uma única
 \en{source pad} que está conectada à \en{sink pad} do elemento subsequente,
-``oggdemux''; ou seja, os dados produzidos pelo elemento ``filesrc'' fluem
+``oggdemux''.  Ou seja, os dados produzidos pelo elemento ``filesrc'' fluem
 através da sua \en{source pad} para a \en{sink pad} do elemento
 ``oggdemux''.  No diagrama essa conexão entre as \en{pads} é representada
 pela aresta entre os elementos ``filesrc'' e ``oggdemux''.  Similarmente, as
@@ -251,7 +251,7 @@ simples.  Basta instanciar os elementos necessários, interconectar suas
 \en{pads} e iniciar \en{pipeline} resultante.  O \en{pipeline} da
 Figura~\ref{fig:pipeline-tipico}, por exemplo, após iniciado opera da
 seguinte forma.
-\begin{itemize}
+\begin{enumerate}
 \item O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de
   arquivos e escreve o fluxo de bytes resultantes na sua \en{source pad}.
   Ogg~\cite{ogg-rfc-3533} é um formato para multiplexação de fluxos de
@@ -284,52 +284,58 @@ seguinte forma.
 \item O elemento ``alsasink'' lê um fluxo de áudio descomprimido da sua
   \en{sink pad} e utiliza a biblioteca ALSA~\cite{alsa} para reproduzir as
   amostras do fluxo nos alto-falantes.
-\item O elemento ``ximagesink'' lê um fluxo de vídeo descomprimido da sua
+\item O elemento ``xvimagesink'' lê um fluxo de vídeo descomprimido da sua
   \en{sink pad} e utiliza a biblioteca X11~\cite{x11} para reproduzir os
   quadros do fluxo na tela.
-\end{itemize}
+\end{enumerate}
 
-O \en{pipeline} anterior, portanto, lê um arquivo Ogg, demultiplexa-o,
-decodifica os fluxos de áudio e vídeo resultantes, e reproduz os fluxos
-decodificados nos dispositivos de saída correspondentes (alto-falantes e
-tela).  A função de um \en{pipeline}---o que ele faz ou computa---é o
+A função de um \en{pipeline}, isto é, o que ele faz ou computa, é o
 resultado da combinação da função dos seus elementos que, conceitualmente,
-operam em paralelo.  Dessa forma, no \en{pipeline} anterior enquanto os
-\en{sinks} ``alsasink'' e ``ximagesink'' estão exibindo amostras, o
+operam em paralelo.  O \en{pipeline} anterior, portanto, (1)~lê um arquivo
+Ogg, (2)~demultiplexa-o, (3--4)~decodifica os fluxos de áudio e vídeo
+resultantes e~(5--6) reproduz os fluxos decodificados nos dispositivos de
+saída correspondentes (alto-falantes e tela).  E tudo isso acontece
+conceitualmente em paralelo.  Ou seja, podemos assumir que enquanto os
+\en{sinks} ``alsasink'' e ``xvimagesink'' estão exibindo amostras, o
 \en{source} ``filesrc'' está lendo bytes do disco, o demultiplexador
-``oggdemux'' está decodificando dados Ogg, e os decodificadores
+``oggdemux'' está demultiplexando dados Ogg e os decodificadores
 ``vorbisdec'' e ``theoradec'' estão decodificando dados Vorbis e Theora.
 
-\clearpage
-Essa descrição seria suficiente se estivéssemos interessados apenas em
+A descrição anterior seria suficiente se estivéssemos interessados apenas em
 exibir as amostras decodificadas o mais rápido possível.  Mas esse não é
 caso.  Queremos ``tocar'' o vídeo original em tempo real, ou seja,
 reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Nesse
 caso, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
 e vídeo devem ser exibidas na taxa correta.  Valores típicos para essas
-taxas são 44100Hz para amostras de áudio e 30Hz para amostras de vídeo.  Ou
-seja, a cada 22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
-dispositivo de saída de áudio, e a cada 33{,}33ms uma nova amostra de vídeo
-deve ser enviada ao dispositivo de saída de vídeo.  No GStreamer, em geral,
-são os elementos \en{sink} os responsáveis por controlar essas taxas de
-exibição.
+taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo.  Ou
+seja, a cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
+dispositivo de saída de áudio, e a cada~33{,}33ms uma nova amostra de vídeo
+deve ser enviada ao dispositivo de saída de~vídeo.
 
-No \en{pipeline} da Figura~\ref{fig:pipeline-tipico}, por exemplo, para
-manter a taxa de reprodução necessária, os \en{sinks} ``alsasink'' e
-``ximagesink'' mantém as amostras recebidas em um \en{buffer} interno, e
-exibem-nas (consomem-nas) apenas no momento adequado.  Já os outros
-elementos operam livres---consomem e produzem dados na taxa que quiserem, em
-geral, o mais rápido possível.  Se durante a execução os elementos
-anteriores ao \en{sinks} operarem rápido o bastante, os \en{buffers} dos
-\en{sinks} nunca ficarão vazios e todas as amostras serão exibidas no
-momento correto.
+No GStreamer, em geral, são os elementos \en{sink} os responsáveis por
+controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline}
+da Figura~\ref{fig:pipeline-tipico}, para manter a taxa de reprodução
+necessária, os \en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as
+amostras recebidas num \en{buffer} interno, e exibem-nas (consomem-nas)
+apenas no momento adequado.  Já os outros elementos operam livres, isto é,
+consomem e produzem dados em taxas arbitrárias.  Se durante a execução os
+elementos que precedem os \en{sinks} operarem rápido o bastante, os
+\en{buffers} dos \en{sinks} nunca ficarão vazios e todas as amostras serão
+exibidas no momento correto.  Mas esse nem sempre é o caso.
 
-No entanto, caso os elementos fluxo acima operem abaixo da taxa de
-reprodução pode ser que o \en{buffer} de um dos \en{sinks} esvazie; ou seja,
-pode ser que chegue o momento de exibir uma amostra e o \en{sink}
-simplesmente não tenha o que exibir.  Nesse caso,
+Caso os elementos fluxo acima operem abaixo da taxa de consumo dos
+\en{sinks}, pode ser que o \en{buffer} interno de um dos \en{sinks} esvazie.
+Nesse caso, se chegar o momento de exibir uma amostra o \en{sink}
+simplesmente não tem o que exibir, o que causa interrupções ou saltos na
+reprodução---as amostras ``atrasadas'' quando chegarem serão descartadas.
+Há ainda o problema inverso, caso os elementos fluxo acima operem muito
+acima da taxa de consumo dos \en{sinks}, pode ser que o \en{buffer} interno
+estoure e amostras sejam perdidas.
 
-Ou ainda, se os elementos \en{upstream} operarem rápido demais
+Para evitar o esvaziamento ou estouro de \en{buffers} nos sinks, ou mesmo
+para limitar o uso de CPU, os \en{sinks}---na verdade, qualquer elemento que
+sincronize amostras---enviam eventos de QoS (\en{quality of service}) aos
+elementos fluxo acima.
 
 
 
@@ -373,4 +379,4 @@ Ou ainda, se os elementos \en{upstream} operarem rápido demais
 % LocalWords:  GStreamer LocalWords mutiplexadores demultiplexadores sinks
 %  LocalWords:  dataflow sources framework frameworks DirectShow Pure seek
 %  LocalWords:  player players fast-foward rewind plugins demultiplexa
-%  LocalWords:  demultiplexa-o demultiplexador
+%  LocalWords:  demultiplexa-o demultiplexador demultiplexando
