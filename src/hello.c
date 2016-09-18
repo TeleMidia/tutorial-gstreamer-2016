@@ -5,6 +5,7 @@ int main (int argc, char *argv[])
 {
   GstElement *playbin;
   char *uri;
+  GstStateChangeReturn ret;
   GstBus *bus;
   GstMessage *msg;
 
@@ -18,7 +19,9 @@ int main (int argc, char *argv[])
   g_object_set (G_OBJECT (playbin), "uri", uri, NULL);
   g_free (uri);
 
-  gst_element_set_state (playbin, GST_STATE_PLAYING);
+  ret = gst_element_set_state (playbin, GST_STATE_PLAYING);
+  g_assert (ret != GST_STATE_CHANGE_FAILURE);
+
   bus = gst_element_get_bus (playbin);
   msg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE,
                                     GST_MESSAGE_ERROR | GST_MESSAGE_EOS);

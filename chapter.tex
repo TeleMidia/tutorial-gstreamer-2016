@@ -202,9 +202,9 @@ forma.
 \item O elemento ``vorbisdec'' lê da sua \en{sink pad} um fluxo de bytes
   codificado no formato Vorbis, decodifica-o e escreve o fluxo de áudio~PCM
   resultante na sua \en{source pad}.  Um fluxo de áudio PCM é o que chamamos
-  de áudio descomprimido (\en{raw}), ou seja, é uma sequência de amostras
-  obtidas via \en{pulse-code modulation} que representa o sinal analógico
-  original.
+  de ``áudio descomprimido'' (\en{raw}), ou seja, é uma sequência de
+  amostras obtidas via \en{pulse-code modulation} que representa o sinal
+  analógico original.
 \item O elemento ``theoradec'' opera de maneira análoga.  Ele lê da sua
   \en{sink pad} um fluxo de bytes codificado no formato Theora, decodifica-o
   e escreve o fluxo de vídeo descomprimido (\en{raw}) resultante na sua
@@ -339,20 +339,19 @@ inclui as declarações da GLib~\cite{glib}, a biblioteca de portabilidade do
 projeto GNOME~\cite{gnome}, e a linha~2 inclui as declarações do
 GStreamer---o GStreamer depende do \en{framework} GObject~\cite{gobject} da
 GLib para programação orientada a objetos em~C\null.  Na listagem, as
-chamadas com prefixo ``\C{g_}'' ou ``\C{G_}'' e referem-se à funções ou
+chamadas com prefixo ``\C{g_}'' ou ``\C{G_}'' e referem-se à funções e
 macros da GLib, e as chamadas com prefixo ``\C{gst_}'' ou ``\C{GST_}'' e as
-declarações com prefixo ``\C{Gst}'' referem-se à funções, macros ou tipos do
+declarações com prefixo ``\C{Gst}'' referem-se à funções, macros e tipos do
 GStreamer.
 
-\clearpage
-A chamada~\C{gst_init} na linha~11 inicializa o GStreamer e trata os
+A chamada~\C{gst_init}, linha~12, inicializa o GStreamer e trata os
 argumentos com prefixo ``-\,-gst-'' em \C{argv}.
 
-A próxima chamada, linha~13, cria um elemento ``playbin'' que é também o
+A próxima chamada, linha~14, cria um elemento ``playbin'' que é também o
 \en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é ele próprio um
 elemento, de fato, um elemento que contém outros elementos mas não possui
-\en{pads}; tais elementos contêiner são chamados de ``\en{bins}''.  A função
-\C{gst_element_factory_make} aloca e retora um novo elemento
+\en{pads}.  Tais elementos contêiner são chamados de ``\en{bins}''.
+A função \C{gst_element_factory_make} aloca e retora um novo elemento
 (\C{GstElement}) do tipo especificado.  O primeiro parâmetro da função é o
 nome da fábrica do tipo e o segundo parâmetro (opcional) é o nome a ser
 atribuído ao elemento retornado.  Nesse caso, a chamada cria e retorna um
@@ -361,15 +360,17 @@ nada mais é do que um \en{pipeline} que se autoconfigura.  Dada uma URI,
 assim que é inciado o ``playbin'' determina o tipo do conteúdo da URI e
 constrói um \en{pipeline} apropriado para reproduzi-lo.
 
-A chamada \C{g_assert_nonnull}, linha~14, é uma asserção que garante que a
+A chamada \C{g_assert_nonnull}, linha~15, é uma asserção que garante que a
 chamada anterior funcionou corretamente, isto é, retornou um elemento válido
 (não nulo).
 
-A chamada da linha~16 constrói uma URI a partir do nome de um arquivo.
-Nesse caso, ``bunny.ogg'' é caminho do arquivo de vídeo Ogg que queremos
-tocar.
+A chamada \C{gst_filename_to_uri}, linha~17, constrói uma URI a partir do
+caminho de um arquivo.  Nesse caso, ``bunny.ogg'' é caminho do arquivo de
+vídeo Ogg que queremos tocar.  O vídeo em si é o curta de animação ``Big
+Buck Bunny''~\cite{bunny} produzido pelo Blender Institute e licenciado via
+Creative Commons.
 
-A chamada \C{g_object_set} na linha~18 atribui a URI criada anteriormente à
+A chamada \C{g_object_set}, linha~19, atribui a URI criada anteriormente à
 propriedade ``uri'' do elemento ``playbin''.  Note que \C{g_object_set} é
 uma função da GObject.  Todo elemento (\C{GstElement}) é também um objeto
 (\C{GObject}), e todo objeto possui propriedades cujos valores podem ser
@@ -377,13 +378,141 @@ obtidos via \C{g_object_get} e alterados via \C{g_object_set}.
 A propriedade ``uri'' do elemento ``playbin'' contém a URI do conteúdo de
 mídia a ser reproduzido.
 
-A chamada seguinte, linha~19, libera a \en{string} alocada na linha~16.
+A chamada \C{g_free}, linha~20, libera a \en{string} alocada na linha~16.
 Nesse ponto a \en{string} já não é mais necessária pois foi copiada pela
 chamada \C{g_object_set} anterior.
 
-A chamada \C{gst_element_set_state}, linha~21, inicia o \en{pipeline} da
-aplicação, isto é, transiciona elemento ``playbin'' para o estado
-\C{GST_STATE_PLAYING}.  No Gstreamer, todo elemento incluindo o
+A chamada \C{gst_element_set_state}, linha~22, inicia o \en{pipeline} da
+aplicação, isto é, transiciona elemento ``playbin'' do seu estado inicial
+\en{null} (\C{GST_STATE_NULL}) para o estado \en{playing}
+(\C{GST_STATE_PLAYING}).  Na Seção~\ref{sec:dissec}, vamos discutir em
+detalhes as consequências internas dessa transição.  Por enquanto, basta
+dizer que nesse ponto o elemento ``playbin''~(1) inspeciona o conteúdo
+apontado pela URI configurada, (2)~instancia e interconecta os elementos
+necessários para reproduzir esse conteúdo, (3)~inicia a sua reprodução numa
+\en{thread} separada e~(4) devolve o controle à \en{thread} principal da
+aplicação.
+
+A chamada \C{g_assert}, linha~23, é uma asserção que garante que a
+requisição de transição de estado anterior foi bem sucedida.  Após essa
+linha, podemos assumir que o vídeo está tocando e que aplicação possui pelo
+menos duas \en{threads}: a \en{thread} principal, que está prestes a
+executar a linha~23, e uma ou mais \en{threads} secundárias, que operam o
+\en{pipeline}.  A \en{thread} principal é chamada de ``\en{thread} da
+aplicação'' e as \en{threads} secundárias são chamadas de ``\en{streaming
+  threads}''.  As \en{streaming threads} se comunicam com a \en{thread} da
+aplicação através de mensagens assíncronas postadas num barramento
+(\en{bus}) associado ao \en{pipeline}.  Essas mensagens informam a
+\en{thread} da aplicação sobre acontecimentos internos do \en{pipeline}, por
+exemplo, mudança de estado de elementos, fim do fluxo, erros, \en{warnings},
+etc., e permitem que aplicação reaja da maneira apropriada.
+
+A chamada \C{gst_element_get_bus}, linha~25, obtém uma referência para o
+barramento de mensagens (\en{bus}) do \en{pipeline} do ``playbin''.
+
+A próxima chamada, linha~26, bloqueia a \en{thread} da aplicação até que uma
+mensagem de erro ou de EOS (\en{end-of-stream}, ``fim do fluxo'') seja
+postada no barramento.  Ou seja, a \en{thread} da aplicação aguarda nessa
+chamada até um erro aconteça ou até que o vídeo seja reproduzido
+completamente.  A função \C{gst_bus_timed_pop_filtered} recebe o \en{bus}, o
+tempo máximo de espera e a máscara dos tipos das mensagens a serem
+aguardadas, e bloqueia até que o tempo máximo seja atingido ou até que uma
+mensagem de um dos tipos esperados seja postada no \en{bus}.  A função
+retorna \C{NULL} caso o tempo máximo seja atingido ou retorna uma referência
+para a mensagem recebida.  Na Listagem~\ref{lst:hello}, estamos aguardando
+por um tempo ilimitado (\C{GST_TIME_CLOCK_NONE}) uma mensagem de erro
+(\C{GST_MESSAGE_ERROR}) ou uma mensagem de EOS (\C{GST_MESSAGE_EOS}) que
+após a chamada é armazenada na variável \C{msg}.
+
+A chamada \C{gst_message_unref}, linha~27, libera a mensagem retornada na
+chamada da linha anterior.  Nesse ponto, ou houve um erro ou a reprodução
+chegou ao fim.
+
+A chamada \C{gst_object_unref}, linha~28, libera a referência para o
+\en{bus} do ``playbin'' obtida na linha~25.  A função \C{gst_object_unref} é
+apenas um \en{alias} para a função \C{g_object_unref}, que libera uma
+referência para um \C{GObject}.  No GStreamer, a maioria dos tipos
+``objeto'' não herdam diretamente de \C{GObject}, mas sim de \C{GstObject}
+que por sua vez herda de \C{GObject}.
+
+A chamada \C{gst_element_set_state}, linha~30, para o \en{pipeline} da
+aplicação (caso ele ainda não esteja parado) e libera os recursos utilizados
+durante o seu processamento, isto é, transiciona o elemento ``playbin'' de
+volta para o estado inicial \en{null}.
+
+Finalmente, a chamada \C{gst_object_unref}, linha~31, libera o próprio
+elemento ``playbin'' alocado na linha~14.
+
+Se tudo correr bem, ao executar o programa anterior uma nova janela aparece
+na tela e vídeo é reproduzido até o final.  A Figura~\ref{fig:bunny}
+apresenta um quadro do vídeo em questão.  Antes de rodar o ``Olá mundo'',
+porém, é preciso compilá-lo.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=.115]{media/frame}
+  \caption{Quadro do vídeo \en{Big Buck Bunny}~\cite{bunny}.}
+  \label{fig:bunny}
+\end{figure}
+
+
+\subsection*{Compilando o programa ``Olá mundo'' no GNU/Linux}
+
+Para compilar o programa da Listagem~\ref{lst:hello} precisamos informar ao
+compilador~C o caminho do diretório que contém os cabeçalhos (.h) da GLib e
+do GStreamer.  Além disso, precisamos informar ao \en{linker} o caminho e o
+nome das bibliotecas dinâmicas correspondentes.  No GNU/Linux, a maneira
+mais fácil de se fazer isso é através ferramenta \en{pkg-config}.  Por
+exemplo:
+\begin{lstlisting}[style=command]
+@\$@ cc `pkg-config --cflags --libs glib-2.0 gstreamer-1.0`\
+      hello.c -o hello
+\end{lstlisting}
+
+Esse comando compila e \en{link}-edita o programa da
+Listagem~\ref{lst:hello} (``hello.c'') e gera um executável chamado
+``hello''.  As opções ``-\,-cflags'' e ``-\,-libs'' do comando
+\en{pkg-config} instruem-no a emitir as \en{flags} de compilação e
+\en{link}-edição apropriadas dos módulos listados, no caso, ``glib-2.0'' e
+``gstreamer-1.0''.  Observe que a chamada do comando \en{pkg-config} aparece
+entre o apóstrofos.  Ou seja, antes de avaliar o comando mais externo,
+\en{cc}, que é a chamada do compilador~C, o interpretador de comandos
+(\en{shell}) executa o comando \en{pkg-config} e substitui o que aparece
+entre apóstrofos pelo resultado dessa execução.
+
+No nosso ambiente, o comando anterior avalia para:
+\begin{lstlisting}[style=command]
+@\$@ cc -pthread\
+     -I/usr/include/gstreamer-1.0\
+     -I/usr/lib/gstreamer-1.0/include\
+     -I/usr/include/glib-2.0\
+     -I/usr/lib/glib-2.0/include\
+     -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0\
+     hello.c -o hello
+\end{lstlisting}
+
+Uma forma de tornar o processo de compilação menos trabalhoso é escrever um
+\en{makefile} com a descrição da sequência de comandos que constrói o
+programa.  A Listagem~\ref{lst:makefile} apresenta o \en{makefile} que
+usamos para construir os programas deste minicurso.  Usando esse
+\en{makefile} sempre que for preciso recompilar o programa basta rodar o
+comando \en{make} no mesmo diretório onde está o arquivo de \en{makefile}
+(``Makefile'').  E sempre que quisermos remover os arquivos gerados pelo
+compilador basta rodar ``\C{make clean}''.  Para mais informações sobre como
+compilar programas no GNU/Linux, veja~\cite{Gough-B-J-2005}.
+
+\lstinputlisting[
+style=display,
+mathescape=no,
+caption={\en{Makefile} que constrói o programa ``Olá mundo''.},
+label={lst:makefile},
+]{src/Makefile.hello}
+
+
+\section{Dissecando o exemplo anterior}
+\label{sec:dissec}
+
+No Gstreamer, todo elemento incluindo o
 \en{pipeline} possui um estado, que pode ser nulo (\en{null}), pronto
 (\en{ready}), pausado (\en{paused}) ou tocando (\en{playing}).  No estado
 inicial, \en{null}, o elemento não possui recursos alocados.  No estado
@@ -392,15 +521,31 @@ ser processado.  No estado \en{paused}, o elemento aloca recursos que
 dependem do conteúdo a ser processado e se prepara para processá-lo.
 Finalmente, no estado \en{playing} o elemento inicia o processamento.
 
-% Um elemento ``playbin'', tipo \C{GstPlayBin}, é uma especialização de um
-% elemento ``pipeline'', tipo \C{GstPipeline}, que por sua vez é uma
-% especialização de um ``bin'', tipo \C{GstBin}.  Esse último herda de
-% \C{GstElement}, o tipo comum a todos os elementos, que eventualmente herda
-% de \C{GObject} o tipo raiz da hierarquia de objetos da GObject.
+Para chegar do estado \en{null} (estado inicial) ao estado \en{playing}
+(estado operante) o elemento tem que passar primeiro pelo estados \en{ready}
+e \en{paused}, nessa ordem.  De forma análoga, para sair do estado
+\en{playing} e voltar ao estado inicial \en{null}, o elemento tem que passar
+pelos estados \en{paused} e \en{ready}.  A Figura~\ref{fig:estados-elt}
+apresenta máquina de estados de um elemento GStreamer, ou seja, os estados e
+transições possíveis.
 
-
-\section{Dissecando o exemplo anterior}
-\label{sec:dissec}
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=.65\wdim+\odim]
+    \node [state] (NULL) {null};
+    \node [state, right of=NULL] (READY) {ready};
+    \node [state, right of=READY] (PAUSED) {paused};
+    \node [state, right of=PAUSED] (PLAYING) {playing};
+    \draw [->] (NULL) to [bend left=25] (READY);
+    \draw [->] (READY) to [bend left=25] (PAUSED);
+    \draw [->] (PAUSED) to [bend left=25] (PLAYING);
+    \draw [->] (PLAYING) to [bend left=25] (PAUSED);
+    \draw [->] (PAUSED) to [bend left=25] (READY);
+    \draw [->] (READY) to [bend left=25] (NULL);
+  \end{tikzpicture}
+  \caption{Máquina de estados de um elemento GStreamer (\C{GstElement}).}
+  \label{fig:estados-elt}
+\end{figure}
 
 
 \section{Filtros}
@@ -435,4 +580,11 @@ Finalmente, no estado \en{playing} o elemento inicia o processamento.
 %  LocalWords:  theoradec alsasink xvimagesink bytes Vorbis Theora raw RGB
 %  LocalWords:  demultiplexa-o pulse-code modulation pixels red-green-blue
 %  LocalWords:  ALSA CPU QoS quality of service buffers events downstream
-%  LocalWords:  upstream EOS end-of-stream flush LocalWords
+%  LocalWords:  upstream EOS end-of-stream flush LocalWords playbin GLib cc
+%  LocalWords:  GNOME GObject gst GST init argv bins element factory make
+%  LocalWords:  GstElement hello assert nonnull filename bunny ogg Big Buck
+%  LocalWords:  Blender Institute Creative Commons object set get free null
+%  LocalWords:  string state PLAYING Gstreamer ready paused playing thread
+%  LocalWords:  threads streaming bus timed filtered warnings CLOCK NONE
+%  LocalWords:  MESSAGE msg message unref makefile clean GstObject linker
+%  LocalWords:  pkg-config link cflags libs flags glib gstreamer shell

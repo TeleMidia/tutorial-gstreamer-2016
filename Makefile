@@ -16,15 +16,21 @@ chapter.tex: chapter-*.tex
 
 # Words that have to be wrapped in \en{...}.
 words=
-words:= buffers?
+words:= bins?
+words:= $(words)|buffers?
+words:= $(words)|bus?
 words:= $(words)|caches?
 words:= $(words)|dataflow
 words:= $(words)|downstream
 words:= $(words)|end-of-stream
 words:= $(words)|events?
 words:= $(words)|fast-forward
+words:= $(words)|flags?
 words:= $(words)|flush
 words:= $(words)|frameworks?
+words:= $(words)|linker
+words:= $(words)|linkers?
+words:= $(words)|makefile
 words:= $(words)|null
 words:= $(words)|pads?
 words:= $(words)|paused
@@ -40,13 +46,16 @@ words:= $(words)|ready
 words:= $(words)|red-green-blue
 words:= $(words)|rewind
 words:= $(words)|seek
+words:= $(words)|shell
 words:= $(words)|sink\s+pads?
 words:= $(words)|sinks?
 words:= $(words)|source\s+pads?
 words:= $(words)|sources?
 words:= $(words)|start
 words:= $(words)|stop
+words:= $(words)|streaming\s+threads?
 words:= $(words)|string
+words:= $(words)|threads?
 words:= $(words)|upstream
 .PHONY: check
 check:
