@@ -21,7 +21,7 @@
 \wdim=2.36\hdim
 \odim=\hdim
 \tikzstyle{element}=[
-    draw=black!60,
+  draw=black!60,
   font={\scriptsize\sffamily},
   inner sep=0pt,
   minimum height=\hdim,
@@ -60,25 +60,7 @@
 \maketitle
 \vskip-1.525\baselineskip\strut
 \begin{abstract}
-  \begin{otherlanguage}{english}
-    This short course is an introduction to GStreamer, one of the main
-    free/open-source frameworks for multimedia processing.  We start
-    presenting GStreamer, its architecture and the dataflow programming
-    model, and then adopt a hands-on approach.  Starting with an example, a
-    simple video player, we introduce each concept of GStreamer’s basic C
-    API and implement it over the initial example incrementally, so that at
-    the end of the course we get a complete video player with support for
-    the usual playback operations (start, stop, pause, seek, fast-forward,
-    and rewind).  We also discuss sample filters---processing elements that
-    manipulate audio and video samples.  We present the various filters
-    natively available in GStreamer and show how one can extend the
-    framework by creating a plugin with a custom filter that manipulates
-    video samples.  The only prerequisite for the short course is a basic
-    knowledge of the C programming language.  At the end of the short
-    course, we expect that participants acquire a general view of GStreamer,
-    and be able to create simple multimedia applications and explore its
-    more advanced features.
-  \end{otherlanguage}
+  \input{chapter-abstract-en}
 \end{abstract}
 \begin{resumo}
   Este minicurso é uma introdução ao GStreamer, um dos principais
@@ -186,7 +168,7 @@ nos atores e pode ser reusada em diversos pontos do \en{dataflow};
 e~(iii)~escalável porque a estrutura é naturalmente composicional (um
 \en{dataflow} pode ser visto como um ator e vice versa).
 
-A Figura~\ref{fig:pipeline-tipico} apresenta o leiaute de um \en{pipeline}
+A Figura~\ref{fig:pipe-tipico} apresenta o leiaute de um \en{pipeline}
 típico para processamento multimídia.  O leiaute nesse caso é uma
 simplificação do \en{pipeline} de uma aplicação GStreamer que reproduz um
 vídeo.  Os nós da figura representam atores e as arestas representam as
@@ -231,7 +213,7 @@ consumidores apenas consomem dados.
     \draw [arrow] (theoradec) -- (xvimagesink);
   \end{tikzpicture}
   \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
-  \label{fig:pipeline-tipico}
+  \label{fig:pipe-tipico}
 \end{figure}
 \vskip-\baselineskip
 
@@ -249,7 +231,7 @@ O processo de desenvolvimento de uma aplicação GStreamer com \en{pipeline}
 estático (cuja topologia não muda em tempo de execução) é relativamente
 simples.  Basta instanciar os elementos necessários, interconectar suas
 \en{pads} e iniciar \en{pipeline} resultante.  O \en{pipeline} da
-Figura~\ref{fig:pipeline-tipico}, por exemplo, após iniciado opera da
+Figura~\ref{fig:pipe-tipico}, por exemplo, após iniciado opera da
 seguinte forma.
 \begin{enumerate}
 \item O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de
@@ -263,7 +245,7 @@ seguinte forma.
 \item O elemento ``oggdemux'' lê da sua \en{sink pad} um fluxo de bytes
   codificado no formato Ogg, demultiplexa-o e escreve os fluxos Vorbis
   (áudio) e Theora (vídeo) resultantes nas \en{source pads} correspondentes.
-  Na figura~\ref{fig:pipeline-tipico}, a \en{source pad} que recebe o fluxo
+  Na figura~\ref{fig:pipe-tipico}, a \en{source pad} que recebe o fluxo
   de áudio codificado possui o rótulo~``A'' e a \en{source pad} que recebe o
   fluxo de vídeo codificado possui o rótulo~``V''.
 \item O elemento ``vorbisdec'' lê da sua \en{sink pad} um fluxo de bytes
@@ -314,28 +296,43 @@ deve ser enviada ao dispositivo de saída de~vídeo.
 
 No GStreamer, em geral, são os elementos \en{sink} os responsáveis por
 controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline}
-da Figura~\ref{fig:pipeline-tipico}, para manter a taxa de reprodução
+da Figura~\ref{fig:pipe-tipico}, para manter a taxa de reprodução
 necessária, os \en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as
-amostras recebidas num \en{buffer} interno, e exibem-nas (consomem-nas)
-apenas no momento adequado.  Já os outros elementos operam livres, isto é,
-consomem e produzem dados em taxas arbitrárias.  Se durante a execução os
-elementos que precedem os \en{sinks} operarem rápido o bastante, os
-\en{buffers} dos \en{sinks} nunca ficarão vazios e todas as amostras serão
-exibidas no momento correto.  Mas esse nem sempre é o caso.
+amostras recebidas numa fila interna, e exibem-nas (consomem-nas) apenas no
+momento adequado.  Já os outros elementos operam livres, isto é, consomem e
+produzem dados em taxas arbitrárias.  Se durante a execução os elementos que
+precedem os \en{sinks} operarem rápido o bastante, as filas dos \en{sinks}
+nunca ficarão vazias e todas as amostras serão exibidas no momento correto.
+Mas esse nem sempre é o caso.
 
-Caso os elementos fluxo acima operem abaixo da taxa de consumo dos
-\en{sinks}, pode ser que o \en{buffer} interno de um dos \en{sinks} esvazie.
-Nesse caso, se chegar o momento de exibir uma amostra o \en{sink}
-simplesmente não tem o que exibir, o que causa interrupções ou saltos na
-reprodução---as amostras ``atrasadas'' quando chegarem serão descartadas.
-Há ainda o problema inverso, caso os elementos fluxo acima operem muito
-acima da taxa de consumo dos \en{sinks}, pode ser que o \en{buffer} interno
-estoure e amostras sejam perdidas.
+Se os elementos fluxo acima operarem abaixo da taxa de consumo dos
+\en{sinks}, pode ser que a fila interna de um dos \en{sinks} fique vazia e,
+caso chegue o momento de exibir uma amostra, o \en{sink} simplesmente não
+tenha o que exibir, causando interrupções ou saltos na reprodução (amostras
+``atrasadas'' quando chegarem serão descartadas).  Há ainda o problema
+inverso, se os elementos fluxo acima operarem muito acima da taxa de consumo
+dos \en{sinks}, pode ser que a capacidade da fila interna seja excedida e
+amostras sejam~perdidas.  Para evitar ambos os problemas, esvaziamento ou
+estouro das filas, ou mesmo para limitar o uso de CPU, os \en{sinks}
+normalmente enviam fluxo acima eventos de QoS (\en{quality of service}) que
+indicam o quão atrasada ou adiantada está cada amostra que chega.  Os
+elementos fluxo acima (produtores e processadores) podem capturar esses
+eventos e usar a informação de retardo para ajustar a sua taxa de operação.
 
-Para evitar o esvaziamento ou estouro de \en{buffers} nos sinks, ou mesmo
-para limitar o uso de CPU, os \en{sinks}---na verdade, qualquer elemento que
-sincronize amostras---enviam eventos de QoS (\en{quality of service}) aos
-elementos fluxo acima.
+De fato, dois tipos de dados trafegam através das conexões de um
+\en{pipeline} GStreamer: segmentos de dados (\en{buffers}) e eventos
+(\en{events}).  Os \en{buffers} carregam segmentos do conteúdo processado
+entre \en{pads} (por exemplo, amostras de áudio e vídeo codificadas ou
+\en{raw}) e fluem exclusivamente na direção das conexões, ou seja, de
+\en{source pads} para \en{sink pads}.  Já os eventos carregam informação de
+controle; eles também fluem entre conexões, mas podem percorrê-las em ambos
+os sentidos: fluxo abaixo (\en{downstream}), de \en{source pads} para
+\en{sink pads}, ou fluxo acima \en{upstream}, de \en{sink pads} para
+\en{source pads}.  Além de eventos de QoS, elementos podem emitir eventos de
+EOS (\en{end-of-stream}) que indicam o fim do fluxo, eventos de \en{seek},
+que indicam avanços ou retrocessos no fluxo, e eventos de \en{flush} que
+sinalizam que os elementos fluxo abaixo devem descarregar \en{caches}
+internos.
 
 
 
@@ -376,7 +373,6 @@ elementos fluxo acima.
 \bibliographystyle{plain}
 \bibliography{bib}
 \end{document}
-% LocalWords:  GStreamer LocalWords mutiplexadores demultiplexadores sinks
-%  LocalWords:  dataflow sources framework frameworks DirectShow Pure seek
-%  LocalWords:  player players fast-foward rewind plugins demultiplexa
-%  LocalWords:  demultiplexa-o demultiplexador demultiplexando
+
+%  LocalWords:  API start stop fast-forward plugin CLAM ChucK Faust ii iii
+%  LocalWords:  bib

@@ -1,0 +1,1 @@
+gst-launch-1.0 filesrc location="big_buck_bunny_1080p_stereo.ogg" ! oggdemux name="demux" demux. ! queue ! theoradec ! xvimagesink demux. ! queue ! vorbisdec ! audioconvert ! alsasink
