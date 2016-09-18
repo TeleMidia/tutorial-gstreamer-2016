@@ -1,55 +1,5 @@
 \documentclass{SBCbookchapter}
-\usepackage[T1]{fontenc}
-\usepackage{textcomp}
-\usepackage[utf8]{inputenc}
-\usepackage[english,brazilian]{babel}
-\usepackage[protrusion=true,expansion]{microtype}
-\usepackage{hyperref}
-\hypersetup{colorlinks=true,allcolors=black}
-\usepackage{amsmath}
-\usepackage{mathtools}
-\usepackage{float}
-\usepackage{natbib}
-\setlength{\bibsep}{0.0pt}
-%%
-\usepackage{tikz}
-\usetikzlibrary{arrows,calc,positioning}
-\newdimen\hdim                  % element height
-\newdimen\wdim                  % element width
-\newdimen\odim                  % offset distance
-\hdim=2.25em
-\wdim=2.36\hdim
-\odim=\hdim
-\tikzstyle{element}=[
-  draw=black!60,
-  font={\scriptsize\sffamily},
-  inner sep=0pt,
-  minimum height=\hdim,
-  minimum width=\wdim,
-  outer sep=0pt,
-  rectangle,
-  rounded corners=\wdim/10,
-  text centered,
-  thick,
-  top color=white,
-  bottom color=black!20,
-]
-\tikzstyle{arrow}=[
-  ->,
-  >=stealth,
-  color=black!60,
-  draw=black!60,
-  shorten >=.5pt,
-  thick,
-]
-\tikzstyle{arrowlabel}=[
-  color=black!60,
-  font={\tiny\sffamily\bfseries},
-]
-\tikzset{node distance=\wdim+\odim}
-%%
-\def\en#1{\foreignlanguage{english}{\emph{#1}}}
-%%
+\input{chapter-header.tex}
 \title{Programando aplicações multimídia no GStreamer}
 \author{%
   Guilherme F\null.~Lima,
@@ -106,17 +56,18 @@ por onde fluem as amostras de áudio e vídeo e dados de controle.  O modelo
 de \en{dataflow} é particularmente interessante para multimídia porque
 possibilita implementações naturalmente paralelas, modulares e escaláveis.
 
-Na parte prática, apresentamos os principais conceitos da API~C básica do
-GStreamer~1.10, sua versão estável mais atual, e ilustramos o uso dessa API
-a partir da construção de um reprodutor (\en{player}) de vídeo.  Apesar de
-aqui estarmos interessados apenas na reprodução (decodificação e
-apresentação) de fluxos de mídia, essa mesma API pode ser utilizada para
-capturar fluxos de áudio e vídeo, codificá-los e transmiti-los na rede.
-O GStreamer possui uma grande variedade de componentes para tratar cada uma
-dessas fases de processamento e, portanto, pode ser usado para construir
-diversos tipos de aplicações multimídia tais como editores de vídeo,
-transcodificadores, transmissores de fluxos de mídia, \en{players} de mídia
-e motores de renderização de linguagens multimídia.
+Na parte prática, apresentamos os principais conceitos da
+API~C~\cite{Kernighan-B-W-1988} básica do GStreamer~1.10, sua versão estável
+mais atual, e ilustramos o uso dessa API a partir da construção de um
+reprodutor (\en{player}) de vídeo.  Apesar de aqui estarmos interessados
+apenas na reprodução (decodificação e apresentação) de fluxos de mídia, essa
+mesma API pode ser utilizada para capturar fluxos de áudio e vídeo,
+codificá-los e transmiti-los na rede.  O GStreamer possui uma grande
+variedade de componentes para tratar cada uma dessas fases de processamento
+e, portanto, pode ser usado para construir diversos tipos de aplicações
+multimídia tais como editores de vídeo, transcodificadores, transmissores de
+fluxos de mídia, \en{players} de mídia e motores de renderização de
+linguagens multimídia.
 
 O restante do capítulo está organizado da seguinte forma.  Na
 Seção~\ref{sec:ola} apresentamos uma versão preliminar do exemplo base do
@@ -189,28 +140,28 @@ consumidores apenas consomem dados.
   \centering
   \begin{tikzpicture}
     \node (filesrc) [element] {filesrc};
-    \node [coordinate, above=.5\hdim of filesrc] (A) {};
-    \node [coordinate, below=.5\hdim of filesrc] (B) {};
+    \coordinate [above=.5\hdim of filesrc] (A);
+    \coordinate [below=.5\hdim of filesrc] (B);
     %%
     \node (oggdemux) [element, right of=filesrc] {oggdemux};
-    \node [coordinate, right of=oggdemux] (C) {};
+    \coordinate [right of=oggdemux] (C);
     %%
     \node (vorbisdec) [element] at (C|-A) {vorbisdec};    
     \node (alsasink) [element, right of=vorbisdec] {alsasink};
     \node (theoradec) [element] at (C|-B) {theoradec};
     \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
     %%
-    \draw [arrow] (filesrc) -- (oggdemux);
-    \node [coordinate] (X) at ($(oggdemux.east)+(0,.25\hdim)$) {};
-    \node [coordinate] (Y) at ($(oggdemux.east)+(0,-.25\hdim)$) {};
-    \draw [arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
-                      -- ($(vorbisdec.west)-(\odim/3,0)$)
-                      -- (vorbisdec.west);
-    \draw [arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
-                      -- ($(theoradec.west)-(\odim/3,0)$)
-                      -- (theoradec.west);
-    \draw [arrow] (vorbisdec) -- (alsasink);
-    \draw [arrow] (theoradec) -- (xvimagesink);
+    \draw [->, arrow] (filesrc) -- (oggdemux);
+    \coordinate (X) at ($(oggdemux.east)+(0,.25\hdim)$);
+    \coordinate (Y) at ($(oggdemux.east)+(0,-.25\hdim)$);
+    \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+                          -- ($(vorbisdec.west)-(\odim/3,0)$)
+                          -- (vorbisdec.west);
+    \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+                          -- ($(theoradec.west)-(\odim/3,0)$)
+                          -- (theoradec.west);
+    \draw [->, arrow] (vorbisdec) -- (alsasink);
+    \draw [->, arrow] (theoradec) -- (xvimagesink);
   \end{tikzpicture}
   \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
   \label{fig:pipe-tipico}
@@ -231,8 +182,8 @@ O processo de desenvolvimento de uma aplicação GStreamer com \en{pipeline}
 estático (cuja topologia não muda em tempo de execução) é relativamente
 simples.  Basta instanciar os elementos necessários, interconectar suas
 \en{pads} e iniciar \en{pipeline} resultante.  O \en{pipeline} da
-Figura~\ref{fig:pipe-tipico}, por exemplo, após iniciado opera da
-seguinte forma.
+Figura~\ref{fig:pipe-tipico}, por exemplo, após iniciado opera da seguinte
+forma.
 \begin{enumerate}
 \item O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de
   arquivos e escreve o fluxo de bytes resultantes na sua \en{source pad}.
@@ -301,9 +252,9 @@ necessária, os \en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as
 amostras recebidas numa fila interna, e exibem-nas (consomem-nas) apenas no
 momento adequado.  Já os outros elementos operam livres, isto é, consomem e
 produzem dados em taxas arbitrárias.  Se durante a execução os elementos que
-precedem os \en{sinks} operarem rápido o bastante, as filas dos \en{sinks}
-nunca ficarão vazias e todas as amostras serão exibidas no momento correto.
-Mas esse nem sempre é o caso.
+precedem os \en{sinks} (fluxo acima) operarem rápido o bastante, as filas
+dos \en{sinks} nunca ficarão vazias e todas as amostras serão exibidas no
+momento correto, mas esse nem sempre é o caso.
 
 Se os elementos fluxo acima operarem abaixo da taxa de consumo dos
 \en{sinks}, pode ser que a fila interna de um dos \en{sinks} fique vazia e,
@@ -315,34 +266,137 @@ dos \en{sinks}, pode ser que a capacidade da fila interna seja excedida e
 amostras sejam~perdidas.  Para evitar ambos os problemas, esvaziamento ou
 estouro das filas, ou mesmo para limitar o uso de CPU, os \en{sinks}
 normalmente enviam fluxo acima eventos de QoS (\en{quality of service}) que
-indicam o quão atrasada ou adiantada está cada amostra que chega.  Os
-elementos fluxo acima (produtores e processadores) podem capturar esses
-eventos e usar a informação de retardo para ajustar a sua taxa de operação.
+indicam o quão atrasada ou adiantada está cada amostra que chega.  Dessa
+forma, os elementos fluxo acima (produtores e processadores) podem capturar
+os eventos e usar a informação de retardo para ajustar a sua taxa de
+operação.
 
-De fato, dois tipos de dados trafegam através das conexões de um
-\en{pipeline} GStreamer: segmentos de dados (\en{buffers}) e eventos
-(\en{events}).  Os \en{buffers} carregam segmentos do conteúdo processado
-entre \en{pads} (por exemplo, amostras de áudio e vídeo codificadas ou
-\en{raw}) e fluem exclusivamente na direção das conexões, ou seja, de
-\en{source pads} para \en{sink pads}.  Já os eventos carregam informação de
-controle; eles também fluem entre conexões, mas podem percorrê-las em ambos
-os sentidos: fluxo abaixo (\en{downstream}), de \en{source pads} para
-\en{sink pads}, ou fluxo acima \en{upstream}, de \en{sink pads} para
-\en{source pads}.  Além de eventos de QoS, elementos podem emitir eventos de
-EOS (\en{end-of-stream}) que indicam o fim do fluxo, eventos de \en{seek},
-que indicam avanços ou retrocessos no fluxo, e eventos de \en{flush} que
-sinalizam que os elementos fluxo abaixo devem descarregar \en{caches}
-internos.
+Dois tipos de dados trafegam através das conexões de um \en{pipeline}
+GStreamer: segmentos de dados (\en{buffers}) e eventos (\en{events}).  Os
+\en{buffers} carregam segmentos do conteúdo processado entre \en{pads} (por
+exemplo, amostras de áudio e vídeo codificadas ou \en{raw}) e fluem
+exclusivamente na direção das conexões, ou seja, de \en{source pads} para
+\en{sink pads}.  Já os eventos carregam informação de controle; eles também
+fluem entre conexões, mas podem percorrê-las em ambos os sentidos: fluxo
+abaixo (\en{downstream}), de \en{source pads} para \en{sink pads}, ou fluxo
+acima \en{upstream}, de \en{sink pads} para \en{source pads}.  Além de
+eventos de QoS, elementos podem emitir eventos de EOS (\en{end-of-stream})
+que indicam o fim do fluxo, eventos de \en{seek} que indicam avanços ou
+retrocessos no fluxo e eventos de \en{flush} que sinalizam que \en{caches}
+internos devem ser descarregados.
 
+\en{Buffers} e eventos percorrem as conexões em paralelo.  Ou seja,
+conceitualmente cada conexão entre as \en{pads} dos elementos pode ser
+entendida como consistindo de dois canais, um canal unidirecional para
+\en{buffers} e outro canal bidirecional para eventos.
+A Figura~\ref{fig:conexao} ilustra a estrutura interna, conceitual de uma
+conexão.  Na figura,``B'' é o canal de \en{buffers} e ``E'' é o canal de
+eventos.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \node [cylinder, thick, draw=black!60, cylinder uses custom fill,
+           cylinder end fill=black!30, cylinder body fill=black!20,
+           minimum height=\wdim, minimum width=\hdim] (c) {};
+    \coordinate (x) at ($(c.before top|-c.east)+(0,.15\hdim)$);
+    \coordinate (y) at ($(c.before top|-c.east)-(0,.15\hdim)$);
+    \coordinate (x0) at ($(c.west|-x)+(.25pt,0)$);
+    \coordinate (y0) at ($(c.west|-y)+(.25pt,0)$);
+    \draw [->,arrow] (x) -- node [arrowlabel, above, pos=.4] {B} ++(\odim,0);
+    \draw [arrow] (x0) -- ++(-\odim,0);
+    \draw [->,arrow] (y) -- node [arrowlabel, below, pos=.4] {E} ++(\odim,0);
+    \draw [->,arrow] (y0) -- ++(-\odim,0);
+  \end{tikzpicture}
+  \caption{Estrutura conceitual de uma conexão entre \en{pads} no
+    GStreamer.}
+  \label{fig:conexao}
+\end{figure}
+
+A discussão do modelo de \en{dataflow} e da sua instanciação no GStreamer se
+encerra aqui.  Na maior parte do tempo, programar no GStreamer consiste em
+montar \en{pipelines} e controlar seu funcionamento.  Até agora discutimos
+de maneira abstrata os conceitos envolvidos nessa montagem e controle.  Está
+na hora de ver esses conceitos na~prática.
 
 
 \section{Olá mundo: Tocando um vídeo}
 \label{sec:ola}
 
-% Nesta seção...  Poderíamos usar implementar pipeline da figura para fazer
-% nosso "olá mundo"---e é exatamente isso que vamos fazer na seção~3---mas
-% há um jeito mais fácil.  Elementos encapsulam
-% funcionalidade... gst-inspect
+Nosso objetivo nessa seção é usar o GStreamer para tocar um vídeo.  Para tal
+poderíamos implementar o \en{pipeline} da Figura~\ref{fig:pipe-tipico}, mas
+há uma maneira mais simples: basta usar o elemento ``playbin''.
+A Listagem~\ref{lst:hello} apresenta um programa~C que faz exatamente isso.
+
+\lstinputlisting[
+style=display,
+caption={Tocando um vídeo no GStreamer usando o elemento ``playbin''.},
+label={lst:hello},
+]{src/hello.c}
+
+Vejamos o propósito de cada linha da Listagem~\ref{lst:hello}.  A linha~1
+inclui as declarações da GLib~\cite{glib}, a biblioteca de portabilidade do
+projeto GNOME~\cite{gnome}, e a linha~2 inclui as declarações do
+GStreamer---o GStreamer depende do \en{framework} GObject~\cite{gobject} da
+GLib para programação orientada a objetos em~C\null.  Na listagem, as
+chamadas com prefixo ``\C{g_}'' ou ``\C{G_}'' e referem-se à funções ou
+macros da GLib, e as chamadas com prefixo ``\C{gst_}'' ou ``\C{GST_}'' e as
+declarações com prefixo ``\C{Gst}'' referem-se à funções, macros ou tipos do
+GStreamer.
+
+\clearpage
+A chamada~\C{gst_init} na linha~11 inicializa o GStreamer e trata os
+argumentos com prefixo ``-\,-gst-'' em \C{argv}.
+
+A próxima chamada, linha~13, cria um elemento ``playbin'' que é também o
+\en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é ele próprio um
+elemento, de fato, um elemento que contém outros elementos mas não possui
+\en{pads}; tais elementos contêiner são chamados de ``\en{bins}''.  A função
+\C{gst_element_factory_make} aloca e retora um novo elemento
+(\C{GstElement}) do tipo especificado.  O primeiro parâmetro da função é o
+nome da fábrica do tipo e o segundo parâmetro (opcional) é o nome a ser
+atribuído ao elemento retornado.  Nesse caso, a chamada cria e retorna um
+elemento do tipo ``playbin'' chamado ``hello''.  Um elemento ``playbin''
+nada mais é do que um \en{pipeline} que se autoconfigura.  Dada uma URI,
+assim que é inciado o ``playbin'' determina o tipo do conteúdo da URI e
+constrói um \en{pipeline} apropriado para reproduzi-lo.
+
+A chamada \C{g_assert_nonnull}, linha~14, é uma asserção que garante que a
+chamada anterior funcionou corretamente, isto é, retornou um elemento válido
+(não nulo).
+
+A chamada da linha~16 constrói uma URI a partir do nome de um arquivo.
+Nesse caso, ``bunny.ogg'' é caminho do arquivo de vídeo Ogg que queremos
+tocar.
+
+A chamada \C{g_object_set} na linha~18 atribui a URI criada anteriormente à
+propriedade ``uri'' do elemento ``playbin''.  Note que \C{g_object_set} é
+uma função da GObject.  Todo elemento (\C{GstElement}) é também um objeto
+(\C{GObject}), e todo objeto possui propriedades cujos valores podem ser
+obtidos via \C{g_object_get} e alterados via \C{g_object_set}.
+A propriedade ``uri'' do elemento ``playbin'' contém a URI do conteúdo de
+mídia a ser reproduzido.
+
+A chamada seguinte, linha~19, libera a \en{string} alocada na linha~16.
+Nesse ponto a \en{string} já não é mais necessária pois foi copiada pela
+chamada \C{g_object_set} anterior.
+
+A chamada \C{gst_element_set_state}, linha~21, inicia o \en{pipeline} da
+aplicação, isto é, transiciona elemento ``playbin'' para o estado
+\C{GST_STATE_PLAYING}.  No Gstreamer, todo elemento incluindo o
+\en{pipeline} possui um estado, que pode ser nulo (\en{null}), pronto
+(\en{ready}), pausado (\en{paused}) ou tocando (\en{playing}).  No estado
+inicial, \en{null}, o elemento não possui recursos alocados.  No estado
+\en{ready}, o elemento aloca recursos globais que não dependem do conteúdo a
+ser processado.  No estado \en{paused}, o elemento aloca recursos que
+dependem do conteúdo a ser processado e se prepara para processá-lo.
+Finalmente, no estado \en{playing} o elemento inicia o processamento.
+
+% Um elemento ``playbin'', tipo \C{GstPlayBin}, é uma especialização de um
+% elemento ``pipeline'', tipo \C{GstPipeline}, que por sua vez é uma
+% especialização de um ``bin'', tipo \C{GstBin}.  Esse último herda de
+% \C{GstElement}, o tipo comum a todos os elementos, que eventualmente herda
+% de \C{GObject} o tipo raiz da hierarquia de objetos da GObject.
 
 
 \section{Dissecando o exemplo anterior}
@@ -375,4 +429,10 @@ internos.
 \end{document}
 
 %  LocalWords:  API start stop fast-forward plugin CLAM ChucK Faust ii iii
-%  LocalWords:  bib
+%  LocalWords:  bib GStreamer frameworks dataflow player seek rewind Pure
+%  LocalWords:  framework DirectShow players fast-foward plugins pads sink
+%  LocalWords:  source sources sinks Ogg filesrc oggdemux vorbisdec pad PCM
+%  LocalWords:  theoradec alsasink xvimagesink bytes Vorbis Theora raw RGB
+%  LocalWords:  demultiplexa-o pulse-code modulation pixels red-green-blue
+%  LocalWords:  ALSA CPU QoS quality of service buffers events downstream
+%  LocalWords:  upstream EOS end-of-stream flush LocalWords

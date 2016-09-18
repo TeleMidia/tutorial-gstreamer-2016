@@ -1,0 +1,107 @@
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[utf8]{inputenc}
+\usepackage[english,brazilian]{babel}
+\usepackage[protrusion=true,expansion]{microtype}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,allcolors=black}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage{natbib}
+\setlength{\bibsep}{0.0pt}
+%% -------------------------------------------------------------------------
+\usepackage{tikz}
+\usetikzlibrary{arrows,calc,positioning,shapes}
+\newdimen\hdim                  % element height
+\newdimen\wdim                  % element width
+\newdimen\odim                  % offset distance
+\hdim=2.25em
+\wdim=2.36\hdim
+\odim=\hdim
+\tikzstyle{element}=[
+  draw=black!60,
+  font={\scriptsize\sffamily},
+  inner sep=0pt,
+  minimum height=\hdim,
+  minimum width=\wdim,
+  outer sep=0pt,
+  rectangle,
+  rounded corners=\wdim/10,
+  text centered,
+  thick,
+  top color=white,
+  bottom color=black!20,
+]
+\tikzstyle{arrow}=[
+  >=stealth,
+  color=black!60,
+  draw=black!60,
+  shorten >=.5pt,
+  thick,
+]
+\tikzstyle{arrowlabel}=[
+  color=black!60,
+  font={\tiny\sffamily\bfseries},
+]
+\tikzset{node distance=\wdim+\odim}
+%% -------------------------------------------------------------------------
+\usepackage{listings}
+\lstset{%
+  basicstyle=\ttfamily,
+  columns=fullflexible,
+  keepspaces=true,
+  keywordstyle=\ttfamily,
+  language=C,
+  escapechar={@},
+  mathescape=true,
+  showstringspaces=false,
+  texcl=true,
+  upquote=true,
+  extendedchars=true,
+  literate=%
+    {á}{{\'a}}1%
+    {é}{{\'e}}1%
+    {í}{{\'i}}1%
+    {ó}{{\'o}}1%
+    {ú}{{\'u}}1%
+    {â}{{\^a}}1%
+    {ê}{{\^e}}1%
+    {ô}{{\^o}}1%
+    {ã}{{\~a}}1%
+    {õ}{{\~o}}1%
+    {ç}{{\c{c}}}1%
+    {€}{\euro}1%
+    {§}{\S}1%
+    {°}{\textdegree{}}1%
+    {ß}{{\ss}}1%
+    {Ä}{{\"A}}1%
+    {Ö}{{\"O}}1%
+    {Ü}{{\"U}}1%
+    {µ}{\textmu}1%
+    {¹}{{\textsuperscript{1}}}1%
+    {²}{{\textsuperscript{2}}}1%
+    {³}{{\textsuperscript{3}}}1%
+    {¼}{\textonequarter}1%
+    {½}{\textonehalf}1%
+    {¢}{\textcent}1%
+    {“}{``}1%
+    {”}{''}1%
+    {‘}{`}1%
+    {’}{'}1%
+    {←}{$\leftarrow$}1%
+    {→}{$\rightarrow$}1%
+}
+\renewcommand{\lstlistingname}{Listagem}
+\lstdefinestyle{display}{
+  aboveskip=\abovedisplayskip,
+  basicstyle=\scriptsize\ttfamily,
+  belowskip=0pt,
+  captionpos=b,
+  frame=tb,
+  numbers=left,
+  numberstyle={\tiny\sffamily},
+}
+%%
+\def\en#1{\foreignlanguage{english}{\emph{#1}}}
+\let\C\lstinline
