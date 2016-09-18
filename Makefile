@@ -16,7 +16,9 @@ chapter.tex: chapter-*.tex
 
 # Words that have to be wrapped in \en{...}.
 words=
-words:= buffers?
+words:= bins?
+words:= $(words)|buffers?
+words:= $(words)|bus?
 words:= $(words)|caches?
 words:= $(words)|dataflow
 words:= $(words)|downstream
@@ -46,7 +48,9 @@ words:= $(words)|source\s+pads?
 words:= $(words)|sources?
 words:= $(words)|start
 words:= $(words)|stop
+words:= $(words)|streaming\s+threads?
 words:= $(words)|string
+words:= $(words)|threads?
 words:= $(words)|upstream
 .PHONY: check
 check:

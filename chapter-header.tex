@@ -34,17 +34,30 @@
   bottom color=black!20,
 ]
 \tikzstyle{arrow}=[
-  >=stealth,
   color=black!60,
   draw=black!60,
-  shorten >=.5pt,
   thick,
 ]
 \tikzstyle{arrowlabel}=[
   color=black!60,
   font={\tiny\sffamily\bfseries},
 ]
-\tikzset{node distance=\wdim+\odim}
+\tikzstyle{state}=[
+  ellipse,
+  draw,
+  font={\scriptsize\sffamily},
+  inner sep=0pt,
+  minimum height=\hdim,
+  minimum width=.65\wdim,
+  text width=.45\wdim,
+  outer sep=0pt,
+  text centered,
+]
+\tikzset{
+  node distance=\wdim+\odim,
+  >=stealth,
+  shorten >=.5pt,
+}
 %% -------------------------------------------------------------------------
 \usepackage{listings}
 \lstset{%
