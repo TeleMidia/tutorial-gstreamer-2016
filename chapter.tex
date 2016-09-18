@@ -403,20 +403,28 @@ aplicação'' e as \en{threads} secundárias são chamadas de ``\en{streaming
   threads}''.  As \en{streaming threads} se comunicam com a \en{thread} da
 aplicação através de mensagens assíncronas postadas num barramento
 (\en{bus}) associado ao \en{pipeline}.  Essas mensagens informam a
-\en{thread} da aplicação sobre acontecimentos no \en{pipeline}, por exemplo,
-mudança de estado de elementos, fim do fluxo, erros, \en{warnings}, etc., e
-permitem que aplicação reaja da maneira apropriada.
+\en{thread} da aplicação sobre acontecimentos internos do \en{pipeline}, por
+exemplo, mudança de estado de elementos, fim do fluxo, erros, \en{warnings},
+etc., e permitem que aplicação reaja da maneira apropriada.
 
 A chamada \C{gst_element_get_bus}, linha~25, obtém uma referência para o
 barramento de mensagens (\en{bus}) do \en{pipeline} do ``playbin''.
 
 A próxima chamada, linha~26, bloqueia a \en{thread} da aplicação até que uma
 mensagem de erro ou de EOS (\en{end-of-stream}, ``fim do fluxo'') seja
-postada no barramento.  A função \C{gst_bus_timed_pop_filtered} recebe o
-\en{bus}, um tempo máximo de espera, e uma máscara de tipo de mensagens, e
-bloqueia até que o tempo máximo seja atingido ou até que uma mensagem de um
-dos tipos esperados seja postada no \en{bus}.
+postada no barramento.  Ou seja, a \en{thread} da aplicação aguarda nessa
+chamada até um erro aconteça ou até que o vídeo seja reproduzido
+completamente.  A função \C{gst_bus_timed_pop_filtered} recebe o \en{bus}, o
+tempo máximo de espera e a máscara dos tipos das mensagens a serem
+aguardadas, e bloqueia até que o tempo máximo seja atingido ou até que uma
+mensagem de um dos tipos esperados seja postada no \en{bus}.  A função
+retorna \C{NULL} caso o tempo máximo seja atingido ou retorna uma referência
+para a mensagem recebida.  Na Listagem~\ref{lst:hello}, estamos aguardando
+por um tempo ilimitado (\C{GST_TIME_CLOCK_NONE}) uma mensagem de erro
+(\C{GST_MESSAGE_ERROR}) ou uma mensagem de EOS (\C{GST_MESSAGE_EOS}), que
+após a chamada é armazenada na variável \C{msg}.
 
+A chamada \C{gst_message_unref},
 
 
 \section{Dissecando o exemplo anterior}
