@@ -393,8 +393,8 @@ necessários para reproduzir esse conteúdo, (3)~inicia a sua reprodução numa
 \en{thread} separada e~(4) devolve o controle à \en{thread} principal da
 aplicação.
 
-A chamada seguinte, \C{g_assert} na linha~23, é uma asserção que garante que
-a requisição de transição de estado anterior foi bem sucedida.  Após essa
+A chamada \C{g_assert}, linha~23, é uma asserção que garante que a
+requisição de transição de estado anterior foi bem sucedida.  Após essa
 linha, podemos assumir que o vídeo está tocando e que aplicação possui pelo
 menos duas \en{threads}: a \en{thread} principal, que está prestes a
 executar a linha~23, e uma ou mais \en{threads} secundárias, que operam o
@@ -421,10 +421,92 @@ mensagem de um dos tipos esperados seja postada no \en{bus}.  A função
 retorna \C{NULL} caso o tempo máximo seja atingido ou retorna uma referência
 para a mensagem recebida.  Na Listagem~\ref{lst:hello}, estamos aguardando
 por um tempo ilimitado (\C{GST_TIME_CLOCK_NONE}) uma mensagem de erro
-(\C{GST_MESSAGE_ERROR}) ou uma mensagem de EOS (\C{GST_MESSAGE_EOS}), que
+(\C{GST_MESSAGE_ERROR}) ou uma mensagem de EOS (\C{GST_MESSAGE_EOS}) que
 após a chamada é armazenada na variável \C{msg}.
 
-A chamada \C{gst_message_unref},
+A chamada \C{gst_message_unref}, linha~27, libera a mensagem retornada na
+chamada da linha anterior.  Nesse ponto, ou houve um erro ou a reprodução
+chegou ao fim.
+
+A chamada \C{gst_object_unref}, linha~28, libera a referência para o
+\en{bus} do ``playbin'' obtida na linha~25.  A função \C{gst_object_unref} é
+apenas um \en{alias} para a função \C{g_object_unref}, que libera uma
+referência para um \C{GObject}.  No GStreamer, a maioria dos tipos
+``objeto'' não herdam diretamente de \C{GObject}, mas sim de \C{GstObject}
+que por sua vez herda de \C{GObject}.
+
+A chamada \C{gst_element_set_state}, linha~30, para o \en{pipeline} da
+aplicação (caso ele ainda não esteja parado) e libera os recursos utilizados
+durante o seu processamento, isto é, transiciona o elemento ``playbin'' de
+volta para o estado inicial \en{null}.
+
+Finalmente, a chamada \C{gst_object_unref}, linha~31, libera o próprio
+elemento ``playbin'' alocado na linha~14.
+
+Se tudo correr bem, ao executar o programa anterior uma nova janela aparece
+na tela e vídeo é reproduzido até o final.  A Figura~\ref{fig:bunny}
+apresenta um quadro do vídeo em questão.  Antes de rodar o ``Olá mundo'',
+porém, é preciso compilá-lo.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[scale=.115]{media/frame}
+  \caption{Quadro do vídeo \en{Big Buck Bunny}~\cite{bunny}.}
+  \label{fig:bunny}
+\end{figure}
+
+
+\subsection*{Compilando o programa ``Olá mundo'' no GNU/Linux}
+
+Para compilar o programa da Listagem~\ref{lst:hello} precisamos informar ao
+compilador~C o caminho do diretório que contém os cabeçalhos (.h) da GLib e
+do GStreamer.  Além disso, precisamos informar ao \en{linker} o caminho e o
+nome das bibliotecas dinâmicas correspondentes.  No GNU/Linux, a maneira
+mais fácil de se fazer isso é através ferramenta \en{pkg-config}.  Por
+exemplo:
+\begin{lstlisting}[style=command]
+@\$@ cc `pkg-config --cflags --libs glib-2.0 gstreamer-1.0`\
+      hello.c -o hello
+\end{lstlisting}
+
+Esse comando compila e \en{link}-edita o programa da
+Listagem~\ref{lst:hello} (``hello.c'') e gera um executável chamado
+``hello''.  As opções ``-\,-cflags'' e ``-\,-libs'' do comando
+\en{pkg-config} instruem-no a emitir as \en{flags} de compilação e
+\en{link}-edição apropriadas dos módulos listados, no caso, ``glib-2.0'' e
+``gstreamer-1.0''.  Observe que a chamada do comando \en{pkg-config} aparece
+entre o apóstrofos.  Ou seja, antes de avaliar o comando mais externo,
+\en{cc}, que é a chamada do compilador~C, o interpretador de comandos
+(\en{shell}) executa o comando \en{pkg-config} e substitui o que aparece
+entre apóstrofos pelo resultado dessa execução.
+
+No nosso ambiente, o comando anterior avalia para:
+\begin{lstlisting}[style=command]
+@\$@ cc -pthread\
+     -I/usr/include/gstreamer-1.0\
+     -I/usr/lib/gstreamer-1.0/include\
+     -I/usr/include/glib-2.0\
+     -I/usr/lib/glib-2.0/include\
+     -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0\
+     hello.c -o hello
+\end{lstlisting}
+
+Uma forma de tornar o processo de compilação menos trabalhoso é escrever um
+\en{makefile} com a descrição da sequência de comandos que constrói o
+programa.  A Listagem~\ref{lst:makefile} apresenta o \en{makefile} que
+usamos para construir os programas deste minicurso.  Usando esse
+\en{makefile} sempre que for preciso recompilar o programa basta rodar o
+comando \en{make} no mesmo diretório onde está o arquivo de \en{makefile}
+(``Makefile'').  E sempre que quisermos remover os arquivos gerados pelo
+compilador basta rodar ``\C{make clean}''.  Para mais informações sobre como
+compilar programas no GNU/Linux, veja~\cite{Gough-B-J-2005}.
+
+\lstinputlisting[
+style=display,
+mathescape=no,
+caption={\en{Makefile} que constrói o programa ``Olá mundo''.},
+label={lst:makefile},
+]{src/Makefile.hello}
 
 
 \section{Dissecando o exemplo anterior}
@@ -498,9 +580,11 @@ transições possíveis.
 %  LocalWords:  theoradec alsasink xvimagesink bytes Vorbis Theora raw RGB
 %  LocalWords:  demultiplexa-o pulse-code modulation pixels red-green-blue
 %  LocalWords:  ALSA CPU QoS quality of service buffers events downstream
-%  LocalWords:  upstream EOS end-of-stream flush LocalWords playbin GLib
+%  LocalWords:  upstream EOS end-of-stream flush LocalWords playbin GLib cc
 %  LocalWords:  GNOME GObject gst GST init argv bins element factory make
 %  LocalWords:  GstElement hello assert nonnull filename bunny ogg Big Buck
 %  LocalWords:  Blender Institute Creative Commons object set get free null
 %  LocalWords:  string state PLAYING Gstreamer ready paused playing thread
-%  LocalWords:  threads streaming bus
+%  LocalWords:  threads streaming bus timed filtered warnings CLOCK NONE
+%  LocalWords:  MESSAGE msg message unref makefile clean GstObject linker
+%  LocalWords:  pkg-config link cflags libs flags glib gstreamer shell

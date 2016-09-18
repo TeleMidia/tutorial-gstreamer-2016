@@ -61,7 +61,7 @@
 %% -------------------------------------------------------------------------
 \usepackage{listings}
 \lstset{%
-  basicstyle=\ttfamily,
+  basicstyle=\small\ttfamily,
   columns=fullflexible,
   keepspaces=true,
   keywordstyle=\ttfamily,
@@ -106,6 +106,10 @@
     {→}{$\rightarrow$}1%
 }
 \renewcommand{\lstlistingname}{Listagem}
+\lstdefinestyle{command}{
+  aboveskip=\abovedisplayskip,
+  belowskip=\belowdisplayskip,
+}
 \lstdefinestyle{display}{
   aboveskip=\abovedisplayskip,
   basicstyle=\scriptsize\ttfamily,
