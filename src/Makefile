@@ -1,4 +1,4 @@
-PROGRAMS= hello
+PROGRAMS= hello mp3
 MODULES= glib-2.0 gstreamer-1.0
 CFLAGS= -g -Wall -Wextra `pkg-config --cflags $(MODULES)`
 LDFLAGS= `pkg-config --libs $(MODULES)`
