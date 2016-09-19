@@ -351,7 +351,7 @@ A próxima chamada, linha~14, cria um elemento ``playbin'' que é também o
 \en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é ele próprio um
 elemento, de fato, um elemento que contém outros elementos mas não possui
 \en{pads}.  Tais elementos contêiner são chamados de ``\en{bins}''.
-A função \C{gst_element_factory_make} aloca e retora um novo elemento
+A função \C{gst_element_factory_make} aloca e retorna um novo elemento
 (\C{GstElement}) do tipo especificado.  O primeiro parâmetro da função é o
 nome da fábrica do tipo e o segundo parâmetro (opcional) é o nome a ser
 atribuído ao elemento retornado.  Nesse caso, a chamada cria e retorna um
@@ -430,7 +430,7 @@ chegou ao fim.
 
 A chamada \C{gst_object_unref}, linha~28, libera a referência para o
 \en{bus} do ``playbin'' obtida na linha~25.  A função \C{gst_object_unref} é
-apenas um \en{alias} para a função \C{g_object_unref}, que libera uma
+um pseudônimo (\en{alias}) para a função \C{g_object_unref}, que libera uma
 referência para um \C{GObject}.  No GStreamer, a maioria dos tipos
 ``objeto'' não herdam diretamente de \C{GObject}, mas sim de \C{GstObject}
 que por sua vez herda de \C{GObject}.
@@ -443,10 +443,10 @@ volta para o estado inicial \en{null}.
 Finalmente, a chamada \C{gst_object_unref}, linha~31, libera o próprio
 elemento ``playbin'' alocado na linha~14.
 
-Se tudo correr bem, ao executar o programa anterior uma nova janela aparece
-na tela e vídeo é reproduzido até o final.  A Figura~\ref{fig:bunny}
-apresenta um quadro do vídeo em questão.  Antes de rodar o ``Olá mundo'',
-porém, é preciso compilá-lo.
+Se tudo correr bem, ao executar o programa ``Olá mundo'' anterior uma nova
+janela aparece na tela e vídeo é reproduzido até o final.
+(A Figura~\ref{fig:bunny} apresenta um quadro do vídeo em questão.)  Antes
+de rodar o ``Olá mundo'', porém, é preciso compilá-lo.
 
 \begin{figure}[H]
   \centering
@@ -475,12 +475,11 @@ Listagem~\ref{lst:hello} (``hello.c'') e gera um executável chamado
 \en{pkg-config} instruem-no a emitir as \en{flags} de compilação e
 \en{link}-edição apropriadas dos módulos listados, no caso, ``glib-2.0'' e
 ``gstreamer-1.0''.  Observe que a chamada do comando \en{pkg-config} aparece
-entre o apóstrofos.  Ou seja, antes de avaliar o comando mais externo,
-\en{cc}, que é a chamada do compilador~C, o interpretador de comandos
-(\en{shell}) executa o comando \en{pkg-config} e substitui o que aparece
-entre apóstrofos pelo resultado dessa execução.
-
-No nosso ambiente, o comando anterior avalia para:
+entre crases.  Ou seja, antes de avaliar o comando mais externo, \en{cc},
+que é a chamada do compilador~C, o interpretador de comandos (\en{shell})
+executa o comando \en{pkg-config} e substitui o comando entre crases pelo
+resultado dessa execução.  Por exemplo, no nosso ambiente o comando anterior
+avalia para:
 \begin{lstlisting}[style=command]
 @\$@ cc -pthread\
      -I/usr/include/gstreamer-1.0\
@@ -493,13 +492,19 @@ No nosso ambiente, o comando anterior avalia para:
 
 Uma forma de tornar o processo de compilação menos trabalhoso é escrever um
 \en{makefile} com a descrição da sequência de comandos que constrói o
-programa.  A Listagem~\ref{lst:makefile} apresenta o \en{makefile} que
-usamos para construir os programas deste minicurso.  Usando esse
-\en{makefile} sempre que for preciso recompilar o programa basta rodar o
-comando \en{make} no mesmo diretório onde está o arquivo de \en{makefile}
-(``Makefile'').  E sempre que quisermos remover os arquivos gerados pelo
-compilador basta rodar ``\C{make clean}''.  Para mais informações sobre como
-compilar programas no GNU/Linux, veja~\cite{Gough-B-J-2005}.
+programa.  A Listagem~\ref{lst:makefile} apresenta o \en{makefile} (arquivo
+texto chamado ``Makefile'') que usamos para construir os exemplos do
+minicurso.  Na listagem, variável \C{PROGRAMS}, linha~1, contém o nome dos
+programas a serem construídos.  A variável \C{MODULES}, linha~2, contém os
+nomes dos módulos \en{pkg-config} necessárias.  E as variáveis \C{CFLAGS} e
+\C{LDFLAGS}, linhas~3 e~4, contém as \en{flags} de compilação e
+\en{link}-edição necessários.  O restante do arquivo, linhas~5--8, define os
+alvos ``all'' e ``clean''.\footnote{Na linha~7, o primeiro caractere é um
+  TAB.}  Ou seja, para construir o programa, basta executar o comando
+``\C{make}'' (ou ``\C{make all}''), e para remover os arquivos gerados pelo
+compilador basta executar ``\C{make clean}''.  (Veja~\cite{Gough-B-J-2005}
+Para mais informações sobre como compilar programas e escrever
+\en{makefiles} no GNU/Linux.)
 
 \lstinputlisting[
 style=display,
@@ -511,6 +516,19 @@ label={lst:makefile},
 
 \section{Dissecando o exemplo anterior}
 \label{sec:dissec}
+
+Tocar um vídeo no GStreamer usando o elemento ``playbin'' é trivial.
+
+O programa ``Olá mundo'' anterior utiliza o elemento ``playbin'' para tocar
+um vídeo no GStreamer.
+
+O exemplo utiliza a API de alto-nível~\texttt{GstPlayer}, atualmente a forma
+mais simples de se reproduzir um áudio ou vídeo no GStreamer.
+
+Apesar da API~\texttt{GstPlayer} simplificar a programação de reprodutores
+de mídia, ela é inflexível e limita os possíveis usos do framework.  Dessa
+forma, é importante que os participantes do minicurso conheçam a API básica
+do GStreamer e seu modo de operação.
 
 No Gstreamer, todo elemento incluindo o
 \en{pipeline} possui um estado, que pode ser nulo (\en{null}), pronto
@@ -531,17 +549,17 @@ transições possíveis.
 
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[node distance=.65\wdim+\odim]
+  \begin{tikzpicture}[node distance=.45\wdim+\odim]
     \node [state] (NULL) {null};
     \node [state, right of=NULL] (READY) {ready};
     \node [state, right of=READY] (PAUSED) {paused};
     \node [state, right of=PAUSED] (PLAYING) {playing};
-    \draw [->] (NULL) to [bend left=25] (READY);
-    \draw [->] (READY) to [bend left=25] (PAUSED);
-    \draw [->] (PAUSED) to [bend left=25] (PLAYING);
-    \draw [->] (PLAYING) to [bend left=25] (PAUSED);
-    \draw [->] (PAUSED) to [bend left=25] (READY);
-    \draw [->] (READY) to [bend left=25] (NULL);
+    \draw [->] (NULL) to [bend left=20] (READY);
+    \draw [->] (READY) to [bend left=20] (PAUSED);
+    \draw [->] (PAUSED) to [bend left=20] (PLAYING);
+    \draw [->] (PLAYING) to [bend left=20] (PAUSED);
+    \draw [->] (PAUSED) to [bend left=20] (READY);
+    \draw [->] (READY) to [bend left=20] (NULL);
   \end{tikzpicture}
   \caption{Máquina de estados de um elemento GStreamer (\C{GstElement}).}
   \label{fig:estados-elt}

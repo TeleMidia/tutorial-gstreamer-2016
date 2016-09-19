@@ -1,8 +1,8 @@
-TARGETS= hello
+PROGRAMS= hello
 MODULES= glib-2.0 gstreamer-1.0
 CFLAGS= -g -Wall -Wextra `pkg-config --cflags $(MODULES)`
 LDFLAGS= `pkg-config --libs $(MODULES)`
-all: $(TARGETS)
+all: $(PROGRAMS)
 clean:
-	-rm -f $(TARGETS)
+	-rm -f $(PROGRAMS)
 .PHONY: all clean
