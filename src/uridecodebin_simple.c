@@ -1,9 +1,8 @@
 #include <glib.h>
 #include <gst/gst.h>
 
-GstElement *pipeline, *filesrc, *demux, *videodecoder, *videoconvert,
-           *audiodecoder, *audioconvert, *videosink, *videoqueue, *audioqueue,
-           *audiosink;
+GstElement *pipeline, *source, *videoconvert, *audioconvert,
+           *videosink, *audiosink;
 
 static void on_pad_added (GstElement *element, GstPad *pad, gpointer data)
 {
@@ -16,10 +15,10 @@ static void on_pad_added (GstElement *element, GstPad *pad, gpointer data)
   pad_struct = gst_caps_get_structure (pad_caps, 0);
   pad_type = gst_structure_get_name (pad_struct);
 
-  if (g_str_has_prefix (pad_type, "audio/x-vorbis"))
-    sinkpad = gst_element_get_static_pad (audioqueue, "sink"); 
-  else if (g_str_has_prefix (pad_type, "video/x-theora"))
-    sinkpad = gst_element_get_static_pad (videoqueue, "sink"); 
+  if (g_str_has_prefix (pad_type, "audio/x-raw"))
+    sinkpad = gst_element_get_static_pad (audioconvert, "sink"); 
+  else if (g_str_has_prefix (pad_type, "video/x-raw"))
+    sinkpad = gst_element_get_static_pad (videoconvert, "sink"); 
 
   if (sinkpad != NULL)
   {
@@ -39,40 +38,29 @@ int main (int argc, char *argv[])
 {
   GstBus *bus;
   GstMessage *msg;
+  char *uri;
 
   gst_init (&argc, &argv);
   
   pipeline = gst_pipeline_new ("pipeline");
 
-  filesrc       = gst_element_factory_make ("filesrc", "source");
-  demux         = gst_element_factory_make ("oggdemux", "demux");
-  videodecoder  = gst_element_factory_make ("theoradec", "videodecoder");
+  source        = gst_element_factory_make ("uridecodebin", "source");
   videoconvert  = gst_element_factory_make ("videoconvert", "videoconverter");
-  videoqueue    = gst_element_factory_make ("queue", "videoqueue");
   audioconvert  = gst_element_factory_make ("audioconvert", "audioconverter");
-  audiodecoder  = gst_element_factory_make ("vorbisdec", "audiodecoder");
-  audioqueue    = gst_element_factory_make ("queue", "audioqueue");
   videosink     = gst_element_factory_make ("xvimagesink", "videosink");
   audiosink     = gst_element_factory_make ("autoaudiosink", "audiosink");
 
-  g_assert (filesrc);
-  g_assert (demux);
-  g_assert (videodecoder);
-  g_assert (audiodecoder);
-  g_assert (videosink);
-  g_assert (audiosink);
-
-  gst_bin_add_many (GST_BIN(pipeline), filesrc, demux, videodecoder, 
-      videoconvert, videoqueue, audiodecoder, audioconvert, audioqueue,
+  gst_bin_add_many (GST_BIN(pipeline), source, videoconvert, audioconvert,
       videosink, audiosink, NULL);
 
-  gst_element_link (filesrc, demux);
-  gst_element_link_many (videoqueue, videodecoder, videoconvert, videosink, NULL);
-  gst_element_link_many (audioqueue, audiodecoder, audioconvert, audiosink, NULL);
+  gst_element_link (videoconvert, videosink);
+  gst_element_link (audioconvert, audiosink);
 
-  g_object_set (G_OBJECT (filesrc), "location", "bunny.ogg", NULL);
+  uri = gst_filename_to_uri ("bunny.ogg", NULL);
+  g_object_set (G_OBJECT (source), "uri", uri, NULL);
+  g_free (uri);
 
-  g_signal_connect (demux, "pad-added", G_CALLBACK (on_pad_added), NULL);
+  g_signal_connect (source, "pad-added", G_CALLBACK (on_pad_added), NULL);
 
   gst_element_set_state (pipeline, GST_STATE_PLAYING);
   bus = gst_element_get_bus (pipeline);
