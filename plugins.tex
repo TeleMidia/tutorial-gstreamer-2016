@@ -1,10 +1,10 @@
 \section{Plugins}
 \label{sec:plugins}
-Até agora só vimos como usar elementos já definidos pelo Gstreamer.  Nesta
-seção iremos discutir como é possível criar novos tipos de elementos---os quais
-podem ser distribuidos separadamente, instalados e usados em um
-\emph{pipeline}.  Um plugin no Gstreamer nada mais é do que um tipo de ator (ou
-``elemento'') que pode ser instanciado em um pipeline.
+Até agora só vimos como usar elementos já definidos pelo Gstreamer (e.g.
+``filesrc'', ``alsasink'').  Nesta seção iremos discutir como é possível criar
+novos tipos de elementos.  No Gstreamer, novos tipos de elementos podem ser
+criados por meio de plugins, os quais podem ser distribuidos separadamente,
+instalados e usados em um \emph{pipeline}. 
 
 %Esta seção apresenta um exemplo e discute a API de plugins do Gstreamer.
 %Espera-se que ao final dela, o leitor tenha uma visão geral de como criar novos
@@ -14,20 +14,14 @@ podem ser distribuidos separadamente, instalados e usados em um
 %\emph{source}, \emph{sink}, \emph{transform}, and \emph{processing} plugin.
 
 Os plugins do Gstreamer são derivados da classe base \emph{GstElement}.  Além
-disso, outras classes distribuídas nos pacotes gst-plugin-base também podem ser
-usadas para criar novos plugins.  As principais são:
-
-\begin{itemize}
+disso, outras classes distribuídas nos pacotes \C{gst-plugin-base} também podem
+ser usadas para criar novos plugins.  As principais são: \C{GstBaseSrc}, classe
+base para plugins tipo \emph{source} (ou produtores); \C{GstBaseSink}, classe
+base para plugins do tipo \emph{sink} (ou consumidores); \C{GstBaseTransform},
+classe base para plugins do tipo \emph{tranform} (ou filtros; e \C{GstBin},
+cria um manipuladores de plugins customizáveis similar ao GstPipeline.
 %  \item{GstElement}--a classe base mais genérica, das quais as outras classes
 %                     bases derivam;
-  \item{GstBaseSrc}--classe base para plugins tipo \emph{source} (ou
-                     produtores);
-  \item{GstBaseSink}--classe base para plugins do tipo \emph{sink} (ou
-                      consumidores);
-  \item{GstBaseTransform}--classe base para plugins do tipo \emph{tranform}; e
-  \item{GstBin}---cria um manipuladores de plugins customizáveis similar ao
-                  GstPipeline.
-\end{itemize}
 
 \tikzstyle{every node}=[draw=black,thick,anchor=west]
 \tikzstyle{selected}=[draw=red,fill=red!30]
@@ -55,7 +49,14 @@ usadas para criar novos plugins.  As principais são:
     };
   \end{tikzpicture}
   \label{fig:class_hierarchy}
+  \caption{Hierarquia de classes dos elementos.}
 \end{figure}
+
+\lstinputlisting[
+style=display,
+caption={Processador de audio},
+label={lst:simpleaudiofilter},
+]{src/simpleaudiofilter.c}
 
 \subsection*{Comunicação entre os plugins}
 Como mencionado anteriormente, a comunicação entre os elementos é gerenciada
