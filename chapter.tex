@@ -125,7 +125,7 @@ simplificação do \en{pipeline} de uma aplicação GStreamer que reproduz um
 vídeo.  Os nós da figura representam atores e as arestas representam as
 conexões por onde fluem as amostras de áudio e vídeo e dados de controle.
 Na terminologia do GStreamer os atores do são chamados de ``elementos'' e as
-portas de~``\en{pads}''.  Há dois tipos de \en{pads}, \en{sink pads} e
+portas de~``\en{pads}''.  Há dois tipos de \en{pads}: \en{sink pads} e
 \en{source pads}.  As \en{sink pads} são as portas de entrada através das
 quais o elemento consome dados, e as \en{source pads} são as portas de saída
 através das quais o elemento produz dados.  Os elementos são classificados
@@ -323,7 +323,7 @@ na hora de ver esses conceitos na~prática.
 \section{Olá mundo: Tocando um vídeo}
 \label{sec:ola}
 
-Nosso objetivo nessa seção é usar o GStreamer para tocar um vídeo.  Para tal
+Nosso objetivo nesta seção é usar o GStreamer para tocar um vídeo.  Para tal
 poderíamos implementar o \en{pipeline} da Figura~\ref{fig:pipe-tipico}, mas
 há uma maneira mais simples: basta usar o elemento ``playbin''.
 A Listagem~\ref{lst:hello} apresenta um programa~C que faz exatamente isso.
@@ -674,8 +674,7 @@ pai, ou seja, estão contidos no mesmo \en{bin}.
 \label{sec:ops}
 
 
-\section{Plugins}
-\label{sec:plugins}
+\input{plugins.tex}
 
 
 \section{Conclusão}

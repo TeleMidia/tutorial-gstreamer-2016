@@ -1,0 +1,114 @@
+\section{Plugins}
+\label{sec:plugins}
+Até agora só vimos como usar elementos já definidos pelo Gstreamer.  Nesta
+seção iremos discutir como é possível criar novos tipos de elementos---os quais
+podem ser distribuidos separadamente, instalados e usados em um
+\emph{pipeline}.  Um plugin no Gstreamer nada mais é do que um tipo de ator (ou
+``elemento'') que pode ser instanciado em um pipeline.
+
+%Esta seção apresenta um exemplo e discute a API de plugins do Gstreamer.
+%Espera-se que ao final dela, o leitor tenha uma visão geral de como criar novos
+%tipos de elementos que podem ser usados em um \emph{pipeline}.
+
+%Os plugins do Gstreamer podem ser divididos em quatro categorias principais:
+%\emph{source}, \emph{sink}, \emph{transform}, and \emph{processing} plugin.
+
+Os plugins do Gstreamer são derivados da classe base \emph{GstElement}.  Além
+disso, outras classes distribuídas nos pacotes gst-plugin-base também podem ser
+usadas para criar novos plugins.  As principais são:
+
+\begin{itemize}
+%  \item{GstElement}--a classe base mais genérica, das quais as outras classes
+%                     bases derivam;
+  \item{GstBaseSrc}--classe base para plugins tipo \emph{source} (ou
+                     produtores);
+  \item{GstBaseSink}--classe base para plugins do tipo \emph{sink} (ou
+                      consumidores);
+  \item{GstBaseTransform}--classe base para plugins do tipo \emph{tranform}; e
+  \item{GstBin}---cria um manipuladores de plugins customizáveis similar ao
+                  GstPipeline.
+\end{itemize}
+
+\tikzstyle{every node}=[draw=black,thick,anchor=west]
+\tikzstyle{selected}=[draw=red,fill=red!30]
+\tikzstyle{optional}=[dashed,fill=gray!50]
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[%
+  grow via three points={one child at (0.5,-0.7) and
+  two children at (0.5,-0.7) and (0.5,-1.4)},
+  edge from parent path={(\tikzparentnode.south) |- (\tikzchildnode.west)}]
+  \node {GObject}
+    child {
+%      node {GInitiallyUnknown}
+%      child {
+        node {GstElement}
+        child {node{GstBaseSrc}}
+        child {node{GstBaseSink}}
+        child {node{GstBin}}
+        child {
+          node {GstBaseTransform}
+          child {node {GstAudioFilter}}
+          child {node {GstVideoFitter}}
+        }
+%      }
+    };
+  \end{tikzpicture}
+  \label{fig:class_hierarchy}
+\end{figure}
+
+\subsection*{Comunicação entre os plugins}
+Como mencionado anteriormente, a comunicação entre os elementos é gerenciada
+usando \emph{pads}.  Sendo assim, ao criar um plugin também devemos especificar
+quantos e quais tipos de \emph{pad} esse plugin aceita como entrada e saída.
+
+%Um \emph{pad} pode ser visto como um conector que conecta dois plugins
+%(similar ao cabo de força que conecta uma tomada na parede ao DVD player).
+
+A comunicação entre os plugins pode ser classificada em duas subcategorias:
+\emph{mensagens de controle} (ou eventos) e \emph{mensagens de conteúdo de
+mídia} (ou buffers).  As mensagens de controle são cruciais para controlar o
+processamento das mídias.  As mensagens de conteúdo de mídia são responsáveis
+por transferir o conteúdo que precisa ser processado.
+
+\subsection*{Funções}
+\begin{itemize}
+  \item plugin\_init
+  \item chain: Essa função é onde todo o processamento dos dados é realizado.
+        No caso de plugins simples as funções \_chain () são geralmente lineares,
+        para cada buffer na enntrada um buffer será gerado na saída também.
+        Below is a very simple implementation of a chain function: 
+  \item event
+\end{itemize}
+
+\subsection*{Exemplo de plugin}
+Plugin simples contendo 1 sink pad e 1 source pad.
+
+Apenas multiplica o dado de entrada por um número X.
+
+\subsection*{Testando o seu plugin}
+Para compilar o nosso plugin devemos gerar uma biblioteca dinâmica (.dll no
+Windows ou .so no Linux).  O comando a seguire compila o exemplo desenvolvido
+acima:
+
+\begin{lstlisting}[style=command]
+@\$@ cc -share -fPIC \
+  `pkg-config --cflags --libs gstreamer-1.0 gstreamer-base-1.0`\
+  simplefilter.c -o simplefilter.so
+\end{lstlisting}
+
+O comando a seguir carrega o plugin myfilter que desenvolvemos em um pipeline
+simples:
+
+\begin{lstlisting}[style=command]
+@\$@ gst-launch-1.0 --gst-plugin-path=. \
+     audiotestsrc ! audioconvert ! myfilter ! alsasink
+\end{lstlisting}
+
+\noindent compare com o resultado sem o nosso filtro:
+\begin{lstlisting}[style=command]
+@\$@ gst-launch-1.0 --gst-plugin-path=. \
+     audiotestsrc ! audioconvert ! alsasink
+\end{lstlisting}
+
+
