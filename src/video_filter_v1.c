@@ -21,17 +21,10 @@ static void on_pad_added (GstElement *element, GstPad *pad, gpointer data)
   else if (g_str_has_prefix (pad_type, "video/x-raw"))
     sinkpad = gst_element_get_static_pad (videoconvert, "sink"); 
 
-  if (sinkpad != NULL)
-  {
-    GstPadLinkReturn ret = gst_pad_link (pad, sinkpad);
-    if (GST_PAD_LINK_SUCCESSFUL(ret))
-      g_print ("Pads linked\n");
-    else
-      g_print ("Pads not linked\n");
+  g_assert (sinkpad);
+  g_assert (GST_PAD_LINK_SUCCESSFUL(gst_pad_link (pad, sinkpad)))
 
-    gst_object_unref (sinkpad);
-  }
-
+  gst_object_unref (sinkpad);
   gst_caps_unref (pad_caps);
 }
 
@@ -59,7 +52,6 @@ int main (int argc, char *argv[])
   videosink     = gst_element_factory_make ("xvimagesink", "videosink");
   audiosink     = gst_element_factory_make ("autoaudiosink", "audiosink");
 
-
   filter = (int) strtoll (argv[1], NULL, 10); 
   switch (filter) {
     case 1:
@@ -77,21 +69,6 @@ int main (int argc, char *argv[])
       break;
     case 5:
       videofilter  = gst_element_factory_make ("revtv", "videofilter");
-      break;
-    case 6:
-      videofilter  = gst_element_factory_make ("radioactv", "videofilter");
-      break;
-    case 7:
-      videofilter  = gst_element_factory_make ("warptv", "videofilter");
-      break;
-    case 8:
-      videofilter  = gst_element_factory_make ("burn", "videofilter");
-      break;
-    case 9:
-      videofilter  = gst_element_factory_make ("gaussianblur", "videofilter");
-      break;
-    case 10:
-      videofilter  = gst_element_factory_make ("solarize", "videofilter");
       break;
     default:
       g_print ("%d: invalid value\n", filter);
