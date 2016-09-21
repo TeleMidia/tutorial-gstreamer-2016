@@ -58,13 +58,13 @@
   yshift=-.45em,
 ]
 \tikzstyle{state}=[
-  ellipse,
+  circle,
   draw,
   font={\scriptsize\sffamily},
   inner sep=0pt,
-  minimum height=.75\hdim,
-  minimum width=.65\wdim,
-  text width=.45\wdim,
+  minimum height=1.5\hdim,
+  minimum width=1.5\hdim,
+  text width=\hdim,
   outer sep=0pt,
   text centered,
 ]
@@ -134,6 +134,6 @@
   numbers=left,
   numberstyle={\tiny\sffamily},
 }
-%%
+%% -------------------------------------------------------------------------
 \def\en#1{\foreignlanguage{english}{\emph{#1}}}
 \let\C\lstinline

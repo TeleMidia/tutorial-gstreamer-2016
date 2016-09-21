@@ -120,9 +120,9 @@ e~(iii)~escalável porque a estrutura é naturalmente composicional (um
 \en{dataflow} pode ser visto como um ator e vice versa).
 
 A Figura~\ref{fig:pipe-tipico} apresenta o leiaute de um \en{pipeline}
-típico para processamento multimídia.  O leiaute nesse caso é uma
-simplificação do \en{pipeline} de uma aplicação GStreamer que reproduz um
-vídeo.  Os nós da figura representam atores e as arestas representam as
+típico para processamento multimídia.  O leiaute nesse caso é uma versão
+simplificada do \en{pipeline} de uma aplicação GStreamer que reproduz um
+vídeo Ogg.  Os nós da figura representam atores e as arestas representam as
 conexões por onde fluem as amostras de áudio e vídeo e dados de controle.
 Na terminologia do GStreamer os atores do são chamados de ``elementos'' e as
 portas de~``\en{pads}''.  Há dois tipos de \en{pads}: \en{sink pads} e
@@ -146,7 +146,7 @@ consumidores apenas consomem dados.
     \node (oggdemux) [element, right of=filesrc] {oggdemux};
     \coordinate [right of=oggdemux] (C);
     %%
-    \node (vorbisdec) [element] at (C|-A) {vorbisdec};    
+    \node (vorbisdec) [element] at (C|-A) {vorbisdec};
     \node (alsasink) [element, right of=vorbisdec] {alsasink};
     \node (theoradec) [element] at (C|-B) {theoradec};
     \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
@@ -303,9 +303,11 @@ eventos.
     \coordinate (y) at ($(c.before top|-c.east)-(0,.15\hdim)$);
     \coordinate (x0) at ($(c.west|-x)+(.25pt,0)$);
     \coordinate (y0) at ($(c.west|-y)+(.25pt,0)$);
-    \draw [->,arrow] (x) -- node [arrowlabel, above, pos=.4] {B} ++(\odim,0);
+    \draw [->,arrow] (x)
+    -- node [arrowlabel, above, pos=.4] {B} ++(\odim,0);
     \draw [arrow] (x0) -- ++(-\odim,0);
-    \draw [->,arrow] (y) -- node [arrowlabel, below, pos=.4] {E} ++(\odim,0);
+    \draw [->,arrow] (y)
+    -- node [arrowlabel, below, pos=.4] {E} ++(\odim,0);
     \draw [->,arrow] (y0) -- ++(-\odim,0);
   \end{tikzpicture}
   \caption{Estrutura conceitual de uma conexão entre \en{pads} no
@@ -459,8 +461,8 @@ de rodar o ``Olá mundo'', porém, é preciso compilá-lo.
 \subsection*{Compilando o programa ``Olá mundo'' no GNU/Linux}
 
 Para compilar o programa da Listagem~\ref{lst:hello} precisamos informar ao
-compilador~C o caminho do diretório que contém os cabeçalhos (.h) da GLib e
-do GStreamer.  Além disso, precisamos informar ao \en{linker} o caminho e o
+compilador~C o caminho do diretório que contém os cabeçalhos da GLib e do
+GStreamer.  Além disso, precisamos informar ao \en{linker} o caminho e o
 nome das bibliotecas dinâmicas correspondentes.  No GNU/Linux, a maneira
 mais fácil de se fazer isso é através ferramenta \en{pkg-config}.  Por
 exemplo:
@@ -477,7 +479,7 @@ Listagem~\ref{lst:hello} (``hello.c'') e gera um executável chamado
 ``gstreamer-1.0''.  Observe que a chamada do comando \en{pkg-config} aparece
 entre crases.  Ou seja, antes de avaliar o comando mais externo, \en{cc},
 que é a chamada do compilador~C, o interpretador de comandos (\en{shell})
-executa o comando \en{pkg-config} e substitui o comando entre crases pelo
+executa o comando \en{pkg-config} e substitui o texto entre crases pelo
 resultado dessa execução.  Por exemplo, no nosso ambiente o comando anterior
 avalia para:
 \begin{lstlisting}[style=command]
@@ -499,10 +501,10 @@ programas a serem construídos.  A variável \C{MODULES}, linha~2, contém os
 nomes dos módulos do \en{pkg-config} necessários.  E as variáveis \C{CFLAGS}
 e \C{LDFLAGS}, linhas~3 e~4, contém as \en{flags} de compilação e
 \en{link}-edição necessárias.  O restante do arquivo, linhas~5--8, define os
-alvos ``all'' e ``clean''.\footnote{Na linha~7, o primeiro caractere é um
-  TAB.}  Ou seja, tendo escrito o \en{makefile}, para construir o programa
-basta executar o comando ``\C{make}'' (ou ``\C{make all}'') e para remover
-os arquivos gerados pelo compilador basta executar ``\C{make clean}''.
+alvos ``all'' e ``clean''.  (Na linha~7, o primeiro caractere é um
+TAB\null.)  Uma vez escrito o \en{makefile}, para construir o programa basta
+executar o comando ``\C{make}'' (ou ``\C{make all}'') e para remover os
+arquivos gerados pelo compilador basta executar ``\C{make clean}''.
 (Veja~\cite{Gough-B-J-2005,Mecklenburg-R-2005} para mais informações sobre
 como compilar programas e escrever \en{makefiles} no GNU/Linux.)
 
@@ -521,19 +523,21 @@ Na Seção~\ref{sec:ola} utilizamos o elemento ``playbin'' para tocar um vídeo
 Ogg no GStreamer.  Nesta seção, faremos a mesma aplicação mas dessa vez sem
 usar o elemento ``playbin''.  Usando apenas elementos básicos (\en{sources},
 demultiplexadores, decodificadores e \en{sinks}) vamos construir um
-\en{pipeline} que lê um arquivo Ogg do disco e reproduz o seu conteúdo, ou
-seja, um \en{pipeline} semelhante ao da Figura~\ref{fig:pipe-tipico} da
-Seção~\ref{sec:intro}.  Antes disso, porém, vejamos um exemplo mais simples.
+\en{pipeline} semelhante ao da Figura~\ref{fig:pipe-tipico},
+Seção~\ref{sec:intro}, que lê um arquivo Ogg do disco, demultiplexa-o, e
+decodifica e reproduz os fluxos de áudio e vídeo resultantes.  Antes disso,
+porém, vejamos um exemplo mais simples.
 
 A Listagem~\ref{lst:mp3} apresenta um programa que reproduz um arquivo de
-áudio~MP3~\cite{mp3}.  Para tal o programa monta um \en{pipeline} com três
-elementos: ``filesrc'', ``mad'' e ``alsasink''.  Como vimos, no GStreamer o
-próprio \en{pipeline} é um elemento---um elemento sem \en{pads} que contém
-outros elementos.  Na listagem, a chamada da linha~18 aloca o elemento
-\en{pipeline}, que inicialmente está vazio, e as chamadas das linhas~19--21,
-alocam os elementos ``filesrc'', ``mad'' e ``alasink''.  (As chamadas
-anteriores, linhas~12--16, simplesmente inicializam o GStreamer e testam se
-o nome do arquivo~MP3 está em \C{argv[1]}.)
+áudio~MP3~\cite{mp3} do disco.  Para tal o programa monta um \en{pipeline}
+com três elementos: ``filesrc'', ``mad'' e ``alsasink''.  Como vimos, no
+GStreamer o próprio \en{pipeline} é um elemento---um elemento sem \en{pads}
+que contém outros elementos.  Na listagem, a chamada da linha~18 aloca o
+elemento \en{pipeline}, que inicialmente está vazio, e as chamadas das
+linhas~19--21, alocam os elementos ``filesrc'', ``mad'' e ``alsasink''.  (As
+chamadas anteriores, linhas~12--16, simplesmente inicializam o GStreamer e
+testam se o programa foi chamado corretamente, isto é, se o caminho para o
+arquivo~MP3 está em \C{argv[1]}.)
 
 \lstinputlisting[
 float={h},
@@ -544,16 +548,16 @@ label={lst:mp3},
 ]{src/mp3.c}
 
 \clearpage
-Discutimos os elementos ``filesrc'' e ``alsasink'' na Seção~\ref{sec:intro}.
-O primeiro lê um arquivo do disco e gera um fluxo de bytes correspondente; o
-segundo lê um fluxo de amostras de áudio PCM e as reproduz no dispositivo de
-saída de áudio.  Já o elemento ``mad'' é um processador, mais precisamente,
-um decodificador.  Ele lê da sua \en{source pad} um fluxo de bytes
-codificado no formato~MP3, decodifica-o via MAD~\cite{mad} (biblioteca para
-decodificação de áudio MP3) e escreve na sua \en{sink pad} o fluxo de áudio
-PCM resultante.  Apesar de os três elementos, ``filesrc'', ``alsasink'' e
-``mad'', fazerem parte do GStreamer, na prática, eles pertencem a pacotes
-diferentes, distribuídos separadamente.
+Na Seção~\ref{sec:intro}, discutimos a operação dos elementos ``filesrc'' e
+``alsasink''.  O primeiro lê um arquivo do disco e gera um fluxo de bytes
+correspondente, e o segundo lê um fluxo de amostras de áudio PCM e as
+reproduz no dispositivo de saída de áudio.  Aqui a novidade é o elemento
+processador, mais precisamente, decodificador ``mad''.  Ele lê da sua
+\en{source pad} um fluxo de bytes no formato~MP3, decodifica-o via
+MAD~\cite{mad} (biblioteca para decodificação de áudio MP3) e escreve na sua
+\en{sink pad} o fluxo de áudio PCM resultante.  Apesar de os três elementos,
+``filesrc'', ``alsasink'' e ``mad'', fazerem parte do GStreamer, na prática,
+eles pertencem a pacotes diferentes, distribuídos separadamente.
 
 A distribuição oficial do GStreamer possui cinco pacotes principais:
 (1)~\en{gstreamer}, contendo o núcleo do \en{framework};
@@ -561,42 +565,45 @@ A distribuição oficial do GStreamer possui cinco pacotes principais:
 (3)~\en{gst-plugins-good}, contendo elementos cuja implementação é
 considerada de boa qualidade e cuja licença é~LGPL (\en{Lesser {GNU} General
   Public License}); (4)~\en{gst-plugins-ugly}, contendo elementos cuja
-implementação é também considerada de boa qualidade mas com licenças
+implementação é também considerada de boa qualidade mas que têm licenças
 problemáticas; e (5)~\en{gst-plugins-bad}, contendo elementos de qualidade
-inferior.\footnote{Essa terminologia é inspirada no faroeste clássico ``The
+inferior.\footnote{Essa terminologia é inspirada clássico de faroeste ``The
   Good, the Bad and the Ugly'' (1966).}  O único pacote absolutamente
 necessário é o \en{gstreamer}.  Os demais incrementam-no instalando
 bibliotecas e \en{plugins} contendo elementos especializados.  O elemento
 ``filesrc'', por exemplo, está no \en{plugin} ``coreelements'' do pacote
 \en{gstreamer}.  Já o elemento ``alsasink'' está no \en{plugin} ``alsa'' do
 pacote \en{gst-plugins-base}, e o elemento ``mad'' está no \en{plugin}
-``mad'' do pacote \en{gst-plugins-ugly}.  (Você pode descobrir os elementos
-e \en{plugins} disponíveis na sua instalação através do comando
-``\C{gst-inspect}''---voltaremos a falar desse comando no final da seção.)
+``mad'' do pacote \en{gst-plugins-ugly}.  Você pode descobrir os elementos e
+\en{plugins} disponíveis na sua instalação através do comando
+``\C{gst-inspect}''---voltaremos a falar desse comando no final da seção.
 
 De volta à Listagem~\ref{lst:mp3}, a chamada \C{g_assert} na linha~22
 assegura que as chamadas \C{gst_element_factory_make} anteriores foram bem
 sucedidas.  Isto é, testa se os elementos ``pipeline'', ``filesrc'', ``mad''
-e ``alsasink'' foram de fato alocados e, caso contrário, aborta o programa.
-Um error comum é tentar instanciar um elemento de um \en{plugin} que não
-está instalado.  Na listagem, se isso acontecer a chamada
-\C{gst_element_factory_make} retornará~\C{NULL} e a asserção irá falhar.
+e ``alsasink'' foram de fato alocados.  Um error comum é tentar instanciar
+um elemento de um \en{plugin} que não está instalado.  Na listagem, se isso
+acontecer a chamada \C{gst_element_factory_make} retornará~\C{NULL} e a
+asserção falhará, abortando o programa.
 
-Continuando, a chamada seguinte, linha~24, adiciona ao elemento ``pipeline''
-os elementos ``filesrc'', ``mad'', ``alsasink''.  A função
-\C{gst_bin_add_many} recebe um elemento \en{bin} (\C{GstBin}) e uma lista de
+Continuando, a chamada da linha~24 adiciona três filhos ao elemento
+``pipeline'': os elementos ``filesrc'', ``mad'' e ``alsasink''.  A função
+\C{gst_bin_add_many} recebe um \en{bin} (\C{GstBin}) e uma sequência de
 elementos (\C{GstElement}) terminada por \C{NULL}, e adiciona cada elemento
-da lista ao \en{bin}.  Note que antes da chamada, precisamos usar a macro
-\C{GST_BIN} para fazer o \en{cast} da variável \C{pipeline} para o tipo
-\C{GstBin}.
+da sequência ao \en{bin}.  Note que antes da chamada, precisamos usar a
+macro \C{GST_BIN} para converter a variável \C{pipeline} para o tipo da sua
+superclasse~\C{GstBin}.
 
 A chamada~\C{gst_element_link_many}, linha~25, conecta os elementos
 apontados pelas variáveis \C{src}, \C{filter} e \C{sink} em série.  Isto é,
 conecta a \en{source pad} do ``filesrc'' à \en{sink pad} do ``mad'', e
 conecta a \en{source pad} do ``mad'' à \en{sink pad} do ``videosink''.
-A função \C{gst_element_link_many} recebe uma lista de elementos terminada
-por \C{NULL} e conecta-os em série apenas se todos possuem o mesmo elemento
-pai, ou seja, estão contidos no mesmo \en{bin}.
+A função \C{gst_element_link_many} recebe uma sequência de elementos
+terminada por \C{NULL} e conecta-os em série apenas se suas \en{pads} são
+compatíveis e se todos possuem o mesmo elemento pai (isto é, são todos
+filhos do mesmo \en{bin}).  A Figura~\ref{fig:pipe-mp3} apresenta a
+estrutura interna do elemento ``pipeline'', variável~\C{pipeline}, após a
+chamada da linha~25.
 
 \begin{figure}[H]
   \centering
@@ -604,61 +611,97 @@ pai, ou seja, estão contidos no mesmo \en{bin}.
     \node (filesrc) [element] {filesrc};
     \node (mad) [element, right of=filesrc] {mad};
     \node (alsasink) [element, right of=mad] {alasink};
-    \coordinate (A) at ($(filesrc.north west)+(-.75\odim,.75\odim)$);
-    \coordinate (B) at ($(alsasink.south east)+(.75\odim,-.75\odim)$);
+    \coordinate (A) at ($(filesrc.north west)+(-.5\odim,.5\odim)$);
+    \coordinate (B) at ($(alsasink.south east)+(.5\odim,-.5\odim)$);
     \path [bin] (A) rectangle node [binlabel] {pipeline} (B);
     \draw [->, arrow] (filesrc) -- (mad);
     \draw [->, arrow] (mad) -- (alsasink);
   \end{tikzpicture}
-  \caption{\en{Pipeline} GStreamer que reproduz um arquivo de áudio~MP3.}
+  \caption{\en{Pipeline} que reproduz um arquivo de áudio~MP3.}
   \label{fig:pipe-mp3}
 \end{figure}
+\vskip-\baselineskip
 
-% O programa ``Olá mundo'' anterior utiliza o elemento ``playbin'' para
-% tocar um vídeo no GStreamer.
+A chamada~\C{g_object_set}, linha~25, atribui o caminho do arquivo MP3 a ser
+tocado (primeiro argumento do programa) à propriedade ``location'' do
+elemento ``filesrc''.  Essa propriedade indica ao elemento o arquivo que
+servirá de fonte de bytes.
 
-% O exemplo utiliza a API de alto-nível~\texttt{GstPlayer}, atualmente a
-% forma mais simples de se reproduzir um áudio ou vídeo no GStreamer.
+A chamada \C{gst_element_set_state}, linha~28, transiciona o ``pipeline'' do
+seu estado atual (\en{null}) para o estado \en{playing} o que, como vimos na
+Seção~\ref{sec:ola}, faz com que os seus filhos ``filesrc'', ``mad'' e
+``alsasink'' comecem a operar.  No Gstreamer, todo elemento incluindo o
+\en{pipeline} possui um estado que pode ser nulo (\en{null}, identificado
+pela constante simbólica \C{GST_STATE_NULL}), pronto (\en{ready},
+\C{GST_STATE_READY}), pausado (\en{paused}, \C{GST_STATE_PAUSED}) ou tocando
+(\en{playing} \C{GST_STATE_PLAYING}).  No estado inicial, \en{null}, o
+elemento não possui recursos alocados.  No estado \en{ready}, o elemento
+aloca recursos globais que não dependem do conteúdo a ser processado.  No
+estado \en{paused}, o elemento aloca recursos que dependem do conteúdo a ser
+processado e se prepara para processá-lo.  Finalmente, no estado
+\en{playing} o elemento inicia o processamento.
 
-% Apesar da API~\texttt{GstPlayer} simplificar a programação de reprodutores
-% de mídia, ela é inflexível e limita os possíveis usos do framework.  Dessa
-% forma, é importante que os participantes do minicurso conheçam a API
-% básica do GStreamer e seu modo de operação.
+Para chegar do estado \en{null} (estado inicial) ao estado \en{playing}
+(estado operante) todo elemento tem que passar primeiro pelo estados
+\en{ready} e \en{paused}, nessa ordem.  De forma análoga, para sair do
+estado \en{playing} e voltar ao estado inicial \en{null}, o elemento tem que
+passar pelos estados \en{paused} e \en{ready}.
+A Figura~\ref{fig:estados-elt} apresenta a máquina de estados de um elemento
+GStreamer (isto é, os estados e as transições possíveis).  Mudanças de
+estado do \en{pipeline}, na verdade de \en{bins} em geral, são propagadas
+nos elementos filhos, e a direção da propagação é sempre dos \en{sinks} para
+os \en{sources}, o que garante que dados não sejam gerados antes que os
+elementos fluxo abaixo estejam prontos para recebê-los.  Por exemplo, na
+Listagem~\ref{lst:mp3}, se bem sucedida a chamada \C{gst_element_set_state}
+(linha~28) implica na seguinte sequência transições (sempre dos \en{sinks}
+para os \en{sources}): (1)~os elementos filhos ``alsasink'', ``mad'' e
+``filesrc'' transicionam de \en{null} para \en{ready} e, em seguida, o
+\en{pipeline} transiciona para \en{ready}; (2)~os filhos transicionam de
+\en{ready} para \en{paused} e, em seguida, o \en{pipeline} transiciona para
+\en{paused}; e~(3) os filhos transicionam de~\en{paused} para \en{playing}
+e, finalmente, o \en{pipeline} transiciona para \en{playing}.  Essa última
+transição completa a chamada que devolve o controle à função \en{main}.
+Nesse ponto, a \en{thread} da aplicação está prestes a executar a asserção
+da linha~29, que aborta o programa em caso de falha da chamada anterior, e
+as \en{streaming threads} já começaram a operar o \en{pipeline}, ou seja, os
+elementos ``filesrc'', ``mad'' e ``alsasink'' já estão produzindo,
+processando e consumindo dados.
 
-% No Gstreamer, todo elemento incluindo o \en{pipeline} possui um estado,
-% que pode ser nulo (\en{null}), pronto (\en{ready}), pausado (\en{paused})
-% ou tocando (\en{playing}).  No estado inicial, \en{null}, o elemento não
-% possui recursos alocados.  No estado \en{ready}, o elemento aloca recursos
-% globais que não dependem do conteúdo a ser processado.  No estado
-% \en{paused}, o elemento aloca recursos que dependem do conteúdo a ser
-% processado e se prepara para processá-lo.  Finalmente, no estado
-% \en{playing} o elemento inicia o processamento.
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[node distance=1.5\hdim+\odim]
+    \node [state] (NULL) {null};
+    \node [state, right of=NULL] (READY) {ready};
+    \node [state, right of=READY] (PAUSED) {paused};
+    \node [state, right of=PAUSED] (PLAYING) {playing};
+    \draw [->] (NULL) to [bend left=20] (READY);
+    \draw [->] (READY) to [bend left=20] (PAUSED);
+    \draw [->] (PAUSED) to [bend left=20] (PLAYING);
+    \draw [->] (PLAYING) to [bend left=20] (PAUSED);
+    \draw [->] (PAUSED) to [bend left=20] (READY);
+    \draw [->] (READY) to [bend left=20] (NULL);
+  \end{tikzpicture}
+  \caption{Máquina de estados de um elemento (\C{GstElement}).}
+  \label{fig:estados-elt}
+\end{figure}
+\vskip-\baselineskip
 
-% Para chegar do estado \en{null} (estado inicial) ao estado \en{playing}
-% (estado operante) o elemento tem que passar primeiro pelo estados
-% \en{ready} e \en{paused}, nessa ordem.  De forma análoga, para sair do
-% estado \en{playing} e voltar ao estado inicial \en{null}, o elemento tem
-% que passar pelos estados \en{paused} e \en{ready}.
-% A Figura~\ref{fig:estados-elt} apresenta máquina de estados de um elemento
-% GStreamer, ou seja, os estados e transições possíveis.
+A chamada seguinte, linha~28, obtém uma referência para o barramento do
+\en{pipeline} e a próxima, linha~29, e bloqueia a \en{thread} da aplicação
+até que erro aconteça ou até que o arquivo de áudio seja reproduzido
+completamente (EOS).
 
-% \begin{figure}[H]
-%   \centering
-%   \begin{tikzpicture}[node distance=.45\wdim+\odim]
-%     \node [state] (NULL) {null};
-%     \node [state, right of=NULL] (READY) {ready};
-%     \node [state, right of=READY] (PAUSED) {paused};
-%     \node [state, right of=PAUSED] (PLAYING) {playing};
-%     \draw [->] (NULL) to [bend left=20] (READY);
-%     \draw [->] (READY) to [bend left=20] (PAUSED);
-%     \draw [->] (PAUSED) to [bend left=20] (PLAYING);
-%     \draw [->] (PLAYING) to [bend left=20] (PAUSED);
-%     \draw [->] (PAUSED) to [bend left=20] (READY);
-%     \draw [->] (READY) to [bend left=20] (NULL);
-%   \end{tikzpicture}
-%   \caption{Máquina de estados de um elemento GStreamer (\C{GstElement}).}
-%   \label{fig:estados-elt}
-% \end{figure}
+Assim que a chamada \C{gst_bus_timed_pop_filtered} retorna, a \en{thread} da
+aplicação libera as referências do bus e da mensagem retornada
+(linhas~34--35), transiciona o \en{pipeline} (linha~36) de volta para o
+estado \en{null} e libera a sua referência (linha~37).  Nesse caso, a
+chamada \C{gst_element_set_state} (linha~36) também propaga a transição para
+os elementos filhos, só que agora as transições são no sentido
+contrário---de \en{playing} para \en{paused}, \en{ready} e \en{null}.
+Finalmente, observe que a chamada \C{gst_object_unref} (linha~37) quando
+aplicada a um \en{bin} libera não apenas \en{bin} mas também os seus filhos,
+ou seja, nesse ponto os elementos alocados nas linhas~18--21 são liberados.
+
 
 
 \section{Filtros}
@@ -699,4 +742,9 @@ pai, ou seja, estão contidos no mesmo \en{bin}.
 %  LocalWords:  string state PLAYING Gstreamer ready paused playing thread
 %  LocalWords:  threads streaming bus timed filtered warnings CLOCK NONE
 %  LocalWords:  MESSAGE msg message unref makefile clean GstObject linker
-%  LocalWords:  pkg-config link cflags libs flags glib gstreamer shell
+%  LocalWords:  pkg-config link cflags libs flags glib gstreamer shell all
+%  LocalWords:  PROGRAMS LDFLAGS TAB makefiles mad gst-plugins-base LGPL
+%  LocalWords:  gst-plugins-good Lesser Public License gst-plugins-ugly The
+%  LocalWords:  gst-plugins-bad Good the Bad and Ugly coreelements alsa bin
+%  LocalWords:  gst-inspect add many GstBin src filter videosink location
+%  LocalWords:  main

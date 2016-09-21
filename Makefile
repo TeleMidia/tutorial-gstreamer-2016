@@ -59,4 +59,4 @@ words:= $(words)|threads?
 words:= $(words)|upstream
 .PHONY: check
 check:
-	./sc.pl --sc-local='/([^{\\]\b($(words))\b[^}])/english' chapter.tex
+	./sc.pl --sc-local='/([^[{\\`-]\b($(words))\b[^-`}]])/english' chapter.tex
