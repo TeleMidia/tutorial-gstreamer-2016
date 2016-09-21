@@ -181,7 +181,7 @@ demais arestas denotam conexões entre \en{source pads} e \en{sink pads}.
 O processo de desenvolvimento de uma aplicação GStreamer com \en{pipeline}
 estático (cuja topologia não muda em tempo de execução) é relativamente
 simples.  Basta instanciar os elementos necessários, interconectar suas
-\en{pads} e iniciar \en{pipeline} resultante.  O \en{pipeline} da
+\en{pads} e iniciar o \en{pipeline} resultante.  O \en{pipeline} da
 Figura~\ref{fig:pipe-tipico}, por exemplo, após iniciado opera da seguinte
 forma.
 \begin{enumerate}
@@ -703,9 +703,7 @@ aplicada a um \en{bin} libera não apenas \en{bin} mas também os seus filhos,
 ou seja, nesse ponto os elementos alocados nas linhas~18--21 são liberados.
 
 
-
-\section{Filtros}
-\label{sec:filtros}
+\input{filtros}
 
 
 \section{Entrada e saída}
