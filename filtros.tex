@@ -1,0 +1,94 @@
+\section{Filtros}
+\label{sec:filtros}
+Filtros são elementos que manipulam amostras de áudio ou vídeos, sendo 
+geralmente utilizados para criar efeitos audiovisuais em um pipeline. Eles
+sempre possuem pelo menos duas \en{pads}, sendo uma para receber os dados
+sobre os quais operam (\en{sink pad}) e outra para escrever os dados 
+resultantes do processamento (\en{source pad})\footnote{Alguns filtros possuem mais de uma \en{pad} de entrada e/ou saída.}. A distribuição oficial do
+GStreamer possui vários filtros disponíveis, dentre os quais: \en{volume}
+(altera o volume de um fluxo de áudio), \en{videoscale} (altera a resolução de
+um fluxo de vídeo), \en{adder} (recebe vários fluxos de áudio e gera um único 
+fluxo contendo os sinais de entrada somados), \en{audiokaraoke} (remove a voz
+de um fluxo de áudio), etc.
+
+Para demonstrar como podemos adicionar filtros em um \en{pipeline}, vamos 
+modificar o programa apresentado na Listagem~\ref{lst:mp3} e alterá-lo para 
+criar um programa que reproduz um áudio MP3 com a metade do volume original.
+O código do reprodutor de MP3 modificado é apresentado na 
+Listagem~\ref{lst:mp3-volume}.
+
+\lstinputlisting[
+style=display,
+mathescape=no,
+caption={Tocando um arquivo de áudio MP3 com a metade do volume original.},
+label={lst:mp3-volume},
+]{src/mp3-volume.c}
+
+Note que este programa é bastante semelhante ao programa da
+Listagem~\ref{lst:mp3}. A diferença entre ambos está no fato do programa da
+Listagem~\ref{lst:mp3-volume} adicionar o elemento \en{volume} ao 
+``pipeline''. Este elemento, instanciado na linha~21, funciona como um
+filtro e está posicionado entre o decodificador (``mad'') e o \en{sink}
+(``alsasink''). Sendo assim, o filtro \en{volume} processa o fluxo de áudio
+gerado pelo decodificador e gera um fluxo de áudio modificado para o 
+\en{sink}. Na linha~28, a chamada \C{g_object_set} atribui o valor \C{0.5} 
+à propriedade ``volume'' do filtro. Essa propriedade controla o nível do 
+volume do fluxo de áudio produzido por este filtro, sendo o valor \C{0.0} 
+correspondendo ao menor nível (mudo) e \C{1.0} correspondendo ao nível 
+máximo  (volume original). Como o valor atribuído é \C{0.5}, o filtro 
+processa o fluxo de entrada e gera um fluxo de saída cujo volume é a metade 
+do nível original.
+
+A Listagem~\ref{lst:video-filter} mostra o código de um programa que aplica
+diferentes filtros em um vídeo de acordo com um argumento passado como
+parâmetro (\C{argv[1]}). 
+
+\lstinputlisting[
+style=display,
+mathescape=no,
+caption={Adicionando diversos efeitos em um vídeo.},
+label={lst:video-filter},
+]{src/video_filter_v1.c}
+
+O programa utiliza o elemento \C{uridecodebin} para
+abrir o arquivo de vídeo ``bunny.ogg'' e decodificá-lo. A 
+Figura~\ref{fig:pipe-filtro} ilustra esquematicamente o ``pipeline'' da
+Listagem~\ref{lst:video-filter}. Dependendo do valor do argumento \C{argv[1]},
+o elemento ``filtro'' da figura é instanciado como um elemento diferente.
+Nesse pipeline, há um elemento \C{videoconvert} antes do filtro e outro após.
+Como cada filtro manipula um determinado formato de \en{pixel}, a inclusão
+destes elementos torna-se necessária para a realização das conversões entre
+os formatos de \en{pixel} dos elementos anteriores e posteriores ao filtro.
+Dependendo do filtro instanciado, ocorrerá um erro na conexão do pipeline
+no caso de ausência desses conversores.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \node (dec) [element] {uridecodebin};
+    \coordinate [above=.5\hdim of filesrc] (A);
+    \coordinate [below=.5\hdim of filesrc] (B);
+    \node (videoconvert) [element] at (C|-A) {videoconvert};    
+    \node (filter) [element, right of=videoconvert] {filtro};
+    \node (videoconvert2) [element, right of=filter] {videoconvert};
+    \node (xvimagesink) [element, right of=videoconvert2] {xvimagesink};
+    \node (audioconvert) [element] at (C|-B) {audioconvert};
+    \node (alsasink) [element, right of=audioconvert] {alsasink};
+    \coordinate (X) at ($(dec.east)+(0,.25\hdim)$);
+    \coordinate (Y) at ($(dec.east)+(0,-.25\hdim)$);
+    \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+                          -- ($(vorbisdec.west)-(\odim/3,0)$)
+                          -- (vorbisdec.west);
+    \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+                          -- ($(theoradec.west)-(\odim/3,0)$)
+                          -- (theoradec.west);
+    \draw [->, arrow] (videoconvert) -- (filter);
+    \draw [->, arrow] (filter) -- (videoconvert2);
+    \draw [->, arrow] (videoconvert2) -- (xvimagesink);
+    \draw [->, arrow] (audioconvert) -- (alsasink);
+  \end{tikzpicture}
+  \caption{Um \en{pipeline} GStreamer que adiciona diferentes filtros 
+    em um vídeo.}
+  \label{fig:pipe-filtro}
+\end{figure}
+\vskip-\baselineskip
