@@ -18,8 +18,10 @@ disso, outras classes distribuídas nos pacotes \C{gst-plugin-base} também pode
 ser usadas para criar novos plugins.  As principais são: \C{GstBaseSrc}, classe
 base para plugins tipo \emph{source} (ou produtores); \C{GstBaseSink}, classe
 base para plugins do tipo \emph{sink} (ou consumidores); \C{GstBaseTransform},
-classe base para plugins do tipo \emph{tranform} (ou filtros; e \C{GstBin},
-cria um manipuladores de plugins customizáveis similar ao GstPipeline.
+classe base para plugins do tipo \emph{tranform} (ou filtros); e \C{GstBin},
+cria um manipuladores de plugins customizáveis similar ao GstPipeline.  A
+Figura~\ref{fig:plugins_class_hierachy} evidencia como essas classes estão
+relacionadas.
 %  \item{GstElement}--a classe base mais genérica, das quais as outras classes
 %                     bases derivam;
 
@@ -48,23 +50,60 @@ cria um manipuladores de plugins customizáveis similar ao GstPipeline.
 %      }
     };
   \end{tikzpicture}
-  \label{fig:class_hierarchy}
-  \caption{Hierarquia de classes dos elementos.}
+  \label{fig:plugins_class_hierarch}
+  \caption{Hierarquia de classes evidenciando algumas classes importantes no
+           desenvolvimento de plugins.}
 \end{figure}
+
+\subsection*{Plugin ``Dummy''}
+Para melhor entendermos como desenvolver um plugin para o GStreamer, iremos
+começar com um exemplo simples, que ao receber algum dado no seu \emph{sink
+pad} irá apenas imprimir o tamanho do buffer recebido e retransmitir esses
+dados em seu \emph{source pad}.  O principal objetivo deste plugin, que
+obviamente não é muito útil na prática, é identificar as principais funções que
+devem ser implementadas por um novo plugin do Gstreamer.  O código fonte desse
+exemplo está divido em dois arquivo (\C{myfilter.h} e \C{myfilter.c}) os quais
+são detalhados a seguir.
+
+O arquivo \C{myfilter.h} (Listagem~\ref{lst:myfilter_h}) define o novo elemento
+que queremos criar (\C{GstMyFilter}) o qual deve ser uma subclasse de
+\C{GstElement}.  A definição desse novo tipo segue o padrão do \emph{framework}
+GObject.  Por isso, é necessário criar as estruturas \C{_GstMyFilter} e
+\C{_GstMyFilterClass}.  A classe \C{GstMyFilter} deve estender a classe
+\C{GstElement}, por isso ela define o campo \C{element} do tipo \C{GstElement},
+linha 7, e a classe \C{GstMyFilterClass} define o campo \C{parent_class} do
+tipo \C{GstElementClass}, linha 12.  As linhas 15--24 definem macros padrões
+que usam o \emph{framework} GObject para checagem e \C{casting} do novo tipo
+definido.
 
 \lstinputlisting[
 style=display,
-caption={Processador de audio},
-label={lst:simpleaudiofilter},
-]{src/simpleaudiofilter.c}
+caption={Arquivo myfilter.h},
+label={lst:myfilter_h},
+]{src/myfilter.h}
 
-\subsection*{Comunicação entre os plugins}
+O arquivo \C{myfilter.c} implementa as principais funções
+
+\lstinputlisting[
+style=display,
+caption={.c},
+label={lst:myfilter_c},
+]{src/myfilter.c}
+
+Coisas importantes para discutirmos:
+\begin{itemize}
+  \item \C{GST_STATIC_PAD_TEMPLATE}
+  \item \C{gst_my_filter_class_init} 
+  \item \C{gst_myfilter_init} 
+  \item \C{myfilter_plugin_init}
+  \item \C{myfilter_chain}
+  \item \C{GST_PLUGIN_DEFINE}
+\end{itemize}
+
+\subsection*{Especificando os pads}
 Como mencionado anteriormente, a comunicação entre os elementos é gerenciada
 usando \emph{pads}.  Sendo assim, ao criar um plugin também devemos especificar
 quantos e quais tipos de \emph{pad} esse plugin aceita como entrada e saída.
-
-%Um \emph{pad} pode ser visto como um conector que conecta dois plugins
-%(similar ao cabo de força que conecta uma tomada na parede ao DVD player).
 
 A comunicação entre os plugins pode ser classificada em duas subcategorias:
 \emph{mensagens de controle} (ou eventos) e \emph{mensagens de conteúdo de
@@ -72,7 +111,7 @@ mídia} (ou buffers).  As mensagens de controle são cruciais para controlar o
 processamento das mídias.  As mensagens de conteúdo de mídia são responsáveis
 por transferir o conteúdo que precisa ser processado.
 
-\subsection*{Funções}
+\subsection*{A função plugin\_init}
 \begin{itemize}
   \item plugin\_init
   \item chain: Essa função é onde todo o processamento dos dados é realizado.
@@ -82,20 +121,15 @@ por transferir o conteúdo que precisa ser processado.
   \item event
 \end{itemize}
 
-\subsection*{Exemplo de plugin}
-Plugin simples contendo 1 sink pad e 1 source pad.
-
-Apenas multiplica o dado de entrada por um número X.
-
 \subsection*{Testando o seu plugin}
 Para compilar o nosso plugin devemos gerar uma biblioteca dinâmica (.dll no
-Windows ou .so no Linux).  O comando a seguire compila o exemplo desenvolvido
+Windows ou .so no Linux).  O comando a seguir compila o exemplo desenvolvido
 acima:
 
 \begin{lstlisting}[style=command]
 @\$@ cc -share -fPIC \
   `pkg-config --cflags --libs gstreamer-1.0 gstreamer-base-1.0`\
-  simplefilter.c -o simplefilter.so
+  myfilter.c -o myfilter.so
 \end{lstlisting}
 
 O comando a seguir carrega o plugin myfilter que desenvolvemos em um pipeline
@@ -103,7 +137,36 @@ simples:
 
 \begin{lstlisting}[style=command]
 @\$@ gst-launch-1.0 --gst-plugin-path=. \
-     audiotestsrc ! audioconvert ! myfilter ! alsasink
+     audiotestsrc !  myfilter ! alsasink
+\end{lstlisting}
+
+Como o plugin que desenvolvemos recebe qualquer tipo de dado (tipo de \emph{pad
+sink} \C{ANY}, é possível utilizá-lo usá-lo em qualquer pipeline.  Por exemplo,
+compare a execução do pipeline anterior com a execução seguinte pipeline:
+
+\begin{lstlisting}[style=command]
+@\$@ gst-launch-1.0 --gst-plugin-path=. \
+     videotestsrc ! myfilter ! alsasink
+\end{lstlisting}
+
+\subsection*{Um plugin para filtro de vídeo}
+
+\lstinputlisting[
+style=display,
+caption={myvideofilter.h},
+label={lst:myvideofilter_h},
+]{src/myvideofilter.h}
+
+\lstinputlisting[
+style=display,
+caption={myvideofilter.c},
+label={lst:myvideofilter_c},
+]{src/myvideofilter.c}
+
+\begin{lstlisting}[style=command]
+@\$@ gst-launch-1.0 --gst-plugin-path=. filesrc location=bunny.ogg ! 
+     oggdemux ! theoradec ! videoconvert ! videoscale ! \
+     video/x-raw,width=720 ! myvideofilter ! ximagesink
 \end{lstlisting}
 
 \noindent compare com o resultado sem o nosso filtro:
@@ -111,5 +174,4 @@ simples:
 @\$@ gst-launch-1.0 --gst-plugin-path=. \
      audiotestsrc ! audioconvert ! alsasink
 \end{lstlisting}
-
 

@@ -1,21 +1,18 @@
-#ifndef _SIMPLEAUDIOFILTER_
-#define _SIMPLEAUDIOFILTER_
+#ifndef _MYFILTER_
+#define _MYFILTER_
 
 #include <gst/gst.h>
 
-/* Definition of strucutre storing data for this element. */
-t	
 typedef struct _GstMyFilter {
-  GstElement element;       // Base class data storage
-  GstPad *sinkpad, *srcpad; // Sink and src pad pointer declaration
-  // gboolean test_arg;        // Place holder for storing valur of argument
+  GstElement element;       /* Declaração da classe base. */
+  GstPad *sinkpad, *srcpad; /* Declaração dos ponteiros para sink e src pad */
 } GstMyFilter;
 
 typedef struct _GstMyFilterClass {
-  GstElementClass parent_class;  // Base class declaration
+  GstElementClass parent_class;  /* Declaração da classe base. */
 } GstMyFilterClass;
 
-/* Standard macros for defining types for this element.  */
+/* Macros padrões para a definição de tipos para este elemento */
 #define GST_TYPE_MY_FILTER (gst_my_filter_get_type())
 #define GST_MY_FILTER(obj) \
   (G_TYPE_CHECK_INSTANCE_CAST((obj),GST_TYPE_MY_FILTER,GstMyFilter))
