@@ -16,10 +16,13 @@ chapter.tex: chapter-*.tex
 
 # Words that have to be wrapped in \en{...}.
 words=
-words:= bins?
+words:= always
+words:= $(words)|always\s+pads?
+words:= $(words)|bins?
 words:= $(words)|buffers?
-words:= $(words)|bus?
+words:= $(words)|bus
 words:= $(words)|caches?
+words:= $(words)|callbacks?
 words:= $(words)|dataflow
 words:= $(words)|downstream
 words:= $(words)|end-of-stream
@@ -30,7 +33,7 @@ words:= $(words)|flush
 words:= $(words)|frameworks?
 words:= $(words)|linker
 words:= $(words)|linkers?
-words:= $(words)|makefile
+words:= $(words)|makefiles?
 words:= $(words)|null
 words:= $(words)|pads?
 words:= $(words)|paused
@@ -44,11 +47,15 @@ words:= $(words)|quality\s+of\s+service
 words:= $(words)|raw
 words:= $(words)|ready
 words:= $(words)|red-green-blue
+words:= $(words)|request
+words:= $(words)|request\s+pads?
 words:= $(words)|rewind
 words:= $(words)|seek
 words:= $(words)|shell
 words:= $(words)|sink\s+pads?
 words:= $(words)|sinks?
+words:= $(words)|sometimes
+words:= $(words)|sometimes\s+pads?
 words:= $(words)|source\s+pads?
 words:= $(words)|sources?
 words:= $(words)|start
@@ -59,4 +66,4 @@ words:= $(words)|threads?
 words:= $(words)|upstream
 .PHONY: check
 check:
-	./sc.pl --sc-local='/([^[{\\`-]\b($(words))\b[^-`}]])/english' chapter.tex
+	./sc.pl --sc-local='/(\s\b($(words))\b\s)/english' chapter.tex

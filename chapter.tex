@@ -113,10 +113,10 @@ multimídia porque aproxima a estrutura real do sistema da sua descrição
 abstrata, idealizada na forma de diagrama de blocos~\cite{Yviquel-H-2014}.
 Além disso, o modelo de \en{dataflow} induz implementações flexíveis e
 eficientes já que ele é naturalmente paralelo, modular e escalável:
-(i)~paralelo porque conceitualmente os atores executam independentemente uns
-dos outros; (ii)~modular porque a lógica de processamento está encapsulada
+(1)~paralelo porque conceitualmente os atores executam independentemente uns
+dos outros; (2)~modular porque a lógica de processamento está encapsulada
 nos atores e pode ser reusada em diversos pontos do \en{dataflow};
-e~(iii)~escalável porque a estrutura é naturalmente composicional (um
+e~(3)~escalável porque a estrutura é naturalmente composicional (um
 \en{dataflow} pode ser visto como um ator e vice versa).
 
 A Figura~\ref{fig:pipe-tipico} apresenta o leiaute de um \en{pipeline}
@@ -227,21 +227,21 @@ resultado da combinação da função dos seus elementos que, conceitualmente,
 operam em paralelo.  O \en{pipeline} anterior, portanto, (1)~lê um arquivo
 Ogg, (2)~demultiplexa-o, (3--4)~decodifica os fluxos de áudio e vídeo
 resultantes e~(5--6) reproduz os fluxos decodificados nos dispositivos de
-saída correspondentes (alto-falantes e tela).  E tudo isso acontece
-conceitualmente em paralelo.  Ou seja, podemos assumir que enquanto os
-\en{sinks} ``alsasink'' e ``xvimagesink'' estão exibindo amostras, o
-\en{source} ``filesrc'' está lendo bytes do disco, o demultiplexador
-``oggdemux'' está demultiplexando dados Ogg e os decodificadores
-``vorbisdec'' e ``theoradec'' estão decodificando dados Vorbis e Theora.
+saída correspondentes (alto-falantes e tela).  Conceitualmente, tudo isso
+acontece em paralelo, ou seja, podemos assumir que enquanto os \en{sinks}
+``alsasink'' e ``xvimagesink'' estão exibindo amostras, o \en{source}
+``filesrc'' está lendo bytes do disco, o demultiplexador ``oggdemux'' está
+demultiplexando dados Ogg e os decodificadores ``vorbisdec'' e ``theoradec''
+estão decodificando dados Vorbis e Theora.
 
 A descrição anterior seria suficiente se estivéssemos interessados apenas em
 exibir as amostras decodificadas o mais rápido possível.  Mas esse não é
-caso.  Queremos ``tocar'' o vídeo original em tempo real, ou seja,
+caso.  Queremos ``tocar'' o vídeo original em tempo real, isto é,
 reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Nesse
 caso, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
 e vídeo devem ser exibidas na taxa correta.  Valores típicos para essas
-taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo.  Ou
-seja, a cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
+taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo: a
+cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
 dispositivo de saída de áudio, e a cada~33{,}33ms uma nova amostra de vídeo
 deve ser enviada ao dispositivo de saída de~vídeo.
 
@@ -250,7 +250,7 @@ controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline}
 da Figura~\ref{fig:pipe-tipico}, para manter a taxa de reprodução
 necessária, os \en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as
 amostras recebidas numa fila interna, e exibem-nas (consomem-nas) apenas no
-momento adequado.  Já os outros elementos operam livres, isto é, consomem e
+momento adequado.  Já os outros elementos operam livres---consomem e
 produzem dados em taxas arbitrárias.  Se durante a execução os elementos que
 precedem os \en{sinks} (fluxo acima) operarem rápido o bastante, as filas
 dos \en{sinks} nunca ficarão vazias e todas as amostras serão exibidas no
@@ -261,14 +261,14 @@ Se os elementos fluxo acima operarem abaixo da taxa de consumo dos
 caso chegue o momento de exibir uma amostra, o \en{sink} simplesmente não
 tenha o que exibir, causando interrupções ou saltos na reprodução (amostras
 ``atrasadas'' quando chegarem serão descartadas).  Há ainda o problema
-inverso, se os elementos fluxo acima operarem muito acima da taxa de consumo
-dos \en{sinks}, pode ser que a capacidade da fila interna seja excedida e
-amostras sejam~perdidas.  Para evitar ambos os problemas, esvaziamento ou
-estouro das filas, ou mesmo para limitar o uso de CPU, os \en{sinks}
-normalmente enviam fluxo acima eventos de QoS (\en{quality of service}) que
-indicam o quão atrasada ou adiantada está cada amostra que chega.  Dessa
-forma, os elementos fluxo acima (produtores e processadores) podem capturar
-os eventos e usar a informação de retardo para ajustar a sua taxa de
+inverso.  Se os elementos fluxo acima operarem muito acima da taxa de
+consumo dos \en{sinks}, pode ser que a capacidade da fila interna seja
+excedida e amostras sejam~perdidas.  Para evitar ambos os problemas,
+esvaziamento ou estouro das filas, ou mesmo para limitar o uso de CPU, os
+\en{sinks} normalmente enviam fluxo acima eventos de QoS (\en{quality of
+  service}) que indicam o quão atrasada ou adiantada está cada amostra que
+chega.  Os elementos fluxo acima (produtores e processadores) podem capturar
+esses eventos e usar a informação de retardo para ajustar a sua taxa de
 operação.
 
 Dois tipos de dados trafegam através das conexões de um \en{pipeline}
@@ -446,9 +446,9 @@ Finalmente, a chamada \C{gst_object_unref}, linha~31, libera o próprio
 elemento ``playbin'' alocado na linha~14.
 
 Se tudo correr bem, ao executar o programa ``Olá mundo'' anterior uma nova
-janela aparece na tela e vídeo é reproduzido até o final.
-(A Figura~\ref{fig:bunny} apresenta um quadro do vídeo em questão.)  Antes
-de rodar o ``Olá mundo'', porém, é preciso compilá-lo.
+janela aparece na tela e o vídeo é reproduzido do inicio ao fim.
+A Figura~\ref{fig:bunny} apresenta um quadro do vídeo em questão.  Para
+rodar o exemplo, porém, primeiro é preciso compilá-lo.
 
 \begin{figure}[H]
   \centering
@@ -461,7 +461,7 @@ de rodar o ``Olá mundo'', porém, é preciso compilá-lo.
 \subsection*{Compilando o programa ``Olá mundo'' no GNU/Linux}
 
 Para compilar o programa da Listagem~\ref{lst:hello} precisamos informar ao
-compilador~C o caminho do diretório que contém os cabeçalhos da GLib e do
+compilador~C o caminho do diretório contendo os cabeçalhos da GLib e do
 GStreamer.  Além disso, precisamos informar ao \en{linker} o caminho e o
 nome das bibliotecas dinâmicas correspondentes.  No GNU/Linux, a maneira
 mais fácil de se fazer isso é através ferramenta \en{pkg-config}.  Por
@@ -475,7 +475,7 @@ Esse comando compila e \en{link}-edita o programa da
 Listagem~\ref{lst:hello} (``hello.c'') e gera um executável chamado
 ``hello''.  As opções ``-\,-cflags'' e ``-\,-libs'' do comando
 \en{pkg-config} instruem-no a emitir as \en{flags} de compilação e
-\en{link}-edição apropriadas dos módulos listados, no caso, ``glib-2.0'' e
+\en{link}-edição apropriadas para módulos listados, no caso, ``glib-2.0'' e
 ``gstreamer-1.0''.  Observe que a chamada do comando \en{pkg-config} aparece
 entre crases.  Ou seja, antes de avaliar o comando mais externo, \en{cc},
 que é a chamada do compilador~C, o interpretador de comandos (\en{shell})
@@ -496,12 +496,12 @@ Uma forma de tornar o processo de compilação menos trabalhoso é escrever um
 \en{makefile} com a descrição da sequência de comandos que constrói o
 programa.  A Listagem~\ref{lst:makefile} apresenta o \en{makefile} (arquivo
 texto chamado ``Makefile'') que usamos para construir os exemplos do
-minicurso.  Na listagem, variável \C{PROGRAMS}, linha~1, contém o nome dos
+minicurso.  Na listagem, a variável \C{PROGRAMS}, linha~1, contém o nome dos
 programas a serem construídos.  A variável \C{MODULES}, linha~2, contém os
 nomes dos módulos do \en{pkg-config} necessários.  E as variáveis \C{CFLAGS}
 e \C{LDFLAGS}, linhas~3 e~4, contém as \en{flags} de compilação e
-\en{link}-edição necessárias.  O restante do arquivo, linhas~5--8, define os
-alvos ``all'' e ``clean''.  (Na linha~7, o primeiro caractere é um
+\en{link}-edição correspondentes.  O restante do arquivo, linhas~5--8,
+define os alvos ``all'' e ``clean''.  (Na linha~7, o primeiro caractere é um
 TAB\null.)  Uma vez escrito o \en{makefile}, para construir o programa basta
 executar o comando ``\C{make}'' (ou ``\C{make all}'') e para remover os
 arquivos gerados pelo compilador basta executar ``\C{make clean}''.
@@ -532,17 +532,16 @@ A Listagem~\ref{lst:mp3} apresenta um programa que reproduz um arquivo de
 áudio~MP3~\cite{mp3} do disco.  Para tal o programa monta um \en{pipeline}
 com três elementos: ``filesrc'', ``mad'' e ``alsasink''.  Como vimos, no
 GStreamer o próprio \en{pipeline} é um elemento---um elemento sem \en{pads}
-que contém outros elementos.  Na listagem, a chamada da linha~18 aloca o
+que contém outros elementos.  Na listagem, a chamada da linha~15 aloca o
 elemento \en{pipeline}, que inicialmente está vazio, e as chamadas das
-linhas~19--21, alocam os elementos ``filesrc'', ``mad'' e ``alsasink''.  (As
-chamadas anteriores, linhas~12--16, simplesmente inicializam o GStreamer e
-testam se o programa foi chamado corretamente, isto é, se o caminho para o
-arquivo~MP3 está em \C{argv[1]}.)
+linhas~16--18, alocam os elementos ``filesrc'', ``mad'' e ``alsasink''.  (As
+chamadas anteriores, linhas~11--13, inicializam o GStreamer e testam se o
+programa foi chamado corretamente, isto é, se o caminho para o arquivo~MP3
+está em \C{argv[1]}.)
 
 \lstinputlisting[
 float={h},
 style=display,
-mathescape=no,
 caption={Tocando um arquivo de áudio MP3.},
 label={lst:mp3},
 ]{src/mp3.c}
@@ -578,7 +577,7 @@ pacote \en{gst-plugins-base}, e o elemento ``mad'' está no \en{plugin}
 \en{plugins} disponíveis na sua instalação através do comando
 ``\C{gst-inspect}''---voltaremos a falar desse comando no final da seção.
 
-De volta à Listagem~\ref{lst:mp3}, a chamada \C{g_assert} na linha~22
+De volta à Listagem~\ref{lst:mp3}, a chamada \C{g_assert} na linha~19
 assegura que as chamadas \C{gst_element_factory_make} anteriores foram bem
 sucedidas.  Isto é, testa se os elementos ``pipeline'', ``filesrc'', ``mad''
 e ``alsasink'' foram de fato alocados.  Um error comum é tentar instanciar
@@ -586,15 +585,14 @@ um elemento de um \en{plugin} que não está instalado.  Na listagem, se isso
 acontecer a chamada \C{gst_element_factory_make} retornará~\C{NULL} e a
 asserção falhará, abortando o programa.
 
-Continuando, a chamada da linha~24 adiciona três filhos ao elemento
-``pipeline'': os elementos ``filesrc'', ``mad'' e ``alsasink''.  A função
-\C{gst_bin_add_many} recebe um \en{bin} (\C{GstBin}) e uma sequência de
-elementos (\C{GstElement}) terminada por \C{NULL}, e adiciona cada elemento
-da sequência ao \en{bin}.  Note que antes da chamada, precisamos usar a
-macro \C{GST_BIN} para converter a variável \C{pipeline} para o tipo da sua
-superclasse~\C{GstBin}.
+Continuando, a chamada da linha~21 adiciona três filhos ao \en{pipeline}:
+``filesrc'', ``mad'' e ``alsasink''.  A função \C{gst_bin_add_many} recebe
+um \en{bin} (\C{GstBin}) e uma sequência de elementos (\C{GstElement})
+terminada por \C{NULL}, e adiciona os elementos da sequência ao \en{bin}.
+Note que antes da chamada, precisamos usar a macro \C{GST_BIN} para
+converter a variável \C{pipeline} para o tipo da sua superclasse~\C{GstBin}.
 
-A chamada~\C{gst_element_link_many}, linha~25, conecta os elementos
+A chamada~\C{gst_element_link_many}, linha~22, conecta os elementos
 apontados pelas variáveis \C{src}, \C{filter} e \C{sink} em série.  Isto é,
 conecta a \en{source pad} do ``filesrc'' à \en{sink pad} do ``mad'', e
 conecta a \en{source pad} do ``mad'' à \en{sink pad} do ``videosink''.
@@ -603,9 +601,9 @@ terminada por \C{NULL} e conecta-os em série apenas se suas \en{pads} são
 compatíveis e se todos possuem o mesmo elemento pai (isto é, são todos
 filhos do mesmo \en{bin}).  A Figura~\ref{fig:pipe-mp3} apresenta a
 estrutura interna do elemento ``pipeline'', variável~\C{pipeline}, após a
-chamada da linha~25.
+chamada da linha~22.
 
-\begin{figure}[H]
+\begin{figure}[t]
   \centering
   \begin{tikzpicture}
     \node (filesrc) [element] {filesrc};
@@ -620,14 +618,13 @@ chamada da linha~25.
   \caption{\en{Pipeline} que reproduz um arquivo de áudio~MP3.}
   \label{fig:pipe-mp3}
 \end{figure}
-\vskip-\baselineskip
 
-A chamada~\C{g_object_set}, linha~25, atribui o caminho do arquivo MP3 a ser
+A chamada~\C{g_object_set}, linha~23, atribui o caminho do arquivo MP3 a ser
 tocado (primeiro argumento do programa) à propriedade ``location'' do
 elemento ``filesrc''.  Essa propriedade indica ao elemento o arquivo que
 servirá de fonte de bytes.
 
-A chamada \C{gst_element_set_state}, linha~28, transiciona o ``pipeline'' do
+A chamada \C{gst_element_set_state}, linha~25, transiciona o ``pipeline'' do
 seu estado atual (\en{null}) para o estado \en{playing} o que, como vimos na
 Seção~\ref{sec:ola}, faz com que os seus filhos ``filesrc'', ``mad'' e
 ``alsasink'' comecem a operar.  No Gstreamer, todo elemento incluindo o
@@ -647,27 +644,27 @@ Para chegar do estado \en{null} (estado inicial) ao estado \en{playing}
 estado \en{playing} e voltar ao estado inicial \en{null}, o elemento tem que
 passar pelos estados \en{paused} e \en{ready}.
 A Figura~\ref{fig:estados-elt} apresenta a máquina de estados de um elemento
-GStreamer (isto é, os estados e as transições possíveis).  Mudanças de
-estado do \en{pipeline}, na verdade de \en{bins} em geral, são propagadas
-nos elementos filhos, e a direção da propagação é sempre dos \en{sinks} para
-os \en{sources}, o que garante que dados não sejam gerados antes que os
+GStreamer (isto é, seus estados e transições possíveis).  Mudanças de estado
+do \en{pipeline}, na verdade de \en{bins} em geral, são propagadas nos
+elementos filhos, e a direção da propagação é sempre dos \en{sinks} para os
+\en{sources}---o que garante que dados não sejam gerados antes que os
 elementos fluxo abaixo estejam prontos para recebê-los.  Por exemplo, na
-Listagem~\ref{lst:mp3}, se bem sucedida a chamada \C{gst_element_set_state}
-(linha~28) implica na seguinte sequência transições (sempre dos \en{sinks}
+Listagem~\ref{lst:mp3}, se bem sucedida, a chamada \C{gst_element_set_state}
+(linha~25) implica na seguinte sequência transições (sempre dos \en{sinks}
 para os \en{sources}): (1)~os elementos filhos ``alsasink'', ``mad'' e
 ``filesrc'' transicionam de \en{null} para \en{ready} e, em seguida, o
 \en{pipeline} transiciona para \en{ready}; (2)~os filhos transicionam de
 \en{ready} para \en{paused} e, em seguida, o \en{pipeline} transiciona para
 \en{paused}; e~(3) os filhos transicionam de~\en{paused} para \en{playing}
 e, finalmente, o \en{pipeline} transiciona para \en{playing}.  Essa última
-transição completa a chamada que devolve o controle à função \en{main}.
-Nesse ponto, a \en{thread} da aplicação está prestes a executar a asserção
-da linha~29, que aborta o programa em caso de falha da chamada anterior, e
-as \en{streaming threads} já começaram a operar o \en{pipeline}, ou seja, os
+transição completa a chamada e devolve o controle à função \C{main}.  Nesse
+ponto, a \en{thread} da aplicação está prestes a executar a asserção da
+linha~26, que aborta o programa em caso de falha da chamada anterior, e as
+\en{streaming threads} já começaram a operar o \en{pipeline}, ou seja, os
 elementos ``filesrc'', ``mad'' e ``alsasink'' já estão produzindo,
 processando e consumindo dados.
 
-\begin{figure}[H]
+\begin{figure}[b]
   \centering
   \begin{tikzpicture}[node distance=1.5\hdim+\odim]
     \node [state] (NULL) {null};
@@ -681,28 +678,136 @@ processando e consumindo dados.
     \draw [->] (PAUSED) to [bend left=20] (READY);
     \draw [->] (READY) to [bend left=20] (NULL);
   \end{tikzpicture}
-  \caption{Máquina de estados de um elemento (\C{GstElement}).}
+  \caption{Máquina de estados de elemento (\C{GstElement}).}
   \label{fig:estados-elt}
 \end{figure}
-\vskip-\baselineskip
 
 A chamada seguinte, linha~28, obtém uma referência para o barramento do
 \en{pipeline} e a próxima, linha~29, e bloqueia a \en{thread} da aplicação
-até que erro aconteça ou até que o arquivo de áudio seja reproduzido
+até que um erro aconteça ou até que o arquivo de áudio seja reproduzido
 completamente (EOS).
 
 Assim que a chamada \C{gst_bus_timed_pop_filtered} retorna, a \en{thread} da
-aplicação libera as referências do bus e da mensagem retornada
-(linhas~34--35), transiciona o \en{pipeline} (linha~36) de volta para o
-estado \en{null} e libera a sua referência (linha~37).  Nesse caso, a
-chamada \C{gst_element_set_state} (linha~36) também propaga a transição para
+aplicação libera as referências do \en{bus} e da mensagem retornada
+(linhas~31--32), transiciona o \en{pipeline} (linha~33) de volta para o
+estado \en{null} e libera a sua referência (linha~34).  Nesse caso, a
+chamada \C{gst_element_set_state} (linha~33) também propaga a transição para
 os elementos filhos, só que agora as transições são no sentido
 contrário---de \en{playing} para \en{paused}, \en{ready} e \en{null}.
-Finalmente, observe que a chamada \C{gst_object_unref} (linha~37) quando
+Finalmente, observe que a chamada \C{gst_object_unref} (linha~34) quando
 aplicada a um \en{bin} libera não apenas \en{bin} mas também os seus filhos,
-ou seja, nesse ponto os elementos alocados nas linhas~18--21 são liberados.
+ou seja, nesse ponto os elementos alocados nas linhas~15--28 são liberados.
 
+\subsection*{De volta ao problema inicial}
 
+Agora que vimos como alocar, adicionar e interconectar elementos num
+\en{pipeline} podemos voltar ao nosso problema inicial: construir um
+\en{pipeline} semelhante ao apresentado na Seção~\ref{sec:intro} que usa
+apenas elementos básicos para tocar um vídeo~Ogg.  Há uma diferença
+importante entre o \en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico}) que
+pretendemos construir e o \en{pipeline} MP3 (Figura~\ref{fig:pipe-mp3}) que
+construímos anteriormente.  Enquanto no \en{pipeline} MP3 o número de
+\en{pads} de todos os elementos é fixo (conhecido em tempo de compilação),
+no \en{pipeline} Ogg esse número é variável.  Em particular, no
+\en{pipeline} Ogg o número de \en{sink pads} do elemento ``oggdemux''
+depende do número de subfluxos multiplexados fluxo Ogg de entrada.  Por
+exemplo, se o fluxo Ogg possuir apenas um subfluxo Vorbis, o elemento
+``oggdemux'' terá uma única \en{sink pad} que deverá ser conectada à
+\en{source pad} do elemento ``vorbisdec''.  No entanto, se o fluxo Ogg
+possuir dois subfluxos, Vorbis e Theora, o elemento ``oggdemux'' terá duas
+\en{sink pads}, uma para o subfluxo Vorbis resultante, que deverá ser
+conectada ao elemento ``vorbisdec'', e outra para o subfluxo Theora
+resultante, que deverá ser conectada ao elemento ``theoradec''.  Dessa
+forma, o número de subfluxos multiplexados no fluxo Ogg de entrada determina
+o número de \en{sink pads} no demultiplexador.  \en{Pads} desse tipo,
+criadas sob demanda pelo elemento, são chamadas de \en{sometimes pads}.
+
+No GStreamer, toda \en{pad} é instanciada de acordo um \en{template} que
+indica a sua direção, capacidade e disponibilidade.  A direção (\en{source}
+ou \en{sink}) determina se a \en{pad} produz ou consome dados.
+A capacidade, ou \en{caps}, determina os tipos de \en{buffers} que podem
+atravessá-la.  E a disponibilidade (\en{always}, \en{sometimes} ou
+\en{request}) determina o momento em que a \en{pad} é criada: (1)~\en{always
+  pads} são criadas assim que o elemento é criado; (2)~\en{sometimes pads}
+são criadas pelo próprio elemento apenas sob condições específicas que
+normalmente envolvem o conteúdo processado; e~(3)\en{request pads} são
+criada apenas sob requisição explícita da aplicação.
+
+No \en{pipeline} MP3 da Figura~\ref{fig:pipe-mp3} as \en{pads} de todos os
+elementos possuem disponibilidade \en{always}.  Isso significa que podemos
+construir o \en{pipeline} inteiro estaticamente, conectando todos os seus
+elementos antes de iniciá-lo.  Já no \en{pipeline} Ogg da
+Figura~\ref{fig:pipe-tipico} essa abordagem não é possível.  As \en{sink
+  pads} do elemento ``oggdemux'' possuem disponibilidade \en{sometimes} e só
+serão criadas quando o elemento decodificar o cabeçalho do fluxo de entrada
+(isto é, transicionar para o estado \en{paused}).  Nesse caso, precisamos
+usar uma abordagem incremental com dois passos.  Primeiro, precisamos montar
+e iniciar um \en{pipeline} contendo apenas os elementos ``filesrc'' e
+``oggdemux'' conectados.  Em seguida, precisamos esperar o elemento
+``oggdemux'' notificar a criação de cada \en{sink pad} para então adicionar
+e conectar os elementos restantes de acordo com as capacidades da \en{pad}
+criada.  No GStreamer, esse tipo de notificação assíncrona disparada por
+elementos é chamada de sinal.  Todo sinal possui um nome (``pad-added'',
+nesse caso) e pode ser capturado via um mecanismo de registro de
+\en{callbacks}.  Ou seja, para capturar um sinal a aplicação registra no
+elemento uma função \en{callback} que é chamada sempre que o sinal é
+disparado.
+
+A Listagem~\ref{lst:ogg} apresenta um programa que utiliza a abordagem
+incremental anterior para montar um \en{pipeline} que reproduz um arquivo
+Ogg.  A estrutura final desse \en{pipeline}, apresentada na
+Figura~\ref{fig:pipe-ogg}, é ligeiramente diferente daquela apresentada na
+Seção~\ref{sec:intro}---a~Figura~\ref{fig:pipe-tipico} é na verdade uma
+versão simplificada da Figura~\ref{fig:pipe-ogg}.  A diferença nesse caso
+está nos elementos adicionais ``audioconvert'', que aparece entre o
+``vorbisdec'' e o ``alsasink'', e ``queue'', que aparece entre o
+``oggdemux'' e o ``theoradec''.
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \node (filesrc) [element] {filesrc};
+    \coordinate [above=.5\hdim of filesrc] (A);
+    \coordinate [below=.5\hdim of filesrc] (B);
+    %%
+    \node (oggdemux) [element, right of=filesrc] {oggdemux};
+    \coordinate [right of=oggdemux] (C);
+    %%
+    \node (vorbisdec) [element] at (C|-A) {vorbisdec};
+    \node (audioconvert) [element, right of=vorbisdec] {audioconvert};
+    \node (alsasink) [element, right of=audioconvert] {alsasink};
+    \node (queue) [element] at (C|-B) {queue};
+    \node (theoradec) [element, right of=queue] {theoradec};
+    \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
+    %%
+    \draw [->, arrow] (filesrc) -- (oggdemux);
+    \coordinate (X) at ($(oggdemux.east)+(0,.25\hdim)$);
+    \coordinate (Y) at ($(oggdemux.east)+(0,-.25\hdim)$);
+    \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+                          -- ($(vorbisdec.west)-(\odim/3,0)$)
+                          -- (vorbisdec.west);
+    \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+                          -- ($(queue.west)-(\odim/3,0)$)
+                          -- (queue.west);
+    \draw [->, arrow] (vorbisdec) -- (audioconvert);
+    \draw [->, arrow] (audioconvert) -- (alsasink);
+    \draw [->, arrow] (queue) -- (theoradec);
+    \draw [->, arrow] (theoradec) -- (xvimagesink);
+  \end{tikzpicture}
+  \caption{Estrutura final do \en{pipeline} da Listagem~\ref{lst:ogg}.}
+  \label{fig:pipe-ogg}
+\end{figure}
+
+Vejamos o propósito de cada linha da Listagem~\ref{lst:ogg}.
+
+\lstinputlisting[
+style=display,
+caption={Tocando um arquivo de vídeo Ogg usando elementos básicos.},
+label={lst:ogg},
+]{src/ogg2.c}
+
+
+\clearpage
 \input{filtros}
 
 
@@ -745,4 +850,5 @@ ou seja, nesse ponto os elementos alocados nas linhas~18--21 são liberados.
 %  LocalWords:  gst-plugins-good Lesser Public License gst-plugins-ugly The
 %  LocalWords:  gst-plugins-bad Good the Bad and Ugly coreelements alsa bin
 %  LocalWords:  gst-inspect add many GstBin src filter videosink location
-%  LocalWords:  main
+%  LocalWords:  main callbacks callback sometimes template caps always
+%  LocalWords:  request pad-added audioconvert queue

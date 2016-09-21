@@ -10,10 +10,7 @@ int main (int argc, char *argv[])
 
   gst_init (&argc, &argv);
   if (argc != 2)
-    {
-      g_printerr ("usage: %s FILE\n", g_get_prgname ());
-      return 1;
-    }
+    return (g_printerr ("usage: %s FILE\n", g_get_prgname ()), 1);
 
   pipeline = gst_element_factory_make ("pipeline", "mp3");
   src = gst_element_factory_make ("filesrc", "src");
