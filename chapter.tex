@@ -760,10 +760,19 @@ incremental anterior para montar um \en{pipeline} que reproduz um arquivo
 Ogg.  A estrutura final desse \en{pipeline}, apresentada na
 Figura~\ref{fig:pipe-ogg}, é ligeiramente diferente daquela apresentada na
 Seção~\ref{sec:intro}---a~Figura~\ref{fig:pipe-tipico} é na verdade uma
-versão simplificada da Figura~\ref{fig:pipe-ogg}.  A diferença nesse caso
-está nos elementos adicionais ``audioconvert'', que aparece entre
-``vorbisdec'' e ``alsasink'', e ``queue'', que aparece entre ``oggdemux'' e
-``theoradec''.
+versão simplificada (não funcional) da Figura~\ref{fig:pipe-ogg}.
+A diferença aqui está nos elementos adicionais ``audioconvert'', que aparece
+entre os elementos ``vorbisdec'' e ``alsasink'', e ``queue'', que aparece
+entre os elementos ``oggdemux'' e ``theoradec''.  O elemento
+``audioconvert'' converte as amostras produzidas pelo ``vorbisdec'' para um
+formato que o ``alsasink'' aceita.  Na prática, não é possível conectar o
+elemento ``vorbisdec'' diretamente ao ``alsasink''---as \en{caps} da
+\en{source pad} do ``vorbisdec'' não são compatíveis com as \en{caps} do
+\en{sink pad} do ``alsasink'', isto é, a interseção das \en{caps} dessas
+\en{pads} é vazia.  (Podemos entender as \en{caps} de uma \en{pad} como o
+conjunto dos possíveis formatos dos \en{buffers} que podem atravessá-la).
+Já o elemento ``queue'' entre os elementos ``oggdemux'' e ``theoradec''
+serve para
 
 \begin{figure}[H]
   \centering
