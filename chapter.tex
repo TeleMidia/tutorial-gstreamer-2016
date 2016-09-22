@@ -1,4 +1,6 @@
 \documentclass{SBCbookchapter}
+\def\chaptername{Capítulo}
+\setcounter{chapter}{8}
 \input{chapter-header.tex}
 \title{Programando aplicações multimídia no GStreamer}
 \author{%
@@ -759,9 +761,9 @@ Ogg.  A estrutura final desse \en{pipeline}, apresentada na
 Figura~\ref{fig:pipe-ogg}, é ligeiramente diferente daquela apresentada na
 Seção~\ref{sec:intro}---a~Figura~\ref{fig:pipe-tipico} é na verdade uma
 versão simplificada da Figura~\ref{fig:pipe-ogg}.  A diferença nesse caso
-está nos elementos adicionais ``audioconvert'', que aparece entre o
-``vorbisdec'' e o ``alsasink'', e ``queue'', que aparece entre o
-``oggdemux'' e o ``theoradec''.
+está nos elementos adicionais ``audioconvert'', que aparece entre
+``vorbisdec'' e ``alsasink'', e ``queue'', que aparece entre ``oggdemux'' e
+``theoradec''.
 
 \begin{figure}[H]
   \centering
