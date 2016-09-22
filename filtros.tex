@@ -66,8 +66,10 @@ no caso de ausência desses conversores.
   \centering
   \begin{tikzpicture}
     \node (dec) [element] {uridecodebin};
-    \coordinate [above=.5\hdim of filesrc] (A);
-    \coordinate [below=.5\hdim of filesrc] (B);
+    \coordinate [above=.5\hdim of dec] (A);
+    \coordinate [below=.5\hdim of dec] (B);
+    \coordinate [right of=dec] (C);
+
     \node (videoconvert) [element] at (C|-A) {videoconvert};    
     \node (filter) [element, right of=videoconvert] {filtro};
     \node (videoconvert2) [element, right of=filter] {videoconvert};
@@ -76,12 +78,12 @@ no caso de ausência desses conversores.
     \node (alsasink) [element, right of=audioconvert] {alsasink};
     \coordinate (X) at ($(dec.east)+(0,.25\hdim)$);
     \coordinate (Y) at ($(dec.east)+(0,-.25\hdim)$);
-    \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
-                          -- ($(vorbisdec.west)-(\odim/3,0)$)
-                          -- (vorbisdec.west);
-    \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
-                          -- ($(theoradec.west)-(\odim/3,0)$)
-                          -- (theoradec.west);
+    \draw [->, arrow] (X) -- node [arrowlabel, above] {V} ++(\odim/3,0)
+                          -- ($(videoconvert.west)-(\odim/3,0)$)
+                          -- (videoconvert.west);
+    \draw [->, arrow] (Y) -- node [arrowlabel, below] {A} ++(\odim/3,0)
+                          -- ($(audioconvert.west)-(\odim/3,0)$)
+                          -- (audioconvert.west);
     \draw [->, arrow] (videoconvert) -- (filter);
     \draw [->, arrow] (filter) -- (videoconvert2);
     \draw [->, arrow] (videoconvert2) -- (xvimagesink);
