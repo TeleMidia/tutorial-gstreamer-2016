@@ -6,11 +6,12 @@
 #include <gst/video/gstvideofilter.h>
 
 typedef struct _GstMyVideoFilter {
-  GstVideoFilter videoFilter;       /* Declaração da classe base. */
+  GstVideoFilter videoFilter;       /* Declaracao da classe base. */
+  gboolean use_r, use_g, use_b;
 } GstMyVideoFilter;
 
 typedef struct _GstMyVideoFilterClass {
-  GstVideoFilterClass parent_class;  /* Declaração da classe base. */
+  GstVideoFilterClass parent_class;  /* Declaracao da classe base. */
 } GstMyVideoFilterClass;
 
 /* Macros padrões para a definição de tipos para este elemento */

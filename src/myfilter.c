@@ -67,7 +67,7 @@ my_filter_plugin_init (GstPlugin *myfilter_plugin)
   return gst_element_register(myfilter_plugin, "myfilter", GST_RANK_NONE, GST_TYPE_MY_FILTER);
 }
 
-#define PACKAGE "myfirstfilter"
+#define PACKAGE "myfilter"
 
 GST_PLUGIN_DEFINE (
   GST_VERSION_MAJOR,
