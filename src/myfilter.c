@@ -62,9 +62,9 @@ gst_my_filter_init (GstMyFilter *filter)
 
 /* inicializacao do plugin */
 static gboolean
-myfilter_plugin_init (GstPlugin *myfilter)
+my_filter_plugin_init (GstPlugin *myfilter_plugin)
 {
-  return gst_element_register(myfilter, "myfilter", GST_RANK_NONE, GST_TYPE_MY_FILTER);
+  return gst_element_register(myfilter_plugin, "myfilter", GST_RANK_NONE, GST_TYPE_MY_FILTER);
 }
 
 #define PACKAGE "myfirstfilter"
@@ -72,8 +72,8 @@ myfilter_plugin_init (GstPlugin *myfilter)
 GST_PLUGIN_DEFINE (
   GST_VERSION_MAJOR,
   GST_VERSION_MINOR,
-  myfilter,
+  my_filter,
   "Template myfilter",
-  myfilter_plugin_init, /* Funcao de inicializacao do plugin */ 
+  my_filter_plugin_init, /* Funcao de inicializacao do plugin */ 
   "1.0.0", "LGPL", "TeleMidia/PUC-Rio", "http://www.telemidia.puc-rio.br")
 
