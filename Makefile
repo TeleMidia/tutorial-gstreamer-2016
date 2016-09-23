@@ -35,6 +35,8 @@ words:= $(words)|frameworks?
 words:= $(words)|linker
 words:= $(words)|linkers?
 words:= $(words)|makefiles?
+words:= $(words)|mutex
+words:= $(words)|mutexes
 words:= $(words)|null
 words:= $(words)|pads?
 words:= $(words)|paused
@@ -66,6 +68,7 @@ words:= $(words)|string
 words:= $(words)|threads?
 words:= $(words)|upstream
 words:= $(words)|userdata
+words:= $(words)|user\s+data
 .PHONY: check
 check:
 	./sc.pl --sc-local='/(\s\b($(words))\b\s)/english' chapter.tex

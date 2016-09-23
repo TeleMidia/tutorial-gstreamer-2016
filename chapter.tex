@@ -72,7 +72,7 @@ fluxos de mídia, \en{players} de mídia e motores de renderização de
 linguagens multimídia.
 
 O restante do capítulo está organizado da seguinte forma.  Na
-Seção~\ref{sec:ola} apresentamos uma versão preliminar do exemplo base do
+Seção~\ref{sec:hello} apresentamos uma versão preliminar do exemplo base do
 minicurso: um \en{player} de vídeo simples porém funcional.  Na
 Seção~\ref{sec:dissec} discutimos o que está por trás do código
 aparentemente simples do exemplo anterior e reconstruímos o mesmo exemplo
@@ -322,7 +322,7 @@ na hora de ver esses conceitos na~prática.
 
 
 \section{Olá mundo: Tocando um vídeo}
-\label{sec:ola}
+\label{sec:hello}
 
 Nosso objetivo nesta seção é usar o GStreamer para tocar um vídeo.  Para tal
 poderíamos implementar o \en{pipeline} da Figura~\ref{fig:pipe-tipico}, mas
@@ -518,7 +518,7 @@ label={lst:makefile},
 \section{Tocando um vídeo a partir de elementos básicos}
 \label{sec:dissec}
 
-Na Seção~\ref{sec:ola} utilizamos o elemento ``playbin'' para tocar um vídeo
+Na Seção~\ref{sec:hello} utilizamos o elemento ``playbin'' para tocar um vídeo
 Ogg no GStreamer.  Nesta seção, nosso objetivo é construir a mesma aplicação
 mas dessa vez sem usar o elemento ``playbin''.  Usando apenas elementos
 básicos (\en{sources}, demultiplexadores, decodificadores e \en{sinks})
@@ -625,7 +625,7 @@ servirá de fonte de bytes.
 
 A chamada \C{gst_element_set_state}, linha~25, transiciona o ``pipeline'' do
 seu estado atual (\en{null}) para o estado \en{playing} o que, como vimos na
-Seção~\ref{sec:ola}, faz com que os seus filhos ``filesrc'', ``mad'' e
+Seção~\ref{sec:hello}, faz com que os seus filhos ``filesrc'', ``mad'' e
 ``alsasink'' comecem a operar.  No Gstreamer, todo elemento incluindo o
 \en{pipeline} possui um estado que pode ser nulo (\en{null}, identificado
 pela constante simbólica \C{GST_STATE_NULL}), pronto (\en{ready},
@@ -901,25 +901,76 @@ Se tudo correr bem, quando iniciado, o programa da Listagem~\ref{lst:ogg}
 demultiplexa o arquivo Ogg fornecido e reproduz os primeiros subfluxos
 Vorbis e Theora que encontrar.  Caso não haja subfluxos Vorbis ou Theora, o
 programa termina imediatamente---uma mensagem de error é postada no \en{bus}
-indicando que o ``oggdemux'' não possui \en{sink pads} conectadas e o
-controle é devolvido à \en{thread} da aplicação que termina o programa.
+indicando que o ``oggdemux'' não possui \en{sink pads} conectadas e, em
+seguida, o controle volta à \en{thread} da aplicação que termina o programa.
 
-Um detalhe sutil mas importante no código da Listagem~\ref{lst:ogg} é que a
-\en{callback} \C{pad_added_cb} pode ser disparada numa \en{thread} diferente
-da \en{thread} da aplicação.  Nesse caso, caso haja dados compartilhados
-entre as \en{threads} é preciso sincronizar o acesso a esses dados usando
-\en{mutexes} e semáforos (tipos \C{GMutex} e~\C{GCond} da GLib).  Na
-Listagem~\ref{lst:ogg} não precisamos fazer isso porque o único dado
-compartilhado entre as \en{threads} da \en{callback} e da aplicação é o
-elemento demultiplexador ``oggdemux'' e, indiretamente, o \en{pipeline}, e
-porque as que chamadas que usamos na \en{callback} para manipular esses
-dados, \C{gst_element_$\ast$} e~\C{gst_bin_$\ast$}, já são internamente
-protegidas por \en{mutexes}.  Além disso, no intervalo em que as
-\en{threads} da \en{callback} e da aplicação estão de fato concorrendo,
-linhas~77--80, a \en{thread} da aplicação não modifica o \en{pipeline}.
+Há um detalhe sutil mas importante no código da Listagem~\ref{lst:ogg}: a
+\en{callback} \C{pad_added_cb} executa numa \en{thread} diferente da
+\en{thread} da aplicação.  Consequentemente, caso haja dados compartilhados
+entre as \en{threads}, para evitar condições de corrida, é necessário
+sincronizar o acesso a esses dados usando \en{mutexes} e semáforos (tipos
+\C{GMutex} e~\C{GCond} da GLib).  Na Listagem~\ref{lst:ogg} não precisamos
+fazer isso porque as que chamadas \C{gst_element_$\ast$}
+e~\C{gst_bin_$\ast$} que usamos na \en{callback} para manipular o elemento
+``pipeline'' (de fato, o único dado compartilhado entre as \en{threads} da
+\en{callback} e da aplicação) são protegidas internamente por \en{mutexes}.
+Além disso, no intervalo em que as \en{threads} da \en{callback} e da
+aplicação estão de fato concorrendo, linhas~77--80, a \en{thread} da
+aplicação não modifica o \en{pipeline}.
 
 
 \subsection*{Os comandos gst-launch e gst-inspect}
+
+Os programas que vimos até agora (Listagens~\ref{lst:hello}, \ref{lst:mp3}
+e~\ref{lst:ogg}) têm uma característica em comum: a topologia do
+\en{pipeline} não muda depois que ele é iniciado (transiciona para o estado
+\en{playing}).  O programa \en{gst-launch}, instalado pelo pacote
+\en{gstreamer}, permite construir \en{pipelines} desse tipo diretamente na
+linha de comando.  Por exemplo, os três comandos seguintes constroem e
+iniciam \en{pipelines} idênticos aos das Listagens~\ref{lst:hello},
+\ref{lst:mp3} e~\ref{lst:ogg}:
+\begin{lstlisting}[style=command]
+@\$@ gst-launch playbin uri="file://@\$@PWD/bunny.ogg"
+
+@\$@ gst-launch filesrc location=bunny.mp3 ! mad ! alsasink
+
+@\$@ gst-launch filesrc location=bunny.ogg ! oggdemux name=demux\
+                  demux. ! vorbisdec ! audioconvert ! alsasink\
+                  demux. ! queue     ! theoradec    ! xvimagesink
+\end{lstlisting}
+
+Usando o \en{gst-launch} é relativamente simples construir uma versão geral
+do \en{pipeline} da Listagem~\ref{lst:ogg}, isto é, construir um
+\en{pipeline} que demultiplexa e decodifica um fluxo de mídia arbitrário
+(não apenas Ogg), obtido de uma fonte arbitrária (não apenas do disco), e
+reproduz os fluxos resultantes num ambiente arbitrário (não apenas
+GNU/Linux).  O comando nesse caso é o seguinte:
+\begin{lstlisting}[style=command]
+gst-launch uridecodebin uri="file://@\$@PWD/bunny.ogg" name=decbin\
+             decbin. ! audioconvert ! autoaudiosink\
+             decbin. ! autovideosink
+\end{lstlisting}
+O \en{pipeline} anterior possui quatro elementos: ``uridecodebin'',
+``autovideosink'', ``audioconvert'' e ``autoaudiosink''.  O elemento
+``uridecodebin'' é um \en{bin} que demultiplexa e decodifica uma URI, isto
+é, ele lê o conteúdo de uma URI, demultiplexa-o, decodifica seus subfluxos e
+escreve os subfluxos decodificados em \en{sometimes pads} correspondentes.
+O elemento ``audioconvert'' é um conversor de formato de áudio PCM.  E os
+elementos ``audioaudiosink'' e ``autovideosink'' são \en{sinks} abstratos de
+áudio e vídeo que detectam e usam os \en{sinks} concretos mais adequados
+para um dado ambiente.  Por exemplo, no nosso ambiente GNU/Linux os
+elementos ``autoaudiosink'' e ``autovideosink'' utilizam os \en{sinks}
+concretos ``alsasink'' e ``xvimagesink'', os mesmos que usamos nos exemplos
+anteriores.  Mas em outro ambiente essa escolha pode variar.
+A Figura~\ref{fig:pipe-gen} apresenta a estrutura do \en{pipeline} criado
+pelo comando anterior.
+
+Além de criar \en{pipelines} para reprodução de áudio e vídeo, podemos usar
+o \en{gst-launch} criar \en{pipelines} que transcodificam
+
+Veja a página de manual do \en{gst-launch} (``\C{man gst-launch}'') para
+mais detalhes sobre as opções suportadas, sintaxe dos argumentos (que é
+similar à da Bourne Shell), exemplos de uso, etc.
 
 
 \clearpage
@@ -963,4 +1014,5 @@ linhas~77--80, a \en{thread} da aplicação não modifica o \en{pipeline}.
 %  LocalWords:  main callbacks callback sometimes template caps always user
 %  LocalWords:  request pad-added audioconvert queue signal connect added
 %  LocalWords:  srcpad demux userdata GstCaps type audio x-vorbis flag has
-%  LocalWords:  vorbis video x-theora theora
+%  LocalWords:  vorbis video x-theora theora mutexes sinkpad GMutex GCond
+%  LocalWords:  gst-launch
