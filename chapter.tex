@@ -947,14 +947,14 @@ Usando o \en{gst-launch} é relativamente simples construir uma versão geral
 do \en{pipeline} da Listagem~\ref{lst:ogg}, isto é, construir um
 \en{pipeline} que demultiplexa e decodifica um fluxo de mídia arbitrário
 (não apenas Ogg), obtido de uma fonte arbitrária (não apenas do disco), e
-reproduz os fluxos resultantes num ambiente arbitrário (não apenas
+que reproduz os fluxos resultantes num ambiente arbitrário (não apenas
 GNU/Linux).  O comando nesse caso é o seguinte:
 \begin{lstlisting}[style=command]
 gst-launch uridecodebin uri="file://@\$@PWD/bunny.ogg" name=decbin\
              decbin. ! audioconvert ! autoaudiosink\
              decbin. ! autovideosink
 \end{lstlisting}
-O \en{pipeline} anterior possui quatro elementos: ``uridecodebin'',
+Esse \en{pipeline} possui quatro elementos: ``uridecodebin'',
 ``autovideosink'', ``audioconvert'' e ``autoaudiosink''.  O elemento
 ``uridecodebin'' é um \en{bin} que demultiplexa e decodifica uma URI, isto
 é, ele lê o conteúdo de uma URI, demultiplexa-o, decodifica seus subfluxos e
