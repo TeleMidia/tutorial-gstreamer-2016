@@ -43,7 +43,7 @@ static void pad_added_cb (GstElement *demux, GstPad *srcpad, gpointer data)
     }
   else
     {
-      goto done;                /* fluxo de tipo desconhecido */
+      goto done;
     }
   ret = gst_pad_link (srcpad, sinkpad);
   g_assert (GST_PAD_LINK_SUCCESSFUL (ret));

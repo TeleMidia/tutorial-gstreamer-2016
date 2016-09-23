@@ -79,18 +79,15 @@ aparentemente simples do exemplo anterior e reconstruímos o mesmo exemplo
 usando a API básica (baixo nível) do GStreamer; essa versão reconstruída é o
 ponto de partida dos incrementos posteriores.  Na Seção~\ref{sec:filtros}
 apresentamos os principais filtros de áudio e vídeo disponíveis no GStreamer
-e discutimos como integrá-los ao exemplo.  Na Seção~\ref{sec:e/s}
-adicionamos suporte a eventos de teclado e mouse ao \en{player} de vídeo, e
-mostramos como injetar ou extrair amostras de uma aplicação GStreamer.  Na
-Seção~\ref{sec:ops} discutimos a teoria por trás das operações usuais de
-controle de reprodução (\en{pause}, \en{seek}, \en{fast-foward}
-e~\en{rewind}) e implementamos o suporte a cada uma delas no exemplo.  Na
-Seção~\ref{sec:plugins} apresentamos a arquitetura de \en{plugins} do
-GStreamer e mostramos como implementar e integrar ao exemplo um
-\emph{plugin} simples contendo um elemento que manipula amostras de vídeo.
-Finalmente, na Seção~\ref{sec:conclusao} discutimos funcionalidades
-avançadas do \en{framework} e listamos algumas referências para estudos
-posteriores.
+e discutimos como integrá-los ao exemplo.  Na Seção~\ref{sec:ops} discutimos
+a teoria por trás das operações usuais de controle de reprodução
+(\en{pause}, \en{seek}, \en{fast-foward} e~\en{rewind}) e implementamos o
+suporte a cada uma delas no exemplo.  Na Seção~\ref{sec:plugins}
+apresentamos a arquitetura de \en{plugins} do GStreamer e mostramos como
+implementar e integrar ao exemplo um \emph{plugin} simples contendo um
+elemento que manipula amostras de vídeo.  Finalmente, na
+Seção~\ref{sec:conclusao} discutimos funcionalidades avançadas do
+\en{framework} e listamos algumas referências para estudos posteriores.
 
 Antes de programar nossa primeira aplicação GStreamer, porém, é preciso
 entender o modelo de computação no qual o \en{framework} se baseia.  No
@@ -242,8 +239,8 @@ caso.  Queremos ``tocar'' o vídeo original em tempo real, isto é,
 reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Nesse
 caso, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
 e vídeo devem ser exibidas na taxa correta.  Valores típicos para essas
-taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo: a
-cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
+taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo, ou
+seja, a cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
 dispositivo de saída de áudio, e a cada~33{,}33ms uma nova amostra de vídeo
 deve ser enviada ao dispositivo de saída de~vídeo.
 
@@ -251,7 +248,7 @@ No GStreamer, em geral, são os elementos \en{sink} os responsáveis por
 controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline}
 da Figura~\ref{fig:pipe-tipico}, para manter a taxa de reprodução
 necessária, os \en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as
-amostras recebidas numa fila interna, e exibem-nas (consomem-nas) apenas no
+amostras recebidas numa fila interna e exibem-nas (consomem-nas) apenas no
 momento adequado.  Já os outros elementos operam livres---consomem e
 produzem dados em taxas arbitrárias.  Se durante a execução os elementos que
 precedem os \en{sinks} (fluxo acima) operarem rápido o bastante, as filas
@@ -353,9 +350,9 @@ argumentos com prefixo ``-\,-gst-'' em \C{argv}.
 
 A próxima chamada, linha~14, cria um elemento ``playbin'' que é também o
 \en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é ele próprio um
-elemento, de fato, um elemento que contém outros elementos mas não possui
-\en{pads}.  Tais elementos contêiner são chamados de ``\en{bins}''.
-A função \C{gst_element_factory_make} aloca e retorna um novo elemento
+elemento---um elemento que contém outros elementos mas não possui \en{pads}.
+Tais elementos contêiner são chamados de ``\en{bins}''.  A função
+\C{gst_element_factory_make} aloca e retorna um novo elemento
 (\C{GstElement}) do tipo especificado.  O primeiro parâmetro da função é o
 nome da fábrica do tipo e o segundo parâmetro (opcional) é o nome a ser
 atribuído ao elemento retornado.  Nesse caso, a chamada cria e retorna um
@@ -518,17 +515,17 @@ label={lst:makefile},
 ]{src/Makefile.hello}
 
 
-\section{Construindo o \en{pipeline} anterior a partir de elementos básicos}
+\section{Tocando um vídeo a partir de elementos básicos}
 \label{sec:dissec}
 
 Na Seção~\ref{sec:ola} utilizamos o elemento ``playbin'' para tocar um vídeo
-Ogg no GStreamer.  Nesta seção, faremos a mesma aplicação mas dessa vez sem
-usar o elemento ``playbin''.  Usando apenas elementos básicos (\en{sources},
-demultiplexadores, decodificadores e \en{sinks}) vamos construir um
-\en{pipeline} semelhante ao da Figura~\ref{fig:pipe-tipico},
-Seção~\ref{sec:intro}, que lê um arquivo Ogg do disco, demultiplexa-o, e
-decodifica e reproduz os fluxos de áudio e vídeo resultantes.  Antes disso,
-porém, vejamos um exemplo mais simples.
+Ogg no GStreamer.  Nesta seção, nosso objetivo é construir a mesma aplicação
+mas dessa vez sem usar o elemento ``playbin''.  Usando apenas elementos
+básicos (\en{sources}, demultiplexadores, decodificadores e \en{sinks})
+vamos construir um \en{pipeline} semelhante ao da
+Figura~\ref{fig:pipe-tipico}, Seção~\ref{sec:intro}, que lê um arquivo Ogg
+do disco, demultiplexa-o, e decodifica e reproduz os fluxos de áudio e vídeo
+resultantes.  Antes disso, porém, vejamos um exemplo mais simples.
 
 A Listagem~\ref{lst:mp3} apresenta um programa que reproduz um arquivo de
 áudio~MP3~\cite{mp3} do disco.  Para tal o programa monta um \en{pipeline}
@@ -591,8 +588,8 @@ Continuando, a chamada da linha~21 adiciona três filhos ao \en{pipeline}:
 ``filesrc'', ``mad'' e ``alsasink''.  A função \C{gst_bin_add_many} recebe
 um \en{bin} (\C{GstBin}) e uma sequência de elementos (\C{GstElement})
 terminada por \C{NULL}, e adiciona os elementos da sequência ao \en{bin}.
-Note que antes da chamada, precisamos usar a macro \C{GST_BIN} para
-converter a variável \C{pipeline} para o tipo da sua superclasse~\C{GstBin}.
+Note que antes da chamada precisamos usar a macro \C{GST_BIN} para converter
+a variável \C{pipeline} para o tipo da sua superclasse~\C{GstBin}.
 
 A chamada~\C{gst_element_link_many}, linha~22, conecta os elementos
 apontados pelas variáveis \C{src}, \C{filter} e \C{sink} em série.  Isto é,
@@ -649,8 +646,8 @@ A Figura~\ref{fig:estados-elt} apresenta a máquina de estados de um elemento
 GStreamer (isto é, seus estados e transições possíveis).  Mudanças de estado
 do \en{pipeline}, na verdade de \en{bins} em geral, são propagadas nos
 elementos filhos, e a direção da propagação é sempre dos \en{sinks} para os
-\en{sources}---o que garante que dados não sejam gerados antes que os
-elementos fluxo abaixo estejam prontos para recebê-los.  Por exemplo, na
+\en{sources}---dessa forma dados não são gerados antes que os elementos
+fluxo abaixo estejam prontos para recebê-los.  Por exemplo, na
 Listagem~\ref{lst:mp3}, se bem sucedida, a chamada \C{gst_element_set_state}
 (linha~25) implica na seguinte sequência transições (sempre dos \en{sinks}
 para os \en{sources}): (1)~os elementos filhos ``alsasink'', ``mad'' e
@@ -658,13 +655,13 @@ para os \en{sources}): (1)~os elementos filhos ``alsasink'', ``mad'' e
 \en{pipeline} transiciona para \en{ready}; (2)~os filhos transicionam de
 \en{ready} para \en{paused} e, em seguida, o \en{pipeline} transiciona para
 \en{paused}; e~(3) os filhos transicionam de~\en{paused} para \en{playing}
-e, finalmente, o \en{pipeline} transiciona para \en{playing}.  Essa última
-transição completa a chamada e devolve o controle à função \C{main}.  Nesse
-ponto, a \en{thread} da aplicação está prestes a executar a asserção da
-linha~26, que aborta o programa em caso de falha da chamada anterior, e as
-\en{streaming threads} já começaram a operar o \en{pipeline}, ou seja, os
-elementos ``filesrc'', ``mad'' e ``alsasink'' já estão produzindo,
-processando e consumindo dados.
+e, finalmente, o \en{pipeline} transiciona de \en{paused} para \en{playing}.
+Essa última transição completa a chamada e devolve o controle à função
+\C{main}.  Nesse ponto, a \en{thread} da aplicação está prestes a executar a
+asserção da linha~26, que aborta o programa em caso de falha da chamada
+anterior, e as \en{streaming threads} já começaram a operar o \en{pipeline},
+ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink'' já estão
+produzindo, processando e consumindo dados.
 
 \begin{figure}[b]
   \centering
@@ -680,7 +677,7 @@ processando e consumindo dados.
     \draw [->] (PAUSED) to [bend left=20] (READY);
     \draw [->] (READY) to [bend left=20] (NULL);
   \end{tikzpicture}
-  \caption{Máquina de estados de elemento (\C{GstElement}).}
+  \caption{Máquina de estados de um elemento (\C{GstElement}).}
   \label{fig:estados-elt}
 \end{figure}
 
@@ -697,63 +694,63 @@ chamada \C{gst_element_set_state} (linha~33) também propaga a transição para
 os elementos filhos, só que agora as transições são no sentido
 contrário---de \en{playing} para \en{paused}, \en{ready} e \en{null}.
 Finalmente, observe que a chamada \C{gst_object_unref} (linha~34) quando
-aplicada a um \en{bin} libera não apenas \en{bin} mas também os seus filhos,
-ou seja, nesse ponto os elementos alocados nas linhas~15--28 são liberados.
+aplicada a um \en{bin} libera não apenas uma referência para o \en{bin} mas
+também libera uma referência para cada elemento filho, ou seja, nesse ponto
+os elementos alocados nas linhas~15--28 são liberados.
 
+
 \subsection*{De volta ao problema inicial}
 
 Agora que vimos como alocar, adicionar e interconectar elementos num
 \en{pipeline} podemos voltar ao nosso problema inicial: construir um
-\en{pipeline} semelhante ao apresentado na Seção~\ref{sec:intro} que usa
-apenas elementos básicos para tocar um vídeo~Ogg.  Há uma diferença
-importante entre o \en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico}) que
-pretendemos construir e o \en{pipeline} MP3 (Figura~\ref{fig:pipe-mp3}) que
-construímos anteriormente.  Enquanto no \en{pipeline} MP3 o número de
-\en{pads} de todos os elementos é fixo (conhecido em tempo de compilação),
-no \en{pipeline} Ogg esse número é variável.  Em particular, no
-\en{pipeline} Ogg o número de \en{sink pads} do elemento ``oggdemux''
-depende do número de subfluxos multiplexados fluxo Ogg de entrada.  Por
-exemplo, se o fluxo Ogg possuir apenas um subfluxo Vorbis, o elemento
-``oggdemux'' terá uma única \en{sink pad} que deverá ser conectada à
-\en{source pad} do elemento ``vorbisdec''.  No entanto, se o fluxo Ogg
+\en{pipeline} semelhante ao da Seção~\ref{sec:intro} que usa apenas
+elementos básicos para tocar um vídeo~Ogg.  Há uma diferença importante
+entre esse \en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico}) e o
+\en{pipeline} MP3 (Figura~\ref{fig:pipe-mp3}) que construímos anteriormente.
+Enquanto no \en{pipeline} MP3 o número total de \en{pads} é fixo (conhecido
+em tempo de compilação) no \en{pipeline} Ogg esse número é variável.  Em
+particular, no \en{pipeline} Ogg o número de \en{sink pads} do elemento
+``oggdemux'' depende do número de subfluxos multiplexados fluxo Ogg de
+entrada.  Por exemplo, se o fluxo Ogg possuir apenas um subfluxo Vorbis, o
+elemento ``oggdemux'' terá uma única \en{sink pad} que deverá ser conectada
+à \en{source pad} do elemento ``vorbisdec''.  No entanto, se o fluxo Ogg
 possuir dois subfluxos, Vorbis e Theora, o elemento ``oggdemux'' terá duas
-\en{sink pads}, uma para o subfluxo Vorbis resultante, que deverá ser
-conectada ao elemento ``vorbisdec'', e outra para o subfluxo Theora
-resultante, que deverá ser conectada ao elemento ``theoradec''.  Dessa
-forma, o número de subfluxos multiplexados no fluxo Ogg de entrada determina
-o número de \en{sink pads} no demultiplexador.  \en{Pads} desse tipo,
-criadas sob demanda pelo elemento, são chamadas de \en{sometimes pads}.
+\en{sink pads}, uma para o subfluxo Vorbis que deverá ser conectada ao
+elemento ``vorbisdec'', e outra para o subfluxo Theora que deverá ser
+conectada ao elemento ``theoradec''.  Logo, o número de subfluxos
+multiplexados no Ogg determina o número de \en{sink pads} no
+demultiplexador.  \en{Pads} desse tipo, criadas sob demanda pelo elemento,
+são chamadas de \en{sometimes pads}.
 
 No GStreamer, toda \en{pad} é instanciada de acordo um \en{template} que
 indica a sua direção, capacidade e disponibilidade.  A direção (\en{source}
-ou \en{sink}) determina se a \en{pad} produz ou consome dados.
+ou \en{sink}) determina se a \en{pad} produz ou consome \en{buffers}.
 A capacidade, ou \en{caps}, determina os tipos de \en{buffers} que podem
 atravessá-la.  E a disponibilidade (\en{always}, \en{sometimes} ou
 \en{request}) determina o momento em que a \en{pad} é criada: (1)~\en{always
   pads} são criadas assim que o elemento é criado; (2)~\en{sometimes pads}
-são criadas pelo próprio elemento apenas sob condições específicas que
-normalmente envolvem o conteúdo processado; e~(3)\en{request pads} são
-criada apenas sob requisição explícita da aplicação.
+são criadas pelo próprio elemento sob condições específicas que normalmente
+envolvem o conteúdo processado; e~(3)\en{request pads} são criada apenas
+quando requisitadas pela aplicação.
 
-No \en{pipeline} MP3 da Figura~\ref{fig:pipe-mp3} as \en{pads} de todos os
-elementos possuem disponibilidade \en{always}.  Isso significa que podemos
-construir o \en{pipeline} inteiro estaticamente, conectando todos os seus
-elementos antes de iniciá-lo.  Já no \en{pipeline} Ogg da
-Figura~\ref{fig:pipe-tipico} essa abordagem não é possível.  As \en{sink
-  pads} do elemento ``oggdemux'' possuem disponibilidade \en{sometimes} e só
-serão criadas quando o elemento decodificar o cabeçalho do fluxo de entrada
-(isto é, transicionar para o estado \en{paused}).  Nesse caso, precisamos
-usar uma abordagem incremental com dois passos.  Primeiro, precisamos montar
-e iniciar um \en{pipeline} contendo apenas os elementos ``filesrc'' e
-``oggdemux'' conectados.  Em seguida, precisamos esperar o elemento
-``oggdemux'' notificar a criação de cada \en{sink pad} para então adicionar
-e conectar os elementos restantes de acordo com as capacidades da \en{pad}
-criada.  No GStreamer, esse tipo de notificação assíncrona disparada por
-elementos é chamada de sinal.  Todo sinal possui um nome (``pad-added'',
-nesse caso) e pode ser capturado via um mecanismo de registro de
-\en{callbacks}.  Ou seja, para capturar um sinal a aplicação registra no
-elemento uma função \en{callback} que é chamada sempre que o sinal é
-disparado.
+No \en{pipeline} MP3 (Figura~\ref{fig:pipe-mp3}) todas as \en{pads} têm
+disponibilidade \en{always}.  Isso significa que podemos construir o
+\en{pipeline} inteiro estaticamente, conectando todos os seus elementos
+antes de iniciá-lo.  Já no \en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico})
+essa abordagem não é possível.  As \en{sink pads} do elemento ``oggdemux''
+possuem disponibilidade \en{sometimes} e só serão criadas quando o elemento
+inspecionar o fluxo de entrada (transicionar para o estado \en{paused}).
+Nesse caso, precisamos usar uma abordagem incremental com dois passos.
+Primeiro, precisamos montar e iniciar um \en{pipeline} contendo apenas os
+elementos ``filesrc'' e ``oggdemux'' conectados.  Em seguida, precisamos
+esperar o elemento ``oggdemux'' notificar a criação de cada \en{sink pad}
+para então adicionar e conectar os elementos restantes de acordo com as
+capacidades da \en{pad} criada.  Esse tipo de notificação assíncrona
+disparada por elementos é chamada de sinal.  Todo sinal possui um nome
+(``pad-added'', nesse caso) e pode ser capturado via um mecanismo de
+registro de \en{callbacks}.  Ou seja, para capturar um sinal a aplicação
+registra no elemento uma função \en{callback} que é chamada sempre que o
+sinal é disparado.
 
 A Listagem~\ref{lst:ogg} apresenta um programa que utiliza a abordagem
 incremental anterior para montar um \en{pipeline} que reproduz um arquivo
@@ -764,15 +761,27 @@ versão simplificada (não funcional) da Figura~\ref{fig:pipe-ogg}.
 A diferença aqui está nos elementos adicionais ``audioconvert'', que aparece
 entre os elementos ``vorbisdec'' e ``alsasink'', e ``queue'', que aparece
 entre os elementos ``oggdemux'' e ``theoradec''.  O elemento
-``audioconvert'' converte as amostras produzidas pelo ``vorbisdec'' para um
-formato que o ``alsasink'' aceita.  Na prática, não é possível conectar o
-elemento ``vorbisdec'' diretamente ao ``alsasink''---as \en{caps} da
+``audioconvert'' converte as amostras produzidas pelo elemento ``vorbisdec''
+para um formato que o ``alsasink'' aceita, e o elemento ``queue'' desacopla
+a operação dos elementos ``oggdemux'' e ``theoradec''.
+
+O elemento ``audioconvert'' é necessário porque os elementos ``vorbisdec'' e
+``alsasink'' não podem ser conectados diretamente---as \en{caps} da
 \en{source pad} do ``vorbisdec'' não são compatíveis com as \en{caps} do
-\en{sink pad} do ``alsasink'', isto é, a interseção das \en{caps} dessas
-\en{pads} é vazia.  (Podemos entender as \en{caps} de uma \en{pad} como o
+\en{sink pad} do ``alsasink'', ou seja, interseção das \en{caps} dessas
+\en{pads} é vazia (podemos entender as \en{caps} de uma \en{pad} como o
 conjunto dos possíveis formatos dos \en{buffers} que podem atravessá-la).
-Já o elemento ``queue'' entre os elementos ``oggdemux'' e ``theoradec''
-serve para
+Já o elemento ``queue'' entre os elementos ``oggdemux'' e ``theoradec'' é
+necessário porque esses elementos precisam operar em \en{streaming threads}
+separadas.  O elemento ``queue'' é uma simples fila de \en{buffers}.  Quando
+inserido entre dois elementos, produtor e consumidor, o ``queue'' força a
+criação de duas \en{streaming threads}, uma que opera o produtor e outra que
+opera o consumidor, e ao mesmo tempo, age como elemento de sincronização
+dessas \en{threads}.  Isto é, o ``queue'' bloqueia a \en{thread} produtora
+caso a fila fique cheia e bloqueia a \en{thread} consumidora caso ela
+esvazie.  Sem o elemento \en{queue} o \en{pipeline} da
+Figura~\ref{fig:pipe-ogg} simplesmente não funciona pois não completa a
+transição do estado \en{paused} para \en{playing}.
 
 \begin{figure}[H]
   \centering
@@ -809,13 +818,108 @@ serve para
   \label{fig:pipe-ogg}
 \end{figure}
 
-Vejamos o propósito de cada linha da Listagem~\ref{lst:ogg}.
+De volta à Listagem~\ref{lst:ogg}, vejamos os trechos relevantes do
+programa.  Na função~\C{main}, as chamadas das linhas~67--69 alocam os
+elementos ``pipeline'', ``filesrc'' e ``oggdemux'', e as chamadas seguintes,
+linhas~72--73, adicionam os dois últimos ao \en{pipeline} e interconecta-os.
+A chamada da linha~74 atribui o caminho do arquivo Ogg à propriedade
+``location'' do elemento ``filesrc''.  Nesse ponto, portanto, o
+\en{pipeline} possui apenas os elementos ``filesrc'' e ``oggdemux'', ambos
+estão conectados e o elemento ``filesrc'' está configurado com o caminho do
+arquivo a ser tocado.
 
+A chamada \C{g_signal_connect}, linha~75, registra a \en{callback}
+\C{pad_added_cb} (linhas~4--54) como tratadora do sinal ``pad-added'' do
+elemento ``oggdemux'', ou seja, a função \C{pad_added_cb} será chamada
+sempre que o ``oggdemux'' criar uma \en{sometimes~pad}.
+
+A chamadas seguintes (linhas~77--85) fazem o mesmo que fizeram nos exemplos
+anteriores: transicionam o \en{pipeline} do estado \en{null} para
+\en{playing} (linha~77), bloqueiam a \en{thread} da aplicação esperando um
+erro ou o fim da reprodução (linhas~79--80) e, quando o controle retorna à
+\C{main}, transicionam o \en{pipeline} de volta ao estado \en{null}
+(linha~84) e liberam os elementos alocados (linha~85).  A diferença aqui
+está no que acontece na transição intermediária do \en{pipeline} do estado
+\en{ready} para o estado \en{paused}, disparada pela chamada
+\C{gst_element_set_state}, linha~77.
+
+Quando o \en{pipeline} da Listagem~\ref{lst:ogg} transiciona para o estado
+\en{paused} seus elementos (nesse ponto, ``filesrc'' e ``oggdemux'') já
+estão pausados, ou seja, já carregaram os dados iniciais do fluxo Ogg e
+estão prontos para começar a operar.  Nesse momento, para cada subfluxo
+multiplexado no fluxo Ogg, o elemento ``oggdemux'' dispara um sinal
+``pad-added'' que resulta numa chamada à função \C{pad_added_cb}
+(linhas~4--54).  Por exemplo, se o fluxo Ogg possuir dois subfluxos, um
+Vorbis e um Theora, a função \C{pad_added_cb} será chamada uma vez para cada
+subfluxo.  Em ambas as chamadas, o parâmetro \C{demux} contém o elemento que
+disparou o sinal (``oggdemux''), \C{srcpad} contém a \en{sometimes pad}
+criada pelo elemento, e \C{data} contém o dado adicional (\en{user data})
+passado à função \C{g_signal_connect} (linha~75) no momento do registro da
+\en{callback} (no caso, \C{NULL}).
+
+Na função~\C{pad_added_cb}, a chamada da linha~13 obtém o \en{pipeline}, a
+chamada linha~14 obtém as \en{caps} (\C{GstCaps}) associadas à \en{sometimes
+  pad} criada (parâmetro \C{srcpad}) e a chamada da linha~15 obtém o nome do
+tipo (\en{mime type}) do fluxo que escoará através da \en{pad}.  Nesse
+ponto, há três possibilidades:
+\begin{enumerate}
+\item Se o tipo é Vorbis (``audio/x-vorbis'') e uma \en{pad} Vorbis ainda
+  não foi encontrada, a \en{callback} aloca os elementos ``vorbisdec'',
+  ``audioconvert'' e ``alsasink'' (linhas~18--20), adiciona-os ao
+  \en{pipeline} (linha~22), transiciona os elementos para o mesmo estado do
+  \en{pipeline}, no caso \en{paused}, (linhas~23--25), conecta-os em série
+  (linha~26), obtém a \en{sink pad} do primeiro elemento da série,
+  ``vorbisdec'', (linha~27), e marca a \en{flag} \C{has_vorbis_pad}
+  (linha~28) para indicar que uma \en{pad} Vorbis foi encontrada.
+\item Se o tipo é Theora (``video/x-theora'') e uma \en{pad} Theora ainda
+  não foi encontrada, a \en{callback} procede de forma análoga mas agora
+  para os elementos ``queue'', ``theoradec'' e ``xvimagesink'', ou seja,
+  aloca-os, adiciona-os ao \en{pipeline}, transiciona-os para o mesmo estado
+  do \en{pipeline}, conecta-os em série, obtém a \en{source pad} do
+  ``queue'' e marca a \en{flag} \C{has_theora_pad}.
+\item Caso contrário, isto é, se o tipo não é Vorbis nem Theora ou se a
+  \en{pad} em questão não é a primeira Vorbis ou Theora encontrada, a
+  \en{pad} é simplesmente ignorada (linha~46).
+\end{enumerate}
+Se a \en{pad} não for ignorada (casos~1 e~2 anteriores), na linha~48 a
+variável~\C{sinkpad} conterá a \en{sink pad} do primeiro elemento da série
+correspondente à \en{sometimes pad} criada (parâmetro \C{srcpad}), ou seja,
+a \en{sink pad} do elemento ``vorbisdec'' se \C{srcpad} é Vorbis ou do
+elemento ``queue'' se \C{srcpad} é Theora.  Finalmente, a chamada
+\C{gst_pad_link} (linha~48) conecta a \C{srcpad} encontrada à \C{sinkpad} da
+série apropriada, e as chamadas seguintes (linhas~50--53) liberam as
+referências utilizadas.
+
+\clearpage
 \lstinputlisting[
 style=display,
 caption={Tocando um arquivo de vídeo Ogg usando elementos básicos.},
 label={lst:ogg},
 ]{src/ogg2.c}
+
+Se tudo correr bem, quando iniciado, o programa da Listagem~\ref{lst:ogg}
+demultiplexa o arquivo Ogg fornecido e reproduz os primeiros subfluxos
+Vorbis e Theora que encontrar.  Caso não haja subfluxos Vorbis ou Theora, o
+programa termina imediatamente---uma mensagem de error é postada no \en{bus}
+indicando que o ``oggdemux'' não possui \en{sink pads} conectadas e o
+controle é devolvido à \en{thread} da aplicação que termina o programa.
+
+Um detalhe sutil mas importante no código da Listagem~\ref{lst:ogg} é que a
+\en{callback} \C{pad_added_cb} pode ser disparada numa \en{thread} diferente
+da \en{thread} da aplicação.  Nesse caso, caso haja dados compartilhados
+entre as \en{threads} é preciso sincronizar o acesso a esses dados usando
+\en{mutexes} e semáforos (tipos \C{GMutex} e~\C{GCond} da GLib).  Na
+Listagem~\ref{lst:ogg} não precisamos fazer isso porque o único dado
+compartilhado entre as \en{threads} da \en{callback} e da aplicação é o
+elemento demultiplexador ``oggdemux'' e, indiretamente, o \en{pipeline}, e
+porque as que chamadas que usamos na \en{callback} para manipular esses
+dados, \C{gst_element_$\ast$} e~\C{gst_bin_$\ast$}, já são internamente
+protegidas por \en{mutexes}.  Além disso, no intervalo em que as
+\en{threads} da \en{callback} e da aplicação estão de fato concorrendo,
+linhas~77--80, a \en{thread} da aplicação não modifica o \en{pipeline}.
+
+
+\subsection*{Os comandos gst-launch e gst-inspect}
 
 
 \clearpage
@@ -849,12 +953,14 @@ label={lst:ogg},
 %  LocalWords:  GstElement hello assert nonnull filename bunny ogg Big Buck
 %  LocalWords:  Blender Institute Creative Commons object set get free null
 %  LocalWords:  string state PLAYING Gstreamer ready paused playing thread
-%  LocalWords:  threads streaming bus timed filtered warnings CLOCK NONE
+%  LocalWords:  threads streaming bus timed filtered warnings CLOCK NONE cb
 %  LocalWords:  MESSAGE msg message unref makefile clean GstObject linker
 %  LocalWords:  pkg-config link cflags libs flags glib gstreamer shell all
 %  LocalWords:  PROGRAMS LDFLAGS TAB makefiles mad gst-plugins-base LGPL
 %  LocalWords:  gst-plugins-good Lesser Public License gst-plugins-ugly The
 %  LocalWords:  gst-plugins-bad Good the Bad and Ugly coreelements alsa bin
 %  LocalWords:  gst-inspect add many GstBin src filter videosink location
-%  LocalWords:  main callbacks callback sometimes template caps always
-%  LocalWords:  request pad-added audioconvert queue
+%  LocalWords:  main callbacks callback sometimes template caps always user
+%  LocalWords:  request pad-added audioconvert queue signal connect added
+%  LocalWords:  srcpad demux userdata GstCaps type audio x-vorbis flag has
+%  LocalWords:  vorbis video x-theora theora

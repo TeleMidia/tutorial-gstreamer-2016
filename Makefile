@@ -29,6 +29,7 @@ words:= $(words)|end-of-stream
 words:= $(words)|events?
 words:= $(words)|fast-forward
 words:= $(words)|flags?
+words:= $(words)|flags?
 words:= $(words)|flush
 words:= $(words)|frameworks?
 words:= $(words)|linker
@@ -64,6 +65,7 @@ words:= $(words)|streaming\s+threads?
 words:= $(words)|string
 words:= $(words)|threads?
 words:= $(words)|upstream
+words:= $(words)|userdata
 .PHONY: check
 check:
 	./sc.pl --sc-local='/(\s\b($(words))\b\s)/english' chapter.tex
