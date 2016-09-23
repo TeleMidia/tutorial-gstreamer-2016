@@ -22,7 +22,7 @@ static void on_pad_added (GstElement *element, GstPad *pad, gpointer data)
     sinkpad = gst_element_get_static_pad (videoconvert, "sink"); 
 
   g_assert (sinkpad);
-  g_assert (GST_PAD_LINK_SUCCESSFUL(gst_pad_link (pad, sinkpad)))
+  g_assert (GST_PAD_LINK_SUCCESSFUL(gst_pad_link (pad, sinkpad)));
 
   gst_object_unref (sinkpad);
   gst_caps_unref (pad_caps);
@@ -49,7 +49,7 @@ int main (int argc, char *argv[])
   videoconvert  = gst_element_factory_make ("videoconvert", "videoconverter");
   videoconvert2 = gst_element_factory_make ("videoconvert", "videoconverter2");
   audioconvert  = gst_element_factory_make ("audioconvert", "audioconverter");
-  videosink     = gst_element_factory_make ("xvimagesink", "videosink");
+  videosink     = gst_element_factory_make ("autovideosink", "videosink");
   audiosink     = gst_element_factory_make ("autoaudiosink", "audiosink");
 
   filter = (int) strtoll (argv[1], NULL, 10); 
