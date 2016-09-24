@@ -7,7 +7,7 @@
 
 typedef struct _GstMyVideoFilter {
   GstVideoFilter videoFilter;       /* Declaracao da classe base. */
-  gboolean use_r, use_g, use_b;
+  gdouble factor;
 } GstMyVideoFilter;
 
 typedef struct _GstMyVideoFilterClass {

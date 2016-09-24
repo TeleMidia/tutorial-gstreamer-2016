@@ -1,14 +1,16 @@
 #include "myvideofilter.h"
 
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+
 /* Cria as funcoes_my_video_filter_get_type e set gst_my_video_filter_parent_class */
 G_DEFINE_TYPE (GstMyVideoFilter, gst_my_video_filter, GST_TYPE_VIDEO_FILTER);
 
 /* propriedades */
 enum {
   PROP_0,
-  PROP_USE_R,
-  PROP_USE_G,
-  PROP_USE_B
+  PROP_WAVE_FACTOR
 };
 
 static void
@@ -47,8 +49,8 @@ gst_my_video_transform_frame (GstVideoFilter *vfilter,
   gint pixel_stride;
   gint offsets[3];
   guint8 *data, *indata;
+  guint outoffset, inoffset, u;
 
-  /* gst_video_frame_copy(outframe, inframe); */
   indata = GST_VIDEO_FRAME_PLANE_DATA (inframe, 0);
 
   data = GST_VIDEO_FRAME_PLANE_DATA (outframe, 0);
@@ -63,22 +65,17 @@ gst_my_video_transform_frame (GstVideoFilter *vfilter,
   pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE (outframe, 0);
   row_wrap = stride - pixel_stride * w;
 
-  for (i = 0; i < w; i++)
+  for (i = 0; i < h; i++)
   {
-    for(j = 0; j < h; j++)
+    for(j = 0; j < w; j++)
     {
-      data[offsets[0]] = (my_vfilter->use_r) ? indata[offsets[0]] : 0;
-      data[offsets[1]] = (my_vfilter->use_g) ? indata[offsets[1]] : 0;
-      data[offsets[2]] = (my_vfilter->use_b) ? indata[offsets[2]] : 0;
+      outoffset = (i*stride) + (j*pixel_stride);
+      u = i + 20*sin(my_vfilter->factor * j);
+      inoffset = (u*stride) + (j*pixel_stride);
 
-      /* anda para o prox. pixel */
-      data += pixel_stride;
-      indata += pixel_stride;
+      if (u < h)
+        memcpy (data + outoffset, indata + inoffset, pixel_stride);
     }
-
-    /* anda para a prox. linha */
-    data += row_wrap;
-    indata += row_wrap;
   }
  
   return GST_FLOW_OK;
@@ -87,7 +84,7 @@ gst_my_video_transform_frame (GstVideoFilter *vfilter,
 static void
 gst_my_video_filter_init (GstMyVideoFilter *filter)
 {
-  filter->use_r = filter->use_g = filter->use_b = FALSE;
+  filter->factor =  2*3.14/130;
 }
 
 static void
@@ -105,7 +102,7 @@ gst_my_video_filter_class_init(GstMyVideoFilterClass *klass)
     "Shows the basic structure of a plugin",
     "roberto robertogerson at telemidia.puc-rio.br");
 
-  /* adicionas os pads na classe */
+  /* adiciona os pads na classe */
   gst_element_class_add_pad_template (gstelement_class,
     gst_static_pad_template_get(&gst_my_video_filter_src_template));
   gst_element_class_add_pad_template (gstelement_class,
@@ -116,20 +113,12 @@ gst_my_video_filter_class_init(GstMyVideoFilterClass *klass)
   gobject_class->get_property = gst_my_video_filter_get_property;
 
   /* define propriedades */
-  g_object_class_install_property(gobject_class, PROP_USE_R,
-    g_param_spec_boolean ("use_r", "Use r",
-                          "Se deve ou nao usar o canal vermelho.",
-                          FALSE, G_PARAM_READWRITE));
-
-  g_object_class_install_property(gobject_class, PROP_USE_G,
-    g_param_spec_boolean ("use_g", "Use g",
-                          "Se deve ou nao usar o canal verde.",
-                          FALSE, G_PARAM_READWRITE));
-
-  g_object_class_install_property(gobject_class, PROP_USE_B,
-    g_param_spec_boolean ("use_b", "Use b",
-                          "Se deve ou nao usar o canal azul.",
-                          FALSE, G_PARAM_READWRITE));
+  g_object_class_install_property(gobject_class, PROP_WAVE_FACTOR,
+    g_param_spec_double ("factor", "Factor",
+                         "Valor do fator",
+                         0.0, 320.0,
+                         2 * 3.14 / 130,
+                         G_PARAM_READWRITE));
 
   /* define a funcao que será chamada para processar o frame de video */
   vfilter_class->transform_frame = GST_DEBUG_FUNCPTR(gst_my_video_transform_frame);
@@ -138,7 +127,8 @@ gst_my_video_filter_class_init(GstMyVideoFilterClass *klass)
 static gboolean
 my_video_filter_plugin_init (GstPlugin *myvideofilter)
 {
-  return gst_element_register(myvideofilter, "myvideofilter", GST_RANK_NONE, GST_TYPE_MY_VIDEO_FILTER);
+  return gst_element_register (myvideofilter, "myvideofilter",
+                               GST_RANK_NONE, GST_TYPE_MY_VIDEO_FILTER);
 }
 
 static void
@@ -150,14 +140,8 @@ gst_my_video_filter_set_property (GObject      *object,
   GstMyVideoFilter *filter = GST_MY_VIDEO_FILTER (object);
 
   switch (prop_id) {
-    case PROP_USE_R:
-      filter->use_r = g_value_get_boolean (value);
-      break;
-    case PROP_USE_G:
-      filter->use_g = g_value_get_boolean (value);
-      break;
-    case PROP_USE_B:
-      filter->use_b = g_value_get_boolean (value);
+    case PROP_WAVE_FACTOR:
+      filter->factor = g_value_get_double (value);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
@@ -174,14 +158,8 @@ gst_my_video_filter_get_property (GObject    *object,
   GstMyVideoFilter *filter = GST_MY_VIDEO_FILTER (object);
                                                                                 
   switch (prop_id) {
-    case PROP_USE_R:
-      g_value_set_boolean (value, filter->use_r);
-      break;
-    case PROP_USE_G:
-      g_value_set_boolean (value, filter->use_g);
-      break;
-    case PROP_USE_B:
-      g_value_set_boolean (value, filter->use_b);
+    case PROP_WAVE_FACTOR:
+      g_value_set_boolean (value, filter->factor);
       break;
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
