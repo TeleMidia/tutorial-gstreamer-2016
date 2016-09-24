@@ -8,6 +8,7 @@
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{float}
+\usepackage{multicol}
 \usepackage{subfigure}
 \usepackage{natbib}
 \setlength{\bibsep}{0.0pt}
@@ -135,6 +136,13 @@
   frame=tb,
   numbers=left,
   numberstyle={\tiny\sffamily},
+}
+\lstdefinestyle{display-tiny}{
+  aboveskip=\abovedisplayskip,
+  basicstyle=\tiny\ttfamily,
+  belowskip=0pt,
+  captionpos=b,
+  frame=tblr,
 }
 %% -------------------------------------------------------------------------
 \def\en#1{\foreignlanguage{english}{\emph{#1}}}

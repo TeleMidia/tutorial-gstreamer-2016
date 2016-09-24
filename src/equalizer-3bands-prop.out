@@ -1,0 +1,9 @@
+band0: gain for the frequency band 100 Hz, ranging from -24.0 to +12.0
+       flags: readable, writable, controllable
+       Double. Range: -24 - 12 Default: 0 
+band1: gain for the frequency band 1100 Hz, ranging from -24.0 to +12.0
+       flags: readable, writable, controllable
+       Double. Range:  -24 - 12 Default: 0 
+band2: gain for the frequency band 11 kHz, ranging from -24.0 to +12.0
+       flags: readable, writable, controllable
+       Double. Range:  -24 -12 Default: 0 

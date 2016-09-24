@@ -26,6 +26,7 @@ words:= $(words)|callbacks?
 words:= $(words)|dataflow
 words:= $(words)|downstream
 words:= $(words)|end-of-stream
+words:= $(words)|equalizers?
 words:= $(words)|events?
 words:= $(words)|fast-forward
 words:= $(words)|flags?
@@ -67,8 +68,8 @@ words:= $(words)|streaming\s+threads?
 words:= $(words)|string
 words:= $(words)|threads?
 words:= $(words)|upstream
-words:= $(words)|userdata
 words:= $(words)|user\s+data
+words:= $(words)|userdata
 .PHONY: check
 check:
 	./sc.pl --sc-local='/(\s\b($(words))\b\s)/english' chapter.tex
