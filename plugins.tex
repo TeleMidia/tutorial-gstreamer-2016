@@ -16,7 +16,7 @@
 Até agora só vimos como usar elementos já definidos pelo Gstreamer (e.g.
 ``filesrc'', ``alsasink'').  Nesta seção iremos discutir como é possível criar
 novos tipos de elementos.  No Gstreamer, novos tipos de elementos podem ser
-criados estendendo a classe base \emph{GstElement}.  Também é possível encapsular
+criados estendendo a classe base \C{GstElement}.  Também é possível encapsular
 esses novos elementos em plugins que podem ser distribuidos separadamente,
 instalados e carregados dinamicamente. 
 
@@ -29,14 +29,13 @@ instalados e carregados dinamicamente.
 
 \subsection*{Elemento ``Dummy''}
 Para entendermos como desenvolver um novo elemento para  o GStreamer, iremos
-começar com um exemplo simples, que ao receber algum dado no seu \emph{sink
-pad} irá apenas imprimir o tamanho do buffer recebido e retransmitir esses
-dados em seu \emph{source pad}.  Iremos chamar esse novo elemento de
-\emph{myfilter}.  A prática de desenvolvê-lo irá nos permitir identificar as
-principais funções que devem ser implementadas por um novo elemento do
-Gstreamer e como encapsulá-lo em um plugin.  O código fonte desse exemplo está
-divido em dois arquivo (\C{myfilter.h} e \C{myfilter.c}) e será detalhado a
-seguir.
+começar com um exemplo simples, que ao receber algum dado no seu \en{sink pad}
+irá apenas imprimir o tamanho do buffer recebido e retransmitir esses dados em
+seu \en{source pad}.  Iremos chamar esse novo elemento de ``myfilter''.  A
+prática de desenvolvê-lo irá nos permitir identificar as principais funções que
+devem ser implementadas por um novo elemento do Gstreamer e como encapsulá-lo
+em um plugin.  O código fonte desse exemplo está divido em dois arquivo
+(\C{myfilter.h} e \C{myfilter.c}) e será detalhado a seguir.
 
 O arquivo \C{myfilter.h} (Listagem~\ref{lst:myfilter_h}) declara uma classe que
 representa o novo tipo de elemento que queremos criar (\C{GstMyFilter}).  A
@@ -47,7 +46,7 @@ isso, é necessário criar as classes \C{GstMyFilter}~(linhas 6--9) e
 classe \C{GstElement}, por isso ela define o campo \C{element} do tipo
 \C{GstElement}, linha 7, e a classe \C{GstMyFilterClass} define o campo
 \C{parent_class} do tipo \C{GstElementClass}, linha 12.  As linhas 15--24
-definem macros padrões que usam o \emph{framework} GObject para checagem e
+definem macros padrões que usam o \en{framework} GObject para checagem e
 \C{casting} do novo tipo definido.
 
 \lstinputlisting[
@@ -58,26 +57,26 @@ label={lst:myfilter_h},
 
 O arquivo \C{myfilter.c}~(Listagem~\ref{lst:myfilter_c}) implementa as funções
 que permitem ao Gstreamer carregar instâncias deste novo elemento e utilizá-las
-em \emph{pipeline}s, bem como a lógica do processamento realizado por esse
+em \en{pipeline}s, bem como a lógica do processamento realizado por esse
 elemento.  A principais funções são as funções de inicialização (\C{*_init}) e
 a de processamento (\C{*_chain}).
 
 A função \C{gst_my_filter_class_init}~(linhas 30--48) é chamada na primeira vez
 que um objeto do tipo \C{GstMyFilter} for instanciado.  Essa função define
 metadados para a classe, por meio do método \C{gst_class_set_static_metadata},
-e define os tipos de \emph{pads} do novo elemento que estamos criando, através
+e define os tipos de \en{pads} do novo elemento que estamos criando, através
 das chamadas \C{gst_element_class_add_pad_template}.  As chamadas dessa função
 utilizam os dados de duas estruturas do tipo \C{GstStaticPadTemplate}
 (respectivamente, \C{sink_factory} e \C{src_factory}, linhas 6--16).  A macro
 \C{GST_STATIC_PAD_TEMPLATE} ajuda a preencher os valores dos campos de
 estruturas \C{GstStaticPadTemplate}.  Ela recebe como parâmetros: (1)~um nome
-para o \emph{pad}; a direção do \emph{pad} (\C{GST_PAD_UNKNOWN},
+para o \en{pad}; a direção do \en{pad} (\C{GST_PAD_UNKNOWN},
 \C{GST_PAD_SRC} ou \C{GST_PAD_SINK}); a sua informação de presença
 (\C{GST_PAD_ALWAYS}, \C{GST_PAD_SOMETIMES} ou \C{GST_PAD_REQUEST}); e as
-capacidades do \emph{pad}, uma estrutura do tipo \C{GstCaps *}.  Geralmente, a
+capacidades do \en{pad}, uma estrutura do tipo \C{GstCaps *}.  Geralmente, a
 inicialização de uma estrutura do tipo \C{GstCaps} é feita por meio da macro
-\C{GST_STATIC_CAPS}. No nosso exemplo, linhas 10 e 16, tanto a \emph{sink pad}
-como a \emph{src pad} do elemento que estamos criando recebe qualquer tipo de
+\C{GST_STATIC_CAPS}.  No nosso exemplo, linhas 10 e 16, tanto a \en{sink pad}
+como a \en{src pad} do elemento que estamos criando recebe qualquer tipo de
 dado (por isso, o parâmetro \C{"ANY"}.
 %Como mencionado anteriormente, cada elemento do pipeline pode ter zero ou mais
 %\emph{source pads} e zero ou mais \emph{sink pads}.  O número de \emph{pads} e
@@ -88,21 +87,22 @@ dado (por isso, o parâmetro \C{"ANY"}.
 
 A função \C{gst_my_filter_init}~(linhas 50--61) é chamada quando uma nova
 instância da classe \C{GstMyFilter} é criada.  Ela basicamente cria as
-instâncias da classe \C{GstPad} relacionadas a cada um dos \emph{pads} do
-elemento \emph{GstMyFilter}, chamadas \C{gst_pad_new_from_static_template}
-(linhas 53 e 58).  Além disso, é também na função \C{gst_my_filter_init} que a
-função \C{gst_pad_set_chain_function} é registrada para ser chamada sempre que
-novos dados apareçam no \emph{sink pad} do elemento \emph{myfilter}.
+instâncias da classe \C{GstPad} relacionadas a cada um dos \en{pads} do
+elemento \C{GstMyFilter}, chamadas \C{gst_pad_new_from_static_template} (linhas
+53 e 58).  Além disso, é também na função \C{gst_my_filter_init}, por meio da
+função \C{gst_pad_set_chain_function}, que a função é registrada para ser
+chamada sempre que novos dados apareçam no \en{sink pad} do elemento
+``myfilter''.
 
 A função \C{gst_my_filter_chain}~(linhas 18--27) é a função de fato responsável
 por fazer o processamento de dados relacionado com o elemento que estamos
 criando.  Essa função será chamada sempre que novos dados chegarem no
-\emph{sink pad} do nosso elemento.  Ela recebe um ponteiro para o \emph{pad}
+\en{sink pad} do nosso elemento.  Ela recebe um ponteiro para o \en{pad}
 (\C{GstPad*}) onde os dados chegaram, um ponteiro para o pai (\C{GstObject*}) e
-um ponteiro para o buffer de dados que está chegando por esse \emph{pad}
+um ponteiro para o buffer de dados que está chegando por esse \en{pad}
 (\C{GstBuffer *}).  No nosso exemplo, essa função apenas imprime o tamanho do
 buffer recebido~(acessado por meio da chamada \C{gst_buffer_get_size(buf)}) e
-reenvia esse buffer para o \emph{src pad} do elemento (usando a chamada
+reenvia esse buffer para o \en{src pad} do elemento (usando a chamada
 \C{gst_pad_push}).
 
 %A macro \C{G_DEFINE_TYPE}, linha 4, também faz parte do
@@ -116,8 +116,8 @@ As linhas 70 a 78 trazem as definições relacionadas ao encapsulamento do nosso
 novo elemento em um plugin.  A macro \C{GST_PLUGIN_DEFINE} é usada para
 definir o ponto de entrada (a função que será chamada quando o plugin for
 carregado pelo GStreamer) e metadados para um plugin.  A macro recebe a versão
-para do Gstreamer que é compatível com o  plugin (dividido em \emph{major} e
-\emph{minor}), o nome do plugin, uma descrição o plugin, um ponteiro para a
+para do Gstreamer que é compatível com o  plugin (dividido em \en{major} e
+\en{minor}), o nome do plugin, uma descrição o plugin, um ponteiro para a
 função de inicialização~(no nosso caso \C{my_filter_plugin_init}).  A função 
 \C{my_filter_plugin_init} é chamada quando o GStreamer carrega o plugin.  No
 nosso exemplo, ela apenas registra a classe \C{GstMyFilter}, por meio da função
@@ -133,7 +133,7 @@ label={lst:myfilter_c},
 \subsection*{Testando o novo elemento}
 Para compilar o nosso plugin devemos gerar uma biblioteca dinâmica (.dll no
 Windows ou .so no Linux).  O comando a seguir compila o exemplo desenvolvido
-acima, gerando o arquivo \emph{myfilter.so}:
+acima, gerando o arquivo \C{myfilter.so}:
 
 \begin{lstlisting}[style=command]
 @\$@ cc -shared -fPIC \
@@ -142,7 +142,7 @@ acima, gerando o arquivo \emph{myfilter.so}:
 \end{lstlisting}
 
 Assumindo que o arquivo gerado \C{myfilter.so} esteja no caminho atual é
-possível, por exemplo, carregar o elemento \emph{myfilter} que desenvolvemos em
+possível, por exemplo, carregar o elemento ``myfilter'' que desenvolvemos em
 um \emph{pipeline} simples através da ferramenta \C{gst-launch}:
 
 \begin{lstlisting}[style=command]
@@ -150,12 +150,12 @@ um \emph{pipeline} simples através da ferramenta \C{gst-launch}:
      audiotestsrc !  myfilter ! alsasink
 \end{lstlisting}
 
-Aqui estamos usando o parâmtero \C{--gst-plugin-path} para informar que o
+O parâmetro \C{--gst-plugin-path} está sendo usado aqui para informar que o
 GStreamer também deve buscar plugins no diretório corrente da linha de comando.
-Como o elemento que desenvolvemos recebe qualquer tipo de dado (tipo de
-\emph{pad sink} \C{ANY}, é possível utilizá-lo usá-lo em qualquer
-\emph{pipeline}.  Por exemplo, compare a execução do \emph{pipeline} anterior
-com a execução seguinte pipeline:
+Como o elemento que desenvolvemos recebe qualquer tipo de dado (tipo de \en{pad
+sink} \C{ANY}, é possível utilizá-lo usá-lo em qualquer \en{pipeline}.  Por
+exemplo, compare a execução do \en{pipeline} anterior com a execução seguinte
+\en{pipeline}:
 
 \begin{lstlisting}[style=command]
 @\$@ gst-launch-1.0 --gst-plugin-path=. \
@@ -164,21 +164,23 @@ com a execução seguinte pipeline:
 
 \subsection*{Exemplo de novo elemento para filtro de vídeo}
 Como mencionado anteriormento, os elementos do Gstreamer são derivados da
-classe base \emph{GstElement}.  Porém, quando queremos desenvolver elementos
-mais complexos, pode ser interessante nos basearmos em outras classes
-distribuídas nos pacotes \C{gst-plugin-base}.
-A Figura~\ref{fig:plugins_base_classes} evidencia algumas dessas classes e
-como elas estão relacionadas.
+classe base \en{GstElement}.  Porém, quando queremos desenvolver elementos mais
+complexos, pode ser interessante nos basearmos em outras classes distribuídas
+nos pacotes \C{gst-plugin-base}.  A Figura~\ref{fig:plugins_base_classes}
+evidencia algumas dessas classes e como elas estão relacionadas.
 
-A classe \C{GstBaseSrc} é um classe base para plugins tipo \emph{source} (ou
+A classe \C{GstBaseSrc} é um classe base para plugins tipo \en{source} (ou
 produtores).  A classe \C{GstBaseSink} é uma classe base para plugins do tipo
-\emph{sink} (ou consumidores).  A classe \C{GstBaseTransform} é uma classe base
-para plugins do tipo \emph{tranform} (ou filtros).  Além disso, quando estamos
+\en{sink} (ou consumidores).  A classe \C{GstBaseTransform} é uma classe base
+para plugins do tipo \en{tranform} (ou filtros).  Além disso, quando estamos
 tratando especificamente de áudio ou vídeo, as classes \C{GstAudioFilter} e
 \C{GstVideoFilter} também podem ser interessantes para desenvolvermos novos
-filtros.  O nosso próximo exemplo (``myvideofilter'') irá usar a classe
-\C{GstVideoFilter} para exemplificar como é possível criarmos um elemento que é
-um filtro de vídeo.
+filtros.  O nosso próximo exemplo---elemento \en{myvideofilter}---irá usar a
+classe \C{GstVideoFilter} para exemplificar como é possível criarmos um
+elemento que processa frames de vídeo.  O objetivo do nosso filtro é aplicar um
+``efeito de onda'' no vídeo.  Assim como o exemplo anterior, o elemento
+\en{myvideofilter} também está dividido em dois arquivos, \C{myvideofilter.h}
+e \C{myvideofilter.c}.
 
 \tikzstyle{every node}=[draw=black,thick,anchor=west,font=\scriptsize]
 \tikzstyle{selected}=[draw=red,fill=red!30]
@@ -210,14 +212,7 @@ um filtro de vídeo.
            desenvolvimento de novos elementos para o GStreamer.}
 \end{figure}
 
-O elemento ``myvideofilter'' tem como objetivo permitir ao usuário escolher
-quais os canais de cores (vermelho, verde ou azul) o usuário quer selecionar.
-Para isso, nesse exemplo também discutiremos como adicionar parâmetros ao
-elemento que estamos criando.  Assim como o exemplo anterior, o elemento
-``myvideofilter'' também está dividido em dois arquivos, \C{myvideofilter.h} e
-\C{myvideofilter.c}.
-
-O arquivo \C{myvideofilter.h} (Listagem~\ref{lst:myfilter_h}) é bastante
+O arquivo \C{myvideofilter.h} (Listagem~\ref{lst:myvideofilter_h}) é bastante
 similar ao exemplo anterior e traz a declaração da classe \C{MyVideoFilter},
 por meio das estruturas \C{GstMyVideoFilter} e \C{GstMyVideoFilterClass},
 linhas 8--10 e 12--14, respectivamtente.  Diferente do exemplo anterior,
@@ -230,6 +225,15 @@ style=display,
 caption={myvideofilter.h},
 label={lst:myvideofilter_h},
 ]{src/myvideofilter.h}
+
+O arquivo \C{myvideofilter.c}~(Listagem~\ref{lst:myvideofilter_c}) implementa
+as principais funções da classe \C{MyVideoFilter}.  Comparado com o exemplo
+anterior as principais diferenças são: as capacidades dos \en{pads}, a função
+de transformação e o fato de que neste plugin também definimos as três
+propriedades que permitem ao usuário controlar quais os canais de cores que
+serão passados para o \en{src pad}.
+
+Para a definição de propriedades...
 
 \lstinputlisting[
 style=display,
@@ -249,12 +253,20 @@ Exemplo de \emph{pipeline} para carregar o novo filtro:
 \begin{lstlisting}[style=command]
 @\$@ gst-launch-1.0 --gst-plugin-path=. filesrc location=bunny.ogg ! \
      oggdemux ! theoradec ! videoconvert ! videoscale ! \
-     video/x-raw,width=720 ! myvideofilter ! ximagesink
+     video/x-raw,width=720 ! myvideofilter use-r ! ximagesink
 \end{lstlisting}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[scale=.250]{pics/myvideofilter.png}
+  \subfigure[factor=0.01]{
+    \includegraphics[width=0.4\textwidth]{pics/myvideofilter}
+  }
+  \subfigure[factor=0.05]{
+    \includegraphics[width=0.4\textwidth]{pics/myvideofilter2}
+  }
+  \subfigure[factor=0.1]{
+    \includegraphics[width=0.4\textwidth]{pics/myvideofilter3}
+  }
   \caption{Exemplos da execução de pipelines usando o elemento
            ``myvideofilter''.}
   \label{fig:bunny_myvideofilter}
