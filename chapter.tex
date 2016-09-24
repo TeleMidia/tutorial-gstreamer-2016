@@ -185,7 +185,7 @@ Figura~\ref{fig:pipe-tipico}, por exemplo, após iniciado opera da seguinte
 forma.
 \begin{enumerate}
 \item O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de
-  arquivos e escreve o fluxo de bytes resultantes na sua \en{source pad}.
+  arquivos e escreve o fluxo de bytes resultante na sua \en{source pad}.
   Ogg~\cite{ogg-rfc-3533} é um formato para multiplexação de fluxos de
   áudio, vídeo e texto.  Vamos assumir que arquivo Ogg nesse caso contém
   apenas dois fluxos multiplexados: um fluxo de áudio (sequência de amostras
@@ -202,8 +202,8 @@ forma.
   codificado no formato Vorbis, decodifica-o e escreve o fluxo de áudio~PCM
   resultante na sua \en{source pad}.  Um fluxo de áudio PCM é o que chamamos
   de ``áudio descomprimido'' (\en{raw}), ou seja, é uma sequência de
-  amostras obtidas via \en{pulse-code modulation} que representa o sinal
-  analógico original.
+  amostras obtidas via \en{pulse-code modulation} que representa
+  digitalmente o sinal analógico original.
 \item O elemento ``theoradec'' opera de maneira análoga.  Ele lê da sua
   \en{sink pad} um fluxo de bytes codificado no formato Theora, decodifica-o
   e escreve o fluxo de vídeo descomprimido (\en{raw}) resultante na sua
@@ -239,7 +239,7 @@ caso.  Queremos ``tocar'' o vídeo original em tempo real, isto é,
 reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Nesse
 caso, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
 e vídeo devem ser exibidas na taxa correta.  Valores típicos para essas
-taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo, ou
+taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo; ou
 seja, a cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
 dispositivo de saída de áudio, e a cada~33{,}33ms uma nova amostra de vídeo
 deve ser enviada ao dispositivo de saída de~vídeo.
@@ -289,8 +289,8 @@ conceitualmente cada conexão entre as \en{pads} dos elementos pode ser
 entendida como consistindo de dois canais, um canal unidirecional para
 \en{buffers} e outro canal bidirecional para eventos.
 A Figura~\ref{fig:conexao} ilustra a estrutura interna, conceitual de uma
-conexão.  Na figura,``B'' é o canal de \en{buffers} e ``E'' é o canal de
-eventos.
+conexão entre \en{pads}.  Na figura,``B'' é o canal de \en{buffers} e ``E''
+é o canal de eventos.
 
 \begin{figure}[H]
   \centering
@@ -637,31 +637,30 @@ estado \en{paused}, o elemento aloca recursos que dependem do conteúdo a ser
 processado e se prepara para processá-lo.  Finalmente, no estado
 \en{playing} o elemento inicia o processamento.
 
-Para chegar do estado \en{null} (estado inicial) ao estado \en{playing}
-(estado operante) todo elemento tem que passar primeiro pelo estados
-\en{ready} e \en{paused}, nessa ordem.  De forma análoga, para sair do
-estado \en{playing} e voltar ao estado inicial \en{null}, o elemento tem que
-passar pelos estados \en{paused} e \en{ready}.
-A Figura~\ref{fig:estados-elt} apresenta a máquina de estados de um elemento
-GStreamer (isto é, seus estados e transições possíveis).  Mudanças de estado
-do \en{pipeline}, na verdade de \en{bins} em geral, são propagadas nos
-elementos filhos, e a direção da propagação é sempre dos \en{sinks} para os
-\en{sources}---dessa forma dados não são gerados antes que os elementos
-fluxo abaixo estejam prontos para recebê-los.  Por exemplo, na
-Listagem~\ref{lst:mp3}, se bem sucedida, a chamada \C{gst_element_set_state}
-(linha~25) implica na seguinte sequência transições (sempre dos \en{sinks}
-para os \en{sources}): (1)~os elementos filhos ``alsasink'', ``mad'' e
-``filesrc'' transicionam de \en{null} para \en{ready} e, em seguida, o
-\en{pipeline} transiciona para \en{ready}; (2)~os filhos transicionam de
-\en{ready} para \en{paused} e, em seguida, o \en{pipeline} transiciona para
-\en{paused}; e~(3) os filhos transicionam de~\en{paused} para \en{playing}
-e, finalmente, o \en{pipeline} transiciona de \en{paused} para \en{playing}.
-Essa última transição completa a chamada e devolve o controle à função
-\C{main}.  Nesse ponto, a \en{thread} da aplicação está prestes a executar a
-asserção da linha~26, que aborta o programa em caso de falha da chamada
-anterior, e as \en{streaming threads} já começaram a operar o \en{pipeline},
-ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink'' já estão
-produzindo, processando e consumindo dados.
+Para chegar do estado \en{null} (inicial) ao estado \en{playing} (operante)
+todo elemento tem que passar primeiro pelo estados \en{ready} e \en{paused},
+nessa ordem.  De forma análoga, para sair do estado \en{playing} e voltar ao
+estado inicial \en{null}, o elemento tem que passar pelos estados
+\en{paused} e \en{ready}.  A Figura~\ref{fig:estados-elt} apresenta a
+máquina de estados de um elemento GStreamer (isto é, seus estados e
+transições possíveis).  Mudanças de estado do \en{pipeline}, na verdade de
+\en{bins} em geral, são propagadas nos elementos filhos, e a direção da
+propagação é sempre dos \en{sinks} para os \en{sources}---dessa forma dados
+não são gerados antes que os elementos fluxo abaixo estejam prontos para
+recebê-los.  Por exemplo, na Listagem~\ref{lst:mp3}, se bem sucedida, a
+chamada \C{gst_element_set_state} (linha~25) implica na seguinte sequência
+transições (sempre dos \en{sinks} para os \en{sources}): (1)~os elementos
+filhos ``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para
+\en{ready} e, em seguida, o \en{pipeline} transiciona para \en{ready};
+(2)~os filhos transicionam de \en{ready} para \en{paused} e, em seguida, o
+\en{pipeline} transiciona para \en{paused}; e~(3) os filhos transicionam
+de~\en{paused} para \en{playing} e, finalmente, o \en{pipeline} transiciona
+para \en{playing}.  Essa última transição completa a chamada e devolve o
+controle à função \C{main}.  Nesse ponto, a \en{thread} da aplicação está
+prestes a executar a asserção da linha~26, que aborta o programa em caso de
+falha da chamada anterior, e as \en{streaming threads} já começaram a operar
+o \en{pipeline}, ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink''
+já estão produzindo, processando e consumindo dados.
 
 \begin{figure}[b]
   \centering
@@ -1052,7 +1051,7 @@ as propriedades do elemento.  A Listagem~\ref{lst:equalizer-3bands}
 apresenta o trecho da saída do comando anterior em que as propriedades
 ``band0'', ``band1'' e ``band2'' são descritas.  Pela descrição, essas
 propriedades controlam o ganho (dB) que o elemento aplica às faixas de
-frequência de~100Hz, 1100Hz e~11kHz; as três recebem valores intervalo
+frequência de~100Hz, 1100Hz e~11kHz; as três recebem valores no intervalo
 real~[-24,12] e são inicializadas com zero.
 
 \lstinputlisting[
