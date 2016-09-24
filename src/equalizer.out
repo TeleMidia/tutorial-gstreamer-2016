@@ -1,0 +1,17 @@
+Plugin Details:
+  Name                     equalizer
+  Description              GStreamer audio equalizers
+  Filename                 /usr/lib/gstreamer-1.0/libgstequalizer.so
+  Version                  1.8.3
+  License                  LGPL
+  Source module            gst-plugins-good
+  Source release date      2016-08-19
+  Binary package           GStreamer Good Plugins (Arch Linux)
+  Origin URL               http://www.archlinux.org/
+
+  equalizer-nbands: N Band Equalizer
+  equalizer-3bands: 3 Band Equalizer
+  equalizer-10bands: 10 Band Equalizer
+
+  3 features:
+  +-- 3 elements

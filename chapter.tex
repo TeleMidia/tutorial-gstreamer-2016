@@ -1015,15 +1015,49 @@ sobre a sintaxe do comando (que é inspirada na sintaxe de \en{pipelines} da
 Bourne Shell), opções suportadas e exemplos de uso, veja a página de manual
 do \en{gst-launch} (``\C{man gst-launch}'').
 
-O pacote \en{gstreamer}, além do \en{gst-launch}, também instala o programa
-\en{gst-inspect}, que permite inspecionar os \en{plugins} e elementos
-disponíveis numa instalação GStreamer.\footnote{Em algumas instalações o
-  nome do comando é \en{gst-inspect-1.0}.}
+Outro programa instalado pelo pacote \en{gstreamer} é o~\en{gst-inspect},
+que permite inspecionar os \en{plugins} e elementos disponíveis no
+ambiente.\footnote{Em algumas instalações o nome do comando é
+  \en{gst-inspect-1.0}.}  Quando executado sem parâmetros o \en{gst-inspect}
+imprime uma lista com os \en{plugins} e elementos disponíveis.  No nosso
+ambiente, por exemplo, há~223 \en{plugins} e~1302 elementos disponíveis.  Já
+quando executado com um nome de \en{plugin} ou nome de elemento como
+argumentos o \en{gst-inspect} apresenta as informações do dado \en{plugin}
+ou elemento.  A Listagem~\ref{lst:equalizer} apresenta a saída do comando
+``\C{gst-inspect$~$equalizer}'' lista as informações do \en{plugin}
+\en{equalizer}.
 
-% Quando executado sem parâmetros ele lista os \en{plugins} e elementos
-% disponíveis na instalação--por exemplo, na nossa instalação há~223
-% \en{plugins} e~1302 elementos.  Quando chamado com o nome de um \en{plugin}
-% ele lista as informações do \en{plugin}.
+\lstinputlisting[
+language={},
+style=display,
+caption={Saída do comando ``\texttt{gst-inspect equalizer}'' no Arch
+  Linux~4.7.4.},
+label={lst:equalizer},
+]{src/equalizer.out}
+
+Na Listagem~\ref{lst:equalizer}, as linhas~2--4 apresentam o nome do
+\en{plugin} (\en{equalizer}), a sua descrição (equalizadores de áudio) e o
+caminho da biblioteca dinâmica contendo o código do \en{plugin}.  As
+linhas~5--10, apresentam informações adicionais (versão, licença, pacote,
+etc.) e as linhas 12--14 listam os elementos includidos no \en{plugin}, no
+caso, ``equalizer-nbands'' (equalizador de~$n$ bandas), ``equalizer-3bands''
+(equalizador de~3 bandas) e ``equalizer-10bandas'' (equalizador de~10
+bandas).  Para listar as informações do elemento ``equalizer-3bands'', por
+exemplo, basta rodar o comando ``\C{gst-inspect equalizer-3bands}''.
+A saída nesse caso contém informações como a hierarquia de tipos do
+elemento, as interfaces que ele implementa, os \en{templates} de suas
+\en{pads}, as \en{pads} propriamente ditas (no caso, uma \en{source pad} com
+disponibilidade \en{always} do tipo ``audio/x-raw'', e uma \en{sink pad}
+também \en{always} e ``audio/x-raw'') e as propriedades do elemento.
+
+\lstinputlisting[
+language={},
+escapechar={},
+style=display,
+caption={Trecho da seção ``Element properties'' da saída do comando
+  ``\texttt{gst-inspect equalizer-3bands}'' no Arch Linux~4.7.4.},
+label={lst:equalizer-3bands},
+]{src/equalizer-3bands-prop.out}
 
 
 \clearpage
@@ -1068,4 +1102,4 @@ disponíveis numa instalação GStreamer.\footnote{Em algumas instalações o
 %  LocalWords:  request pad-added audioconvert queue signal connect added
 %  LocalWords:  srcpad demux userdata GstCaps type audio x-vorbis flag has
 %  LocalWords:  vorbis video x-theora theora mutexes sinkpad GMutex GCond
-%  LocalWords:  gst-launch Bourne
+%  LocalWords:  gst-launch Bourne equalizer equalizer-nbands bands
