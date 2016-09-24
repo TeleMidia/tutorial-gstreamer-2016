@@ -1,0 +1,111 @@
+\section{\en{Pause}, \en{seek}, \en{fast-forward} e~\en{rewind}}
+\label{sec:ops}
+Nesta seção vamos incrementar o nosso primeiro exemplo 
+(Listagem~\ref{lst:hello}) adicionando as operações \en{pause, seek, 
+  fast-forward} e \en{rewind}. Além disso, vamos aprender como
+desenvolver uma aplicação usando o GStreamer que responde à eventos de tecla.
+Nossa aplicação responderá aos seguintes comandos: 
+\begin{compactitem}
+  \item espaço -- pausa ou resume
+  \item seta direita -- avança 5 segundos
+  \item seta esquerda -- retrocede 5 segundos
+  \item f -- faz o vídeo tocar mais rápido (\en{fast-forward})
+  \item r -- faz o vídeo tocar retrocedendo (\en{rewind})
+  \item n -- faz o vídeo tocar normalmente
+\end{compactitem}
+
+Até aqui, em todos os exemplos usamos a função \C{gst_bus_timed_pop_filtered} 
+para recuperar mensagens postadas no \en{bus}. Como vimos, essa função bloqueia
+(ou seja, é uma função síncrona) até que uma mensagem correspondente a uma 
+das máscaras passadas seja postada ou quando o tempo máximo passado é 
+atingido.
+
+O GStreamer permite que mensagens do \en{bus} sejam recuperadas de forma
+assíncrona por meio de uma \en{callback}, usando o \en{loop} de eventos do
+\en{framework} GLib. Usando essa forma de programação, nosso programa passa
+a ser orientado a eventos, como veremos a seguir. Considere a
+Listagem~\ref{lst:playbin-main}.
+
+\lstinputlisting[
+language={},
+escapechar={},
+style=display,
+caption={Usando o \en{loop} de eventos da GLib.},
+label={lst:playbin-main},
+]{src/playbin_control_main.c}
+
+Na linha~4 declaramos o ponteiro \C{GMainLoop *loop} que será utilizado para 
+criar nosso \en{loop} que captura eventos e chama nossa \en{callback}. Logo
+após inicializarmos o GStreamer, inicializamos esse ponteiro utilizando a
+função \C{g_main_loop_new (NULL, FALSE)}, na linha~18 (poderíamos ter
+chamado essa função em qualquer outro lugar do código). Essa função cria uma
+instância de um \C{GMainLoop} e recebe dois parâmetros. O primeiro parâmetro
+é um \C{GMainContext}, sendo este uma estrutura de dados da GLib que representa
+um conjunto de fontes de eventos (\en{event sources}) que serão gerenciados 
+pelo \en{loop} criado. Como não passamos nenhum contexto para essa
+função (\C{NULL}), nosso \en{loop} irá gerenciar todos os eventos do
+contexto \en{default}\footnotetext{Informações aprofundadas sobre como a GLib
+  trata eventos utilizando o \C{GMainLoop} e \C{GMainContext} podem ser 
+  encontradas em~\cite{glib}.}. O segundo parâmetro é um valor booleano
+indicando se o \en{loop} criado deve começar a executar imediatamente ou não.
+No nosso caso, inciaremos o \en{loop} posteriormente.
+
+Na linha~31, utilizamos a função \C{gst_element_get_bus} para obter uma
+referência para o \en{bus} do elemento \C{playbin}. Porém, ao contrário dos
+outros exemplos, usamos a função
+\C{gst_bus_add_watch (bus, bus_callback, playbin)}~(linha 32) para registrarmos
+a \en{callback} \C{bus_callback} que será chamada sempre que uma nova mensagem
+for postada naquele \en{bus}. O último argumento dessa função é um ponteiro
+que é passado à nossa \en{callback}. No nosso exemplo, sempre que a
+\en{callback} \C{bus_callback} for chamada, ela receberá o valor do ponteiro 
+\C{playbin} como parâmetro (uma referência para o elemento \C{playbin} criado
+na linha 20). Finalmente, a função \C{gst_bus_add_watch}
+retorna um identificador para a \en{callback} registrada. Armazenamos esse
+identificador na variável \C{watch_id}, que será utilizado posteriormente para
+remover essa \en{callback} do \en{loop} de eventos quando não necessitarmos
+mais dela.
+
+Na linha~35 chamamos a função \C{g_main_loop_run (loop)} para executar o
+\en{loop}. Essa chamada bloqueia a execução e só retorna quando o \en{loop}
+termina por meio da chamada à função \C{g_main_loop_quit}. Assim, a partir
+deste ponto nosso programa torna-se orientado a eventos, isto é, o fluxo do
+programa é suspenso, passando a ser controlado por meio de chamadas à 
+\en{callback} \C{bus_callback}. Quando o \en{loop} termina, entramos no trecho
+do código de liberação de memória antes de finalizarmos o programa. Na linha~39
+removemos a \en{callback} registrada (\C{g_source_remove}) e, em seguida
+(linha~40), liberamos a memória alocada para o \en{loop}
+(\C{g_main_loop_unref}). Vamos agora analisar o código da \en{callback} 
+\C{bus_callback} (Listagem~\ref{lst:playbin-callback}).
+
+\lstinputlisting[
+language={},
+escapechar={},
+style=display,
+caption={Callback \textit{bus\_callback}.},
+label={lst:playbin-callback},
+]{src/playbin_control_callback.c}
+
+O GStreamer chama a \en{callback} \C{bus_callback} passando três parâmetros:
+\C{bus}, \C{msg} e \C{data}. O primeiro parâmetro é um ponteiro para o \en{bus}
+que registramos essa \en{callback}, o segundo é um ponteiro para a mensagem
+postada e o último parâmetro é o valor do ponteiro passado como terceiro
+argumento para a função \C{gst_bus_add_watch} (ponteiro \C{playbin}, linha~32
+da Listagem~\ref{lst:playbin-main}). O tipo \C{gpointer} é um \en{alias} para
+o tipo \C{void *}. A atribuição da linha~3 da
+Listagem~\ref{lst:playbin-callback} é segura porque o real tipo do ponteiro
+\C{data} é \C{GstElement *}, conforme a conversão explícita utilizada.
+A principal parte da nossa \en{callback} é a cláusula \C{switch} nas
+linhas~4--64, que testa o tipo da mensagem usando a macro \C{GST_MESSAGE_TYPE}
+e executa um determinado bloco de código dependendo do valor retornado. 
+
+Nesse exemplo, só estamos interessados em tratar três tipos de eventos:
+\C{GST_MESSAGE_ERROR}, \C{GST_MESSAGE_EOS} e \C{GST_MESSAGE_ELEMENT}.
+O primeiro tipo de mensagem é postado quando ocorre algum erro internamente
+no \en{pipeline}. Um exemplo de erro comum postado no \en{bus} é quando se
+fecha a janela em que o vídeo é renderizado. O segundo tipo de mensagem é 
+postado quando o conteúdo exibido termina (\en{End-Of-Stream}). Um elemento
+pode postar mensagens específicas no \en{bus}, o que gera o recebimento de 
+uma mensagem do tipo \C{GST_MESSAGE_ELEMENT}. Como veremos adiante,
+o \en{sink} de vídeo posta uma mensagem deste tipo para informar sobre eventos
+de tecla e de mouse. Os demais tipos de mensagens do GStreamer podem ser
+encontradas em~\cite{gstreamer}.
