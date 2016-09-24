@@ -66,6 +66,7 @@ words:= $(words)|start
 words:= $(words)|stop
 words:= $(words)|streaming\s+threads?
 words:= $(words)|string
+words:= $(words)|templates?
 words:= $(words)|threads?
 words:= $(words)|upstream
 words:= $(words)|user\s+data

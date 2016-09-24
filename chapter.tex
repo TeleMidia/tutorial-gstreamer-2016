@@ -918,15 +918,15 @@ linhas~77--80, a \en{thread} da aplicação não modifica o \en{pipeline}.
 
 \subsection*{Os comandos gst-launch e gst-inspect}
 
-Os programas que vimos até agora (Listagens~\ref{lst:hello}, \ref{lst:mp3}
+Os programas que vimos até agora (Listagens~\ref{lst:hello},~\ref{lst:mp3}
 e~\ref{lst:ogg}) têm uma característica em comum: a topologia do
 \en{pipeline} não muda depois que ele é iniciado (transiciona para o estado
 \en{playing}).  O comando \en{gst-launch}, instalado pelo pacote
 \en{gstreamer}, permite construir \en{pipelines} desse tipo diretamente na
 linha de comando.\footnote{Em algumas instalações o nome do comando é
   \en{gst-launch-1.0}.}  Por exemplo, os três comandos seguintes constroem e
-iniciam \en{pipelines} idênticos aos das Listagens~\ref{lst:hello},
-\ref{lst:mp3} e~\ref{lst:ogg}:
+iniciam \en{pipelines} idênticos aos das
+Listagens~\ref{lst:hello},~\ref{lst:mp3} e~\ref{lst:ogg}:
 \begin{lstlisting}[style=command]
 @\$@ gst-launch playbin uri="file://@\$@PWD/bunny.ogg"
 
@@ -937,24 +937,23 @@ iniciam \en{pipelines} idênticos aos das Listagens~\ref{lst:hello},
                   demux. ! queue     ! theoradec    ! xvimagesink
 \end{lstlisting}
 
-No exemplo anterior, o primeiro comando cria um \en{pipeline} contento
-apenas o elemento ``playbin'', atribui a URI do vídeo à propriedade ``uri''
-do elemento e inicia o \en{pipeline}.  O segundo comando cria um
-\en{pipeline} com os elementos ``filesrc'', ``mad'' e ``alsasink''
-conectados em série, atribui o caminho do vídeo à propriedade ``location''
-do ``filesrc'' e incia o \en{pipeline}.  O terceiro comando cria um
-\en{pipeline} preliminar contento apenas os elementos ``filesrc'' e
-``oggdemux'' conectados, atribui o caminho do vídeo à propriedade
-``location'' do ``filesrc'' e inicia o \en{pipeline}.  Em seguida, quando o
-``oggdemux'' instancia suas \en{sometimes pads}, o \en{gst-launch} adiciona
-ao \en{pipeline} e conecta as componentes conexas restantes: a série
-``vorbisdec'', ``audioconvert'' e ``alsasink'', e a série ``queue'',
-``theoradec'', e ``xvimagesink''.
+O primeiro comando anterior cria um \en{pipeline} contento apenas o elemento
+``playbin'', atribui a URI do vídeo à propriedade ``uri'' do elemento e
+inicia o \en{pipeline}.  O segundo comando cria um \en{pipeline} com os
+elementos ``filesrc'', ``mad'' e ``alsasink'' conectados em série, atribui o
+caminho do vídeo à propriedade ``location'' do ``filesrc'' e incia o
+\en{pipeline}.  E o terceiro comando cria um \en{pipeline} preliminar
+contento apenas os elementos ``filesrc'' e ``oggdemux'' conectados, atribui
+o caminho do vídeo à propriedade ``location'' do ``filesrc'' e inicia o
+\en{pipeline}; em seguida, quando o ``oggdemux'' instancia suas
+\en{sometimes pads}, o \en{gst-launch} adiciona ao \en{pipeline} e conecta
+as componentes conexas restantes: a série ``vorbisdec'', ``audioconvert'' e
+``alsasink'', e a série ``queue'', ``theoradec'', e ``xvimagesink''.
 
 O comando \en{gst-launch} é particularmente útil para depurar ou testar a
-viabilidade de \en{pipelines} antes de implementá-los em~C.  Por exemplo,
-usando o \en{gst-launch} podemos construir rapidamente uma versão genérica
-do \en{pipeline} da Listagem~\ref{lst:ogg}, isto é, construir um
+viabilidade de \en{pipelines} antes de implementá-los em~C\null.  Por
+exemplo, usando o \en{gst-launch} podemos facilmente construir uma versão
+genérica do \en{pipeline} da Listagem~\ref{lst:ogg}, isto é, construir um
 \en{pipeline} que demultiplexa e decodifica um fluxo de mídia arbitrário
 (não apenas Ogg), obtido de uma fonte arbitrária (não apenas do disco), e
 que reproduz os fluxos resultantes num ambiente arbitrário (não apenas
@@ -970,13 +969,13 @@ Esse \en{pipeline} possui quatro elementos: ``uridecodebin'',
 ``uridecodebin'' é um \en{bin} que demultiplexa e decodifica uma URI, isto
 é, ele lê o conteúdo de uma URI, demultiplexa-o, decodifica seus subfluxos e
 escreve os subfluxos decodificados em \en{sometimes pads} correspondentes.
-O elemento ``audioconvert'' é um conversor de formato de áudio PCM.  E os
-elementos ``audioaudiosink'' e ``autovideosink'' são \en{sinks} abstratos de
-áudio e vídeo que detectam e usam os \en{sinks} concretos mais adequados
-para um dado ambiente.  Por exemplo, no nosso ambiente GNU/Linux os
-elementos ``autoaudiosink'' e ``autovideosink'' utilizam os \en{sinks}
+O elemento ``audioconvert'' é um conversor de formato de áudio PCM\null.
+E os elementos ``autoaudiosink'' e ``autovideosink'' são \en{sinks}
+abstratos de áudio e vídeo que detectam e usam os \en{sinks} concretos mais
+adequados para um dado ambiente.  Por exemplo, no nosso ambiente GNU/Linux
+os elementos ``autoaudiosink'' e ``autovideosink'' utilizam os \en{sinks}
 concretos ``alsasink'' e ``xvimagesink'', os mesmos que usamos nos programas
-das Listagens~\ref{lst:mp3} e~\ref{lst:ogg}.  Mas em outro ambiente essa
+das Listagens~\ref{lst:mp3} e~\ref{lst:ogg}, mas em outro ambiente essa
 escolha pode variar.  A Figura~\ref{fig:pipe-gen} apresenta a estrutura do
 \en{pipeline} criado pelo comando \en{gst-launch} anterior.
 
@@ -1017,14 +1016,14 @@ do \en{gst-launch} (``\C{man gst-launch}'').
 
 Outro programa instalado pelo pacote \en{gstreamer} é o~\en{gst-inspect},
 que permite inspecionar os \en{plugins} e elementos disponíveis no
-ambiente.\footnote{Em algumas instalações o nome do comando é
-  \en{gst-inspect-1.0}.}  Quando executado sem parâmetros o \en{gst-inspect}
-imprime uma lista com os \en{plugins} e elementos disponíveis.  No nosso
+sistema.\footnote{Em algumas instalações o nome do comando é
+  \en{gst-inspect-1.0}.}  Quando executado sem argumentos o \en{gst-inspect}
+imprime uma lista com os \en{plugins} e elementos disponíveis---no nosso
 ambiente, por exemplo, há~223 \en{plugins} e~1302 elementos disponíveis.  Já
 quando executado com um nome de \en{plugin} ou nome de elemento como
-argumentos o \en{gst-inspect} apresenta as informações do dado \en{plugin}
-ou elemento.  A Listagem~\ref{lst:equalizer} apresenta a saída do comando
-``\C{gst-inspect$~$equalizer}'' lista as informações do \en{plugin}
+argumento o \en{gst-inspect} apresenta as informações do dado \en{plugin} ou
+elemento.  A Listagem~\ref{lst:equalizer} apresenta a saída do comando
+``\C{gst-inspect$~$equalizer}'' que lista as informações do \en{plugin}
 \en{equalizer}.
 
 \lstinputlisting[
@@ -1039,22 +1038,28 @@ Na Listagem~\ref{lst:equalizer}, as linhas~2--4 apresentam o nome do
 \en{plugin} (\en{equalizer}), a sua descrição (equalizadores de áudio) e o
 caminho da biblioteca dinâmica contendo o código do \en{plugin}.  As
 linhas~5--10, apresentam informações adicionais (versão, licença, pacote,
-etc.) e as linhas 12--14 listam os elementos includidos no \en{plugin}, no
+etc.) e as linhas~12--14 listam os elementos includidos no \en{plugin}, no
 caso, ``equalizer-nbands'' (equalizador de~$n$ bandas), ``equalizer-3bands''
-(equalizador de~3 bandas) e ``equalizer-10bandas'' (equalizador de~10
-bandas).  Para listar as informações do elemento ``equalizer-3bands'', por
-exemplo, basta rodar o comando ``\C{gst-inspect equalizer-3bands}''.
-A saída nesse caso contém informações como a hierarquia de tipos do
-elemento, as interfaces que ele implementa, os \en{templates} de suas
-\en{pads}, as \en{pads} propriamente ditas (no caso, uma \en{source pad} com
-disponibilidade \en{always} do tipo ``audio/x-raw'', e uma \en{sink pad}
-também \en{always} e ``audio/x-raw'') e as propriedades do elemento.
+(equalizador de~3 bandas) e ``equalizer-10bands'' (equalizador de~10
+bandas).  Para listar as informações de um desses elementos,
+``equalizer-3bands'' por exemplo, basta rodar o comando
+``\C{gst-inspect$~$equalizer-3bands}''.  A saída nesse caso contém
+informações como a hierarquia de tipos do elemento, as interfaces que ele
+implementa, os \en{templates} de suas \en{pads}, as \en{pads} propriamente
+ditas (no caso, uma \en{source pad} com disponibilidade \en{always} do tipo
+``audio/x-raw'', e uma \en{sink pad} também \en{always} e ``audio/x-raw'') e
+as propriedades do elemento.  A Listagem~\ref{lst:equalizer-3bands}
+apresenta o trecho da saída do comando anterior em que as propriedades
+``band0'', ``band1'' e ``band2'' são descritas.  Pela descrição, essas
+propriedades controlam o ganho (dB) que o elemento aplica às faixas de
+frequência de~100Hz, 1100Hz e~11kHz; as três recebem valores intervalo
+real~[-24,12] e são inicializadas com zero.
 
 \lstinputlisting[
 language={},
 escapechar={},
 style=display,
-caption={Trecho da seção ``Element properties'' da saída do comando
+caption={Trecho da seção ``Element Properties'' da saída do comando
   ``\texttt{gst-inspect equalizer-3bands}'' no Arch Linux~4.7.4.},
 label={lst:equalizer-3bands},
 ]{src/equalizer-3bands-prop.out}
@@ -1094,7 +1099,7 @@ label={lst:equalizer-3bands},
 %  LocalWords:  threads streaming bus timed filtered warnings CLOCK NONE cb
 %  LocalWords:  MESSAGE msg message unref makefile clean GstObject linker
 %  LocalWords:  pkg-config link cflags libs flags glib gstreamer shell all
-%  LocalWords:  PROGRAMS LDFLAGS TAB makefiles mad gst-plugins-base LGPL
+%  LocalWords:  PROGRAMS LDFLAGS TAB makefiles mad gst-plugins-base LGPL dB
 %  LocalWords:  gst-plugins-good Lesser Public License gst-plugins-ugly The
 %  LocalWords:  gst-plugins-bad Good the Bad and Ugly coreelements alsa bin
 %  LocalWords:  gst-inspect add many GstBin src filter videosink location
@@ -1102,4 +1107,6 @@ label={lst:equalizer-3bands},
 %  LocalWords:  request pad-added audioconvert queue signal connect added
 %  LocalWords:  srcpad demux userdata GstCaps type audio x-vorbis flag has
 %  LocalWords:  vorbis video x-theora theora mutexes sinkpad GMutex GCond
-%  LocalWords:  gst-launch Bourne equalizer equalizer-nbands bands
+%  LocalWords:  gst-launch Bourne equalizer equalizer-nbands bands man band
+%  LocalWords:  Properties uridecodebin autovideosink autoaudiosink x-raw
+%  LocalWords:  templates
