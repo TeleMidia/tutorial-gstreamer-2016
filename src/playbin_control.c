@@ -4,6 +4,7 @@
 #include <string.h>
 
 GMainLoop *loop;
+int is_paused;
 
 void seek (GstElement *element, gint64 offset)
 {
@@ -41,7 +42,15 @@ gboolean bus_callback (GstBus *bus, GstMessage *msg, gpointer data)
           {
             const gchar *key;
             gst_navigation_event_parse_key_event (event, &key);
-            if (strcmp(key, "Right") == 0)
+            if (strcmp (key, "space") == 0)
+            {
+              if (is_paused)
+                gst_element_set_state (playbin, GST_STATE_PLAYING);
+              else 
+                gst_element_set_state (playbin, GST_STATE_PAUSED);
+              is_paused = ! is_paused;
+            }
+            else if (strcmp(key, "Right") == 0)
               seek (playbin, 5 * GST_SECOND); 
             else if (strcmp(key, "Left") == 0)
               seek (playbin, -5 * GST_SECOND); 
