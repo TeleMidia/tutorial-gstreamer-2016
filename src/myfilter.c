@@ -64,7 +64,8 @@ gst_my_filter_init (GstMyFilter *filter)
 static gboolean
 my_filter_plugin_init (GstPlugin *myfilter_plugin)
 {
-  return gst_element_register(myfilter_plugin, "myfilter", GST_RANK_NONE, GST_TYPE_MY_FILTER);
+  return gst_element_register (myfilter_plugin, "myfilter",
+                               GST_RANK_NONE, GST_TYPE_MY_FILTER);
 }
 
 #define PACKAGE "myfilter"

@@ -7,37 +7,59 @@
 /* Cria as funcoes_my_video_filter_get_type e set gst_my_video_filter_parent_class */
 G_DEFINE_TYPE (GstMyVideoFilter, gst_my_video_filter, GST_TYPE_VIDEO_FILTER);
 
-/* propriedades */
-enum {
-  PROP_0,
-  PROP_WAVE_FACTOR
-};
-
-static void
-gst_my_video_filter_set_property (GObject      *object,
-	                          guint         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec);
-
-static void
-gst_my_video_filter_get_property (GObject    *object,
-	                          guint       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec);
-
 static GstStaticPadTemplate gst_my_video_filter_src_template =
 GST_STATIC_PAD_TEMPLATE ("src",
   GST_PAD_SRC,
   GST_PAD_ALWAYS,
-  GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE("{BGRx}"))
+  GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE("{BGRx, RGB}"))
 );
 
 static GstStaticPadTemplate gst_my_video_filter_sink_template =
 GST_STATIC_PAD_TEMPLATE ("sink",
   GST_PAD_SINK,
   GST_PAD_ALWAYS,
-  GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE("{BGRx}"))
+  GST_STATIC_CAPS (GST_VIDEO_CAPS_MAKE("{BGRx, RGB}"))
 );
+
+/* propriedades */
+#define DEFAULT_FACTOR 2*3.1415 / 130
+
+enum {
+  PROP_0,
+  PROP_WAVE_FACTOR
+};
+
+static void
+gst_my_video_filter_set_property (GObject *object, guint prop_id, const GValue *value,
+                                  GParamSpec *pspec)
+{
+  GstMyVideoFilter *filter = GST_MY_VIDEO_FILTER (object);
+
+  switch (prop_id) {
+    case PROP_WAVE_FACTOR:
+      filter->factor = g_value_get_double (value);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+  }
+}
+
+static void
+gst_my_video_filter_get_property (GObject  *object, guint prop_id, GValue *value,
+                                  GParamSpec *pspec)
+{
+  GstMyVideoFilter *filter = GST_MY_VIDEO_FILTER (object);
+                                                                                
+  switch (prop_id) {
+    case PROP_WAVE_FACTOR:
+      g_value_set_double (value, filter->factor);
+      break;
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
+      break;
+  }
+}
 
 static GstFlowReturn
 gst_my_video_transform_frame (GstVideoFilter *vfilter,
@@ -82,12 +104,6 @@ gst_my_video_transform_frame (GstVideoFilter *vfilter,
 }
 
 static void
-gst_my_video_filter_init (GstMyVideoFilter *filter)
-{
-  filter->factor =  2*3.14/130;
-}
-
-static void
 gst_my_video_filter_class_init(GstMyVideoFilterClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS(klass);
@@ -117,11 +133,17 @@ gst_my_video_filter_class_init(GstMyVideoFilterClass *klass)
     g_param_spec_double ("factor", "Factor",
                          "Valor do fator",
                          0.0, 320.0,
-                         2 * 3.14 / 130,
+                         DEFAULT_FACTOR,
                          G_PARAM_READWRITE));
 
   /* define a funcao que será chamada para processar o frame de video */
   vfilter_class->transform_frame = GST_DEBUG_FUNCPTR(gst_my_video_transform_frame);
+}
+
+static void
+gst_my_video_filter_init (GstMyVideoFilter *filter)
+{
+  filter->factor =  DEFAULT_FACTOR;
 }
 
 static gboolean
@@ -129,42 +151,6 @@ my_video_filter_plugin_init (GstPlugin *myvideofilter)
 {
   return gst_element_register (myvideofilter, "myvideofilter",
                                GST_RANK_NONE, GST_TYPE_MY_VIDEO_FILTER);
-}
-
-static void
-gst_my_video_filter_set_property (GObject      *object,
-	                          guint         prop_id,
-                                  const GValue *value,
-                                  GParamSpec   *pspec)
-{
-  GstMyVideoFilter *filter = GST_MY_VIDEO_FILTER (object);
-
-  switch (prop_id) {
-    case PROP_WAVE_FACTOR:
-      filter->factor = g_value_get_double (value);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-  }
-}
-
-static void
-gst_my_video_filter_get_property (GObject    *object,
-	                          guint       prop_id,
-                                  GValue     *value,
-                                  GParamSpec *pspec)
-{
-  GstMyVideoFilter *filter = GST_MY_VIDEO_FILTER (object);
-                                                                                
-  switch (prop_id) {
-    case PROP_WAVE_FACTOR:
-      g_value_set_boolean (value, filter->factor);
-      break;
-    default:
-      G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
-      break;
-  }
 }
 
 #define PACKAGE "myvideofilter"
