@@ -1,0 +1,50 @@
+Factory Details:
+  Rank                     none (0)
+  Long-name                A VideoFilter example plugin
+  Klass                    Example/FirstExample
+  Description              Shows the basic structure of a plugin
+  Author                   roberto robertogerson at telemidia.puc-rio.br
+
+Plugin Details:
+  Name                     my_video_filter
+  Description              Template myvideofilter
+  Filename                 ./myvideofilter.so
+  Version                  1.0.0
+  License                  LGPL
+  Source module            myvideofilter
+  Binary package           TeleMidia/PUC-Rio
+  Origin URL               http://www.telemidia.puc-rio.br
+
+GObject
+ +----GInitiallyUnowned
+       +----GstObject
+             +----GstElement
+                   +----GstBaseTransform
+                         +----GstVideoFilter
+                               +----GstMyVideoFilter
+
+Pad Templates:
+  SRC template: 'src'
+    Availability: Always
+    Capabilities:
+      video/x-raw
+                 format: { BGRx, RGB }
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+
+  SINK template: 'sink'
+    Availability: Always
+    Capabilities:
+      video/x-raw
+                 format: { BGRx, RGB }
+                  width: [ 1, 2147483647 ]
+                 height: [ 1, 2147483647 ]
+              framerate: [ 0/1, 2147483647/1 ]
+
+[ ... ]
+Element Properties:
+  [ ... ]
+  factor              : Valor do fator
+                        flags: readable, writable
+                        Double. Range: 0-320  Default: 0.04833077 
