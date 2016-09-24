@@ -1,7 +1,4 @@
 \documentclass{SBCbookchapter}
-
-\usepackage{subfigure}
-
 \def\chaptername{Capítulo}
 \setcounter{chapter}{8}
 \input{chapter-header.tex}
@@ -11,7 +8,6 @@
   Rodrigo C\null.\,M.~Santos,
   Roberto G\null.\,~de~A.~Azevedo
 }
-
 \begin{document}
 \maketitle
 \vskip-1.525\baselineskip\strut
@@ -583,8 +579,8 @@ pacote \en{gst-plugins-base}, e o elemento ``mad'' está no \en{plugin}
 De volta à Listagem~\ref{lst:mp3}, a chamada \C{g_assert} na linha~19
 assegura que as chamadas \C{gst_element_factory_make} anteriores foram bem
 sucedidas.  Isto é, testa se os elementos ``pipeline'', ``filesrc'', ``mad''
-e ``alsasink'' foram de fato alocados.  Um error comum é tentar instanciar
-um elemento de um \en{plugin} que não está instalado.  Na listagem, se isso
+e ``alsasink'' foram de fato alocados.  Um erro comum é tentar instanciar um
+elemento de um \en{plugin} que não está instalado.  Na listagem, se isso
 acontecer a chamada \C{gst_element_factory_make} retornará~\C{NULL} e a
 asserção falhará, abortando o programa.
 
@@ -862,10 +858,10 @@ passado à função \C{g_signal_connect} (linha~75) no momento do registro da
 \en{callback} (no caso, \C{NULL}).
 
 Na função~\C{pad_added_cb}, a chamada da linha~13 obtém o \en{pipeline}, a
-chamada linha~14 obtém as \en{caps} (\C{GstCaps}) associadas à \en{sometimes
-  pad} criada (parâmetro \C{srcpad}) e a chamada da linha~15 obtém o nome do
-tipo (\en{mime type}) do fluxo que escoará através da \en{pad}.  Nesse
-ponto, há três possibilidades:
+chamada da linha~14 obtém as \en{caps} (\C{GstCaps}) associadas à
+\en{sometimes pad} criada (parâmetro \C{srcpad}) e a chamada da linha~15
+obtém o tipo (\en{mime type}) do fluxo que escoará através da \en{pad}.
+Nesse ponto, há três possibilidades:
 \begin{enumerate}
 \item Se o tipo é Vorbis (``audio/x-vorbis'') e uma \en{pad} Vorbis ainda
   não foi encontrada, a \en{callback} aloca os elementos ``vorbisdec'',
@@ -879,7 +875,7 @@ ponto, há três possibilidades:
   não foi encontrada, a \en{callback} procede de forma análoga mas agora
   para os elementos ``queue'', ``theoradec'' e ``xvimagesink'', ou seja,
   aloca-os, adiciona-os ao \en{pipeline}, transiciona-os para o mesmo estado
-  do \en{pipeline}, conecta-os em série, obtém a \en{source pad} do
+  do \en{pipeline}, conecta-os em série, obtém a \en{source pad} do elemento
   ``queue'' e marca a \en{flag} \C{has_theora_pad}.
 \item Caso contrário, isto é, se o tipo não é Vorbis nem Theora ou se a
   \en{pad} em questão não é a primeira Vorbis ou Theora encontrada, a
@@ -888,11 +884,10 @@ ponto, há três possibilidades:
 Se a \en{pad} não for ignorada (casos~1 e~2 anteriores), na linha~48 a
 variável~\C{sinkpad} conterá a \en{sink pad} do primeiro elemento da série
 correspondente à \en{sometimes pad} criada (parâmetro \C{srcpad}), ou seja,
-a \en{sink pad} do elemento ``vorbisdec'' se \C{srcpad} é Vorbis ou do
-elemento ``queue'' se \C{srcpad} é Theora.  Finalmente, a chamada
-\C{gst_pad_link} (linha~48) conecta a \C{srcpad} encontrada à \C{sinkpad} da
-série apropriada, e as chamadas seguintes (linhas~50--53) liberam as
-referências utilizadas.
+a \en{sink pad} do elemento ``vorbisdec'' se \C{srcpad} é do tipo Vorbis ou
+do elemento ``queue'' se \C{srcpad} é do tipo Theora.  Finalmente, a chamada
+\C{gst_pad_link} (linha~48) conecta as \en{pads} \C{srcpad} e \C{sinkpad}, e
+as chamadas seguintes (linhas~50--53) liberam as referências utilizadas.
 
 \clearpage
 \lstinputlisting[
@@ -901,26 +896,25 @@ caption={Tocando um arquivo de vídeo Ogg usando elementos básicos.},
 label={lst:ogg},
 ]{src/ogg2.c}
 
-Se tudo correr bem, quando iniciado, o programa da Listagem~\ref{lst:ogg}
-demultiplexa o arquivo Ogg fornecido e reproduz os primeiros subfluxos
-Vorbis e Theora que encontrar.  Caso não haja subfluxos Vorbis ou Theora, o
-programa termina imediatamente---uma mensagem de error é postada no \en{bus}
-indicando que o ``oggdemux'' não possui \en{sink pads} conectadas e, em
-seguida, o controle volta à \en{thread} da aplicação que termina o programa.
+Quando iniciado o programa da Listagem~\ref{lst:ogg} demultiplexa o arquivo
+Ogg fornecido e reproduz os primeiros subfluxos Vorbis e Theora que
+encontrar.  Se não houverem tais subfluxos, o elemento ``oggdemux'' posta
+uma mensagem de erro no \en{bus} (indicando que não há \en{sink pad}
+conectada) o que causa o desbloqueio da \en{thread} da aplicação e,
+consequentemente, o término do programa.
 
 Há um detalhe sutil mas importante no código da Listagem~\ref{lst:ogg}: a
 \en{callback} \C{pad_added_cb} executa numa \en{thread} diferente da
-\en{thread} da aplicação.  Consequentemente, caso haja dados compartilhados
-entre as \en{threads}, para evitar condições de corrida, é necessário
+\en{thread} da aplicação.  Consequentemente, caso as \en{threads}
+compartilhem dados, para evitar condições de corrida, é necessário
 sincronizar o acesso a esses dados usando \en{mutexes} e semáforos (tipos
 \C{GMutex} e~\C{GCond} da GLib).  Na Listagem~\ref{lst:ogg} não precisamos
-fazer isso porque as que chamadas \C{gst_element_$\ast$}
-e~\C{gst_bin_$\ast$} que usamos na \en{callback} para manipular o elemento
-``pipeline'' (de fato, o único dado compartilhado entre as \en{threads} da
-\en{callback} e da aplicação) são protegidas internamente por \en{mutexes}.
-Além disso, no intervalo em que as \en{threads} da \en{callback} e da
-aplicação estão de fato concorrendo, linhas~77--80, a \en{thread} da
-aplicação não modifica o \en{pipeline}.
+fazer isso porque as chamadas \C{gst_element_$\ast$} e~\C{gst_bin_$\ast$}
+que usamos na \en{callback} para manipular o elemento ``pipeline'' (único
+dado compartilhado) já são protegidas internamente por \en{mutexes}.  Além
+disso, no intervalo em que as \en{threads} da \en{callback} e da aplicação
+estão de fato concorrendo, linhas~77--80, a \en{thread} da aplicação não
+modifica o \en{pipeline}.
 
 
 \subsection*{Os comandos gst-launch e gst-inspect}
@@ -928,9 +922,10 @@ aplicação não modifica o \en{pipeline}.
 Os programas que vimos até agora (Listagens~\ref{lst:hello}, \ref{lst:mp3}
 e~\ref{lst:ogg}) têm uma característica em comum: a topologia do
 \en{pipeline} não muda depois que ele é iniciado (transiciona para o estado
-\en{playing}).  O programa \en{gst-launch}, instalado pelo pacote
+\en{playing}).  O comando \en{gst-launch}, instalado pelo pacote
 \en{gstreamer}, permite construir \en{pipelines} desse tipo diretamente na
-linha de comando.  Por exemplo, os três comandos seguintes constroem e
+linha de comando.\footnote{Em algumas instalações o nome do comando é
+  \en{gst-launch-1.0}.}  Por exemplo, os três comandos seguintes constroem e
 iniciam \en{pipelines} idênticos aos das Listagens~\ref{lst:hello},
 \ref{lst:mp3} e~\ref{lst:ogg}:
 \begin{lstlisting}[style=command]
@@ -943,7 +938,9 @@ iniciam \en{pipelines} idênticos aos das Listagens~\ref{lst:hello},
                   demux. ! queue     ! theoradec    ! xvimagesink
 \end{lstlisting}
 
-Usando o \en{gst-launch} é relativamente simples construir uma versão geral
+O comando \en{gst-launch} é particularmente útil para depurar \en{pipelines}
+ou para testar a sua viabilidade antes de implementá-los em~C.  Por exemplo,
+usando o \en{gst-launch} podemos construir rapidamente uma versão genérica
 do \en{pipeline} da Listagem~\ref{lst:ogg}, isto é, construir um
 \en{pipeline} que demultiplexa e decodifica um fluxo de mídia arbitrário
 (não apenas Ogg), obtido de uma fonte arbitrária (não apenas do disco), e
@@ -969,12 +966,50 @@ anteriores.  Mas em outro ambiente essa escolha pode variar.
 A Figura~\ref{fig:pipe-gen} apresenta a estrutura do \en{pipeline} criado
 pelo comando anterior.
 
-Além de criar \en{pipelines} para reprodução de áudio e vídeo, podemos usar
-o \en{gst-launch} criar \en{pipelines} que transcodificam
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \node (uridecodebin) [element] {uridecodebin};
+    \coordinate [above=.5\hdim of uridecodebin] (A);
+    \coordinate [below=.5\hdim of uridecodebin] (B);
+    %%
+    \coordinate [right of=uridecodebin] (C);
+    \node (audioconvert) [element] at (C|-A) {audioconvert};
+    \node (autoaudiosink) [element, right of=audioconvert] {autoaudiosink};
+    %%
+    \coordinate [right of=audioconvert] (D);
+    \node (autovideosink) [element] at (D|-B) {autovideosink};
+    %%
+    \coordinate (X) at ($(uridecodebin.east)+(0,.25\hdim)$);
+    \coordinate (Y) at ($(uridecodebin.east)+(0,-.25\hdim)$);
+    \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+                          -- ($(audioconvert.west)-(\odim/3,0)$)
+                          -- (audioconvert.west);
+    \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+                          -- ($(audioconvert.west|-B)-(\odim/3,0)$)
+                          -- (autovideosink.west);
+    \draw [->, arrow] (audioconvert) -- (autoaudiosink);
+  \end{tikzpicture}
+  \caption{\en{Pipeline} genérico para reprodução de áudio e vídeo.}
+  \label{fig:pipe-gen}
+\end{figure}
 
-Veja a página de manual do \en{gst-launch} (``\C{man gst-launch}'') para
-mais detalhes sobre as opções suportadas, sintaxe dos argumentos (que é
-similar à da Bourne Shell), exemplos de uso, etc.
+Além de \en{pipelines} para reprodução de áudio e vídeo, o comando
+\en{gst-launch} pode ser usado para criar \en{pipelines} que decodificam,
+transcodificam e transmitem fluxos de mídia na rede.  Para informações sobre
+a sintaxe do comando (que é inspirada na sintaxe de \en{pipelines} da Bourne
+Shell), opções suportadas e exemplos de uso, veja a página de manual do
+\en{gst-launch} (``\C{man gst-launch}'').
+
+Outro comando interessante instalado pelo pacote \en{gstreamer} é o comando
+\en{gst-inspect}, que permite inspecionar uma instalação
+GStreamer.\footnote{Em algumas instalações o nome do comando é
+  \en{gst-inspect-1.0}.}
+
+% Quando executado sem parâmetros ele lista os \en{plugins} e elementos
+% disponíveis na instalação--por exemplo, na nossa instalação há~223
+% \en{plugins} e~1302 elementos.  Quando chamado com o nome de um \en{plugin}
+% ele lista as informações do \en{plugin}.
 
 
 \clearpage
@@ -1019,4 +1054,4 @@ similar à da Bourne Shell), exemplos de uso, etc.
 %  LocalWords:  request pad-added audioconvert queue signal connect added
 %  LocalWords:  srcpad demux userdata GstCaps type audio x-vorbis flag has
 %  LocalWords:  vorbis video x-theora theora mutexes sinkpad GMutex GCond
-%  LocalWords:  gst-launch
+%  LocalWords:  gst-launch Bourne
