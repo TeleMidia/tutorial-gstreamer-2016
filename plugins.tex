@@ -297,7 +297,7 @@ frame de saída.
 Por fim, a definição do plugin e a função \C{gst_my_video_plugin_init} são bem
 similares ao exemplo anterior e não necessitam de mais detalhes aqui.
 
-\subsection*{Compilando e testando o ``myvideofilter''}
+\subsection*{Compilando e testando o elemento ``myvideofilter''}
 Para compilar o element ``myvideofilter'' como um plugin é possível usar um
 comando similar ao do exemplo anteriro.  A única diferença é que agora estamos
 nos baseando na classe base \C{GstVideoFilter} e, por isso, também temos que
@@ -333,8 +333,6 @@ caption={Saída do programa gst-inpect-1.0, consultando os detalhes do elemento
          ``myvideofilter''.},
 label={lst:myvideofilter_gstinspect},
 ]{src/myvideofilter.gstinspect}
-
-\newpage
 
 A Figura~\ref{fig:bunny_myvideofilter} mostra exemplos de uso do filtro
 ``myvideofilter'' com diferentes valores para o parâmetro \en{factor}.

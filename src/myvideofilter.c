@@ -66,10 +66,8 @@ gst_my_video_transform_frame (GstVideoFilter *vfilter,
                               GstVideoFrame *inframe, GstVideoFrame *outframe)
 {
   GstMyVideoFilter *my_vfilter = GST_MY_VIDEO_FILTER (vfilter);
-  gint i, j, h;
-  gint w, stride, row_wrap;
-  gint pixel_stride;
-  gint offsets[3];
+  gint i, j, w, h;
+  gint stride, pixel_stride;
   guint8 *data, *indata;
   guint outoffset, inoffset, u;
 
@@ -80,12 +78,7 @@ gst_my_video_transform_frame (GstVideoFilter *vfilter,
   w = GST_VIDEO_FRAME_COMP_WIDTH (outframe, 0);
   h = GST_VIDEO_FRAME_COMP_HEIGHT (outframe, 0);
 
-  offsets[0] = GST_VIDEO_FRAME_COMP_OFFSET (outframe, 0);
-  offsets[1] = GST_VIDEO_FRAME_COMP_OFFSET (outframe, 1);
-  offsets[2] = GST_VIDEO_FRAME_COMP_OFFSET (outframe, 2);
-
   pixel_stride = GST_VIDEO_FRAME_COMP_PSTRIDE (outframe, 0);
-  row_wrap = stride - pixel_stride * w;
 
   for (i = 0; i < h; i++)
   {
