@@ -867,9 +867,13 @@ Nesse ponto, há três possibilidades:
   ``audioconvert'' e ``alsasink'' (linhas~18--20), adiciona-os ao
   \en{pipeline} (linha~22), transiciona os elementos para o mesmo estado do
   \en{pipeline}, no caso \en{paused}, (linhas~23--25), conecta-os em série
-  (linha~26), obtém a \en{sink pad} do primeiro elemento da série,
-  ``vorbisdec'', (linha~27), e marca a \en{flag} \C{has_vorbis_pad}
-  (linha~28) para indicar que uma \en{pad} Vorbis foi encontrada.
+  (linha~26)\footnote{Observe que só é possível conectar elementos que estão
+    no mesmo estado.  Por isso, antes de conectar os elementos, a chamada
+    \C[basicstyle=\scriptsize\ttfamily]{pad_added_cb} primeiro os
+    transiciona para o mesmo estado do \en{pipeline}.}, obtém a \en{sink
+    pad} do primeiro elemento da série, ``vorbisdec'', (linha~27), e marca a
+  \en{flag} \C{has_vorbis_pad} (linha~28) para indicar que uma \en{pad}
+  Vorbis foi encontrada.
 \item Se o tipo é Theora (``video/x-theora'') e uma \en{pad} Theora ainda
   não foi encontrada, a \en{callback} procede de forma análoga mas agora
   para os elementos ``queue'', ``theoradec'' e ``xvimagesink'', ou seja,
@@ -937,17 +941,17 @@ Listagens~\ref{lst:hello},~\ref{lst:mp3} e~\ref{lst:ogg}:
 \end{lstlisting}
 
 O primeiro comando anterior cria um \en{pipeline} contento apenas o elemento
-``playbin'', atribui a URI do vídeo à propriedade ``uri'' do elemento e
-inicia o \en{pipeline}.  O segundo comando cria um \en{pipeline} com os
-elementos ``filesrc'', ``mad'' e ``alsasink'' conectados em série, atribui o
-caminho do vídeo à propriedade ``location'' do ``filesrc'' e incia o
-\en{pipeline}.  E o terceiro comando cria um \en{pipeline} preliminar
+``playbin'', atribui a URI do vídeo a ser tocado à propriedade ``uri'' do
+elemento e inicia o \en{pipeline}.  O segundo comando cria um \en{pipeline}
+com os elementos ``filesrc'', ``mad'' e ``alsasink'' conectados em série,
+atribui o caminho do vídeo à propriedade ``location'' do ``filesrc'' e incia
+o \en{pipeline}.  E o terceiro comando cria um \en{pipeline} preliminar
 contento apenas os elementos ``filesrc'' e ``oggdemux'' conectados, atribui
 o caminho do vídeo à propriedade ``location'' do ``filesrc'' e inicia o
 \en{pipeline}; em seguida, quando o ``oggdemux'' instancia suas
-\en{sometimes pads}, o \en{gst-launch} adiciona ao \en{pipeline} e conecta
-as componentes conexas restantes: a série ``vorbisdec'', ``audioconvert'' e
-``alsasink'', e a série ``queue'', ``theoradec'', e ``xvimagesink''.
+\en{sometimes pads}, o \en{gst-launch} adiciona e conecta as componentes
+conexas restantes, a saber, a série ``vorbisdec'', ``audioconvert'' e
+``alsasink'' e a série ``queue'', ``theoradec'', e ``xvimagesink''.
 
 O comando \en{gst-launch} é particularmente útil para depurar ou testar a
 viabilidade de \en{pipelines} antes de implementá-los em~C\null.  Por
@@ -1022,8 +1026,8 @@ ambiente, por exemplo, há~223 \en{plugins} e~1302 elementos disponíveis.  Já
 quando executado com um nome de \en{plugin} ou nome de elemento como
 argumento o \en{gst-inspect} apresenta as informações do dado \en{plugin} ou
 elemento.  A Listagem~\ref{lst:equalizer} apresenta a saída do comando
-``\C{gst-inspect$~$equalizer}'' que lista as informações do \en{plugin}
-\en{equalizer}.
+``\C{gst-inspect$~$equalizer}'' que lista as informações do
+\en{plugin}~``equalizer''.
 
 \lstinputlisting[
 language={},
@@ -1034,7 +1038,7 @@ label={lst:equalizer},
 ]{src/equalizer.out}
 
 Na Listagem~\ref{lst:equalizer}, as linhas~2--4 apresentam o nome do
-\en{plugin} (\en{equalizer}), a sua descrição (equalizadores de áudio) e o
+\en{plugin} (``equalizer''), a sua descrição (equalizadores de áudio) e o
 caminho da biblioteca dinâmica contendo o código do \en{plugin}.  As
 linhas~5--10, apresentam informações adicionais (versão, licença, pacote,
 etc.) e as linhas~12--14 listam os elementos includidos no \en{plugin}, no
@@ -1063,9 +1067,215 @@ caption={Trecho da seção ``Element Properties'' da saída do comando
 label={lst:equalizer-3bands},
 ]{src/equalizer-3bands-prop.out}
 
+Um equalizador é um processador de áudio que permite modificar o ganho dos
+graves, médios e agudos das amostras de um fluxo de áudio descomprimido.  Os
+três equalizadores instalados pelo \en{plugin} ``equalizer'' anterior
+possuem a mesma estrutura.  Os três têm uma \en{source pad} que consome
+áudio descomprimido e uma \en{sink pad} que produz audio descomprimido, e
+todos eles processam uma amostra por vez: leem uma amostra da sua \en{source
+  pad}, modificam-na acordo com os valores de ganho especificados em suas
+propriedades e escrevem a amostra resultante na sua \en{sink pad}.
+Elementos que realizam esse tipo de processamento são chamados de filtros.
+
 
-\clearpage
-\input{filtros}
+\section{Filtros}
+\label{sec:filtros}
+
+Um filtro é um elemento que aplica uma transformação sobre um fluxo de
+amostras descomprimidas.  A transformação em si é normalmente ortogonal,
+isto é, depende apenas do conteúdo das amostras, e altera esse conteúdo afim
+de produzir efeitos sonoros ou visuais no fluxo resultante.
+A Tabela~\ref{tab:filtros} apresenta alguns filtros de áudio e vídeo
+disponíveis na distribuição oficial do GStreamer.
+
+\begin{table}[h]
+  \sffamily
+  \scriptsize
+  \centering
+  \begin{tabular}{llll}
+    \toprule
+    &\textbf{Plugin}
+    &\textbf{Elemento}
+    &\textbf{Descrição (controle)}\\
+    \midrule
+    \textbf{Áudio}
+    &audiofx    & audiodynamic & Compressão ou expansão\\
+    &audiofx    & audioecho    & Eco\\
+    &equalizer  & equalizer-nbands & Equalização~($n$~bandas)\\
+    &freeverb   & freeverb     & Reverberação\\
+    &soundtouch & pitch        & Tonalidade e tempo\\
+    &speed      & speed        & Velocidade\\
+    &volume     & volume       & Volume\\
+    \multicolumn{4}{l}{\dotfill}\\
+    \textbf{Vídeo}
+    &coloreffects& coloreffects& Efeito de colorização\\
+    &effecttv    & shagadelictv & Efeito de espiral caleidoscópica\\
+    &effectv     & agingtv     & Efeito de envelhecimento\\
+    &effectv     & rippletv    & Efeito de ondulação\\
+    &videocrop   & videocrop   & Recorte\\
+    &videofilter & videobalance & Brilho, cor e saturação\\
+    &videoscale  & videoscale  & Redimensionamento\\
+    \bottomrule
+  \end{tabular}
+  \caption{Alguns filtros de áudio e vídeo disponíveis no GStreamer.}
+  \label{tab:filtros}
+\end{table}
+
+Todo filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.
+Ambas as \en{pads} têm disponibilidade \en{always} e escoam apenas fluxos
+descomprimidos (\en{mime type} ``audio/x-raw'' ou ``video/x-raw'').
+Consequentemente, num \en{pipeline} os elementos filtros normalmente
+aparecem entre os decodificadores e os \en{sinks}.  Por exemplo, o comando
+seguinte adiciona o filtro ``volume'' ao \en{pipeline} da
+Listagem~\ref{lst:mp3}, que reproduz um arquivo de áudio MP3.
+\begin{lstlisting}[style=command]
+@\$@ gst-launch filesrc location=bunny.mp3\
+                  ! mad ! volume volume=.5 ! alsasink
+\end{lstlisting}
+Nesse caso, o áudio é reproduzido com a metade do volume original---a
+propriedade ``volume'' do elemento ``volume'' inicializada com o valor~.5
+indica ao elemento que o volume das amostras deve ser reduzido à metade.
+
+% A Figura~\ref{fig:pipe-mp3-volume} apresenta a estrutura do \en{pipeline}
+% criado pelo comando \en{gst-launch} anterior.
+% \begin{figure}[h]
+%   \centering
+%   \begin{tikzpicture}
+%     \node (filesrc) [element] {filesrc};
+%     \node (mad) [element, right of=filesrc] {mad};
+%     \node (volume) [element, right of=mad] {volume};
+%     \node (alsasink) [element, right of=volume] {alasink};
+%     \coordinate (A) at ($(filesrc.north west)+(-.5\odim,.5\odim)$);
+%     \coordinate (B) at ($(alsasink.south east)+(.5\odim,-.5\odim)$);
+%     \path [bin] (A) rectangle node [binlabel] {pipeline} (B);
+%     \draw [->, arrow] (filesrc) -- (mad);
+%     \draw [->, arrow] (mad) -- (volume);
+%     \draw [->, arrow] (volume) -- (alsasink);
+%   \end{tikzpicture}
+%   \caption{\en{Pipeline} que reproduz áudio~MP3 com a metade do volume
+%     original.}
+%   \label{fig:pipe-mp3-volume}
+% \end{figure}
+
+Vejamos agora um exemplo mais complexo.  O \en{shell script} da
+Listagem~\ref{lst:filtros-sh} usa o comando \en{gst-launch} para reproduzir
+um vídeo com um dado efeito de áudio e vídeo.  O \en{script} recebe dois
+argumentos, a URI do vídeo a ser reproduzido e o efeito a ser aplicado
+(número entre~0--4), e usa o comando \en{gst-launch} para montar o
+\en{pipeline} apropriado.
+
+\lstinputlisting[
+language={},
+escapechar={},
+mathescape=false,
+style=display,
+caption={\en{Shell script} que reproduz um vídeo aplicando efeitos de áudio
+  e vídeo.},
+label={lst:filtros-sh},
+]{src/filter.sh}
+
+A Figura~\ref{fig:pipe-filtros-sh} apresenta a estrutura final do
+\en{pipeline} criado pelo \en{script} da Listagem~\ref{lst:filtros-sh}.  Na
+figura, os elementos~$\<\text{\en{audio filter}}>$
+e~$\<\text{\en{video filter}}>$ (variáveis~\C{af} e~\C{vf} na listagem)
+variam de acordo com o valor do segundo argumento do \en{script}.  Há cinco
+possibilidades:
+\begin{itemize}
+\item Se o argumento é~0, pela linha~3 na listagem, o \en{script} utiliza o
+  filtro de áudio ``volume'' com a propriedade ``volume'' inicializada
+  com~2, e o filtro de vídeo ``coloreffects'' com a propriedade ``preset''
+  inicializada com~1.  Nesse caso, as amostras de áudio serão reproduzidas
+  com o dobro do volume original e as amostras de vídeo serão colorizadas
+  para simular o efeito ``câmera de calor''
+  (Figura~\ref{fig:filtros-screen}.b).
+\item Se o argumento é~1, pela linha~4, o \en{script} utiliza o filtro de
+  áudio ``pitch'' com a propriedade ``pitch'' inicializada com~.5, e o
+  filtro de vídeo ``rippletv''.  Nesse caso, as amostras de áudio serão
+  reproduzidas na metade do tom (frequência) original e as amostas de vídeo
+  serão alteradas para simular um efeito de ondulação
+  (Figura~\ref{fig:filtros-screen}.c).
+\item Se o argumento é~2, pela linha~5, o \en{script} utiliza o filtro de
+  áudio ``audioecho'' com as propriedades ``delay'' e ``intensity''
+  inicializadas com~.5s e~1, e o filtro de vídeo ``shagadelictv''.  Nesse
+  caso, as amostras de áudio serão reproduzidas com eco, e as amostras de
+  vídeo simulam serão alteradas para simular o efeito espiral caleidoscópica
+  (Figura~\ref{fig:filtros-screen}.d).
+\item Se o argumento é~3, pela linha~6, \en{script} utiliza o filtro áudio
+  ``freeverb'' com as propriedades ``room-size'' e ``level'' inicializadas
+  com~1 e~1, e o filtro de vídeo ``edgetv''.  Nesse caso, as amostras de
+  áudio serão alteradas para simular a reverberação numa sala ampla, e as
+  amostras de vídeo serão alteradas para mostrar apenas as bordas da imagem
+  de cada quadro (Figura~\ref{fig:filtros-screen}.e).
+\item Finalmente, se o argumento é~4, pela linha~7, o \en{script} utiliza o
+  filtro de áudio ``equalizer-3bands'' com as propriedades ``band0'' e
+  ``band1'' inicializadas com~12dB e~-24dB, e o filtro de vídeo ``revtv''.
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+    \node (uridecodebin) [element] {uridecodebin};
+    \coordinate [above=.5\hdim of uridecodebin] (A);
+    \coordinate [below=.5\hdim of uridecodebin] (B);
+    %%
+    \coordinate [right of=uridecodebin] (C);
+    \node (videoconvert1) [element] at (C|-B) {videoconvert};
+    \node (videofilter) [element, right of=videoconvert1]
+    {$\<\text{\emph{video filter}}>$};
+    \node (videoconvert2) [element, right of=videofilter] {videoconvert};
+    \node (autovideosink) [element, right of=videoconvert2] {autovideosink};
+    %%
+    \coordinate [above of=videofilter] (D);
+    \node (audiofilter) [element] at (D|-A)
+    {$\<\text{\emph{audio filter}}>$};
+    \node (audioconvert) [element, right of=audiofilter] {audioconvert};
+    \node (autoaudiosink) [element, right of=audioconvert] {autoaudiosink};
+    %%
+    \coordinate (X) at ($(uridecodebin.east)+(0,.25\hdim)$);
+    \coordinate (Y) at ($(uridecodebin.east)+(0,-.25\hdim)$);
+    \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+                          -- ($(videoconvert1.west|-A)-(\odim/3,0)$)
+                          -- (audiofilter.west);
+    \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+                          -- ($(videoconvert1.west)-(\odim/3,0)$)
+                          -- (videoconvert1.west);
+    \draw [->, arrow] (audiofilter) -- (audioconvert);
+    \draw [->, arrow] (audioconvert) -- (autoaudiosink);
+    \draw [->, arrow] (videoconvert1) -- (videofilter);
+    \draw [->, arrow] (videofilter) -- (videoconvert2);
+    \draw [->, arrow] (videoconvert2) -- (autovideosink);
+  \end{tikzpicture}
+  \caption{Estrutura final do \en{pipeline} da
+    Listagem~\ref{lst:filtros-sh}.}
+  \label{fig:pipe-filtros-sh}
+\end{figure}
+
+\begin{figure*}[h!]
+  \centering
+  \subfigure[original]{
+    \includegraphics[width=0.4\textwidth]{pics/original}
+  }
+  \subfigure[coloreffects]{
+    \includegraphics[width=0.4\textwidth]{pics/coloreffects}
+  }
+  \subfigure[rippletv]{
+    \includegraphics[width=0.4\textwidth]{pics/rippletv}
+  }
+  \subfigure[shagadelictv]{
+    \includegraphics[width=0.4\textwidth]{pics/shagadelictv}
+  }
+  \subfigure[edgetv]{
+    \includegraphics[width=0.4\textwidth]{pics/edgetv}
+  }
+  \subfigure[revtv]{
+    \includegraphics[width=0.4\textwidth]{pics/revtv}
+  }
+  \caption{Efeitos de vídeo aplicados pelo \en{script} da
+    Listagem~\ref{lst:filtros-sh}.}
+  \label{fig:filtros-screen}
+\end{figure*}
+
+% \input{filtros}
 
 
 \clearpage
@@ -1108,4 +1318,4 @@ label={lst:equalizer-3bands},
 %  LocalWords:  vorbis video x-theora theora mutexes sinkpad GMutex GCond
 %  LocalWords:  gst-launch Bourne equalizer equalizer-nbands bands man band
 %  LocalWords:  Properties uridecodebin autovideosink autoaudiosink x-raw
-%  LocalWords:  templates
+%  LocalWords:  templates transicioná-los
