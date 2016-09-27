@@ -109,7 +109,7 @@ gst_my_video_filter_class_init(GstMyVideoFilterClass *klass)
     "A VideoFilter example plugin",
     "Example/FirstExample",
     "Shows the basic structure of a plugin",
-    "roberto robertogerson at telemidia.puc-rio.br");
+    "TeleMidia/PUC-Rio");
 
   /* adiciona os pads na classe */
   gst_element_class_add_pad_template (gstelement_class,

@@ -251,4 +251,16 @@ como novo valor de início do fluxo no sexto argumento (na prática isso implica
 que não haverá mudança na posição de reprodução do fluxo). 
 
 Dessa forma, a \en{callback} \C{bus_callback} juntamente com as funções \C{seek}
-e \C{change_playback_rate} implementam o exemplo dessa seção.
+e \C{change_playback_rate} implementam o exemplo dessa seção. Para compilar
+este programa, precisamos adicionar as \en{flags} de compilação do pacote
+\C{gstreamer-video-1.0} (devido às funções referentes ao processamento de
+mensagens do tipo \en{navigation}). Assumindo que o nome do arquivo fonte seja
+\C{video_control.c}, o seguinte \en{makefile} pode ser usado para
+compilar o código acima:
+
+\lstinputlisting[
+style=display,
+mathescape=no,
+caption={\en{Makefile} que constrói o programa ``Olá mundo''.},
+label={lst:makefile},
+]{src/Makefile.hello_control}
