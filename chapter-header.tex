@@ -15,7 +15,7 @@
 \usepackage{natbib}
 \usepackage{paralist}
 \usepackage{xargs}
-\usepackage[prependcaption,textsize=tiny,textwidth=2.5cm]{todonotes}
+\usepackage[prependcaption,textsize=tiny]{todonotes}
 \usepackage{color}
 \usepackage{soulutf8}
 \setlength{\bibsep}{0.0pt}
@@ -170,6 +170,8 @@
 \let\C\lstinline
 \def\<#1>{\ensuremath{\left<#1\right>}}
 
+\setlength{\marginparwidth}{2.5cm}
+\newcommandx{\rc}[2]{{\sethlcolor{red}\hl{#1}}\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red]{#2}}
 \newcommandx{\rg}[1]{\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan]{#1}}
 \newcommandx{\rghl}[2]{{\sethlcolor{cyan}\hl{#1}}\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan]{#2}}
 

@@ -70,7 +70,11 @@ pode ser usado para construir diversos tipos de aplicações multimídia tais co
 editores de vídeo, transcodificadores, transmissores de fluxos de mídia,
 \en{players} de mídia e motores de renderização de linguagens multimídia.
 
-O restante do capítulo está organizado da seguinte forma.  Na
+O restante do capítulo está %%
+%%
+\rc{organizado da seguinte forma.}{Rever essa descrição}
+%%
+Na
 Seção~\ref{sec:hello} apresentamos uma versão preliminar do exemplo base do
 minicurso: um \en{player} de vídeo simples, porém funcional.  Na
 Seção~\ref{sec:dissec} discutimos o que está por trás do código aparentemente
@@ -129,8 +133,8 @@ ator e vice versa).
 A Figura~\ref{fig:pipe-tipico} apresenta o leiaute de um \en{pipeline} típico
 para processamento multimídia.  O leiaute nesse caso é uma versão simplificada
 do \en{pipeline} de uma aplicação GStreamer que reproduz um vídeo
-Ogg~\cite{ogg-rfc-3533}.  Ogg~\cite{ogg-rfc-3533} é um formato para
-multiplexação de fluxos de áudio, vídeo e texto.  Os nós da figura representam
+Ogg~\cite{ogg-rfc-3533} (formato para multiplexação de fluxos de áudio, 
+vídeo e texto).  Os nós da figura representam
 atores e as arestas representam as conexões por onde fluem as amostras de áudio
 e vídeo e dados de controle.  Na terminologia do GStreamer os atores são
 chamados de ``elementos'' e as portas de~``\en{pads}''.  Há dois tipos de
@@ -170,6 +174,23 @@ apenas consomem dados.
                           -- (theoradec.west);
     \draw [->, arrow] (vorbisdec) -- (alsasink);
     \draw [->, arrow] (theoradec) -- (xvimagesink);
+
+    %%pads
+    \filldraw[black] ($(filesrc.east)-(0,.05)$) rectangle ($(filesrc.east)+(.05,.05)$);
+
+    \filldraw[black] ($(oggdemux.west)+(0,.05)$) rectangle ($(oggdemux.west)-(.05,.05)$);
+    \filldraw[black] ($(oggdemux.north east)-(0,.3)$) rectangle ($(oggdemux.north east)+(.05,-.15)$);
+    \filldraw[black] ($(oggdemux.south east)+(0,.3)$) rectangle ($(oggdemux.south east)+(.05,.15)$);
+
+    \filldraw[black] ($(vorbisdec.west)-(0,.05)$) rectangle ($(vorbisdec.west)+(-.05,.05)$);
+    \filldraw[black] ($(vorbisdec.east)-(0,.05)$) rectangle ($(vorbisdec.east)+(.05,.05)$);
+    
+    \filldraw[black] ($(theoradec.west)-(0,.05)$) rectangle ($(theoradec.west)+(-.05,.05)$);
+    \filldraw[black] ($(theoradec.east)-(0,.05)$) rectangle ($(theoradec.east)+(.05,.05)$);
+    
+    \filldraw[black] ($(alsasink.west)-(0,.05)$) rectangle ($(alsasink.west)+(-.05,.05)$);
+
+    \filldraw[black] ($(xvimagesink.west)-(0,.05)$) rectangle ($(xvimagesink.west)+(-.05,.05)$);
   \end{tikzpicture}
   \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
   \label{fig:pipe-tipico}
@@ -219,7 +240,7 @@ forma.
   \en{sink pad} um fluxo de bytes codificado no formato Theora, decodifica-o
   e escreve o fluxo de vídeo descomprimido (\en{raw}) resultante na sua
   \en{source pad}.  Um fluxo de vídeo descomprimido é uma sequência de
-  amostras (quadros) de vídeo em cada quadro é uma matriz de \en{pixels}
+  amostras (quadros) de vídeo em que cada quadro é uma matriz de \en{pixels}
   codificados em algum modelo de cor.  No modelo de cor RGB
   (\en{red-green-blue}), por exemplo, cada \en{pixel} é codificado como uma
   sequência de três inteiros que representam tonalidades de vermelho, verde
@@ -256,30 +277,30 @@ dispositivo de saída de áudio, e a cada~33{,}33ms uma nova amostra de vídeo
 deve ser enviada ao dispositivo de saída de~vídeo.
 
 No GStreamer, em geral, são os elementos \en{sink} os responsáveis por
-controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline}
-da Figura~\ref{fig:pipe-tipico}, para manter a taxa de reprodução
-necessária, os \en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as
-amostras recebidas numa fila interna e exibem-nas (consomem-nas) apenas no
-momento adequado.  Já os outros elementos operam livres---consomem e
-produzem dados em taxas arbitrárias.  Se durante a execução os elementos que
-precedem os \en{sinks} (fluxo acima) operarem rápido o bastante, as filas
-dos \en{sinks} nunca ficarão vazias e todas as amostras serão exibidas no
-momento correto, mas esse nem sempre é o caso.
+controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline} da
+Figura~\ref{fig:pipe-tipico}, para manter a taxa de reprodução necessária, os
+\en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as amostras recebidas numa
+fila interna e exibem-nas (consomem-nas) apenas no momento adequado.  Já os
+outros elementos operam livres---consomem e produzem dados em taxas
+arbitrárias.  Se durante a execução os elementos que precedem os \en{sinks}
+operarem rápido o bastante, as filas dos \en{sinks} nunca ficarão vazias e
+todas as amostras serão exibidas no momento correto, mas esse nem sempre é o
+caso.
 
-Se os \rghl{elementos fluxo}{?} acima operarem abaixo da taxa de consumo dos
-\en{sinks}, pode ser que a fila interna de um dos \en{sinks} fique vazia e,
-caso chegue o momento de exibir uma amostra, o \en{sink} simplesmente não
-tenha o que exibir, causando interrupções ou saltos na reprodução (amostras
-``atrasadas'' quando chegarem serão descartadas).  Há ainda o problema
-inverso.  Se os \rghl{elementos fluxo}{?} acima operarem muito acima da taxa de
-consumo dos \en{sinks}, pode ser que a capacidade da fila interna seja
-excedida e amostras sejam~perdidas.  Para evitar ambos os problemas,
-esvaziamento ou estouro das filas, ou mesmo para limitar o uso de CPU, os
-\en{sinks} normalmente enviam fluxo acima eventos de QoS (\en{quality of
-  service}) que indicam o quão atrasada ou adiantada está cada amostra que
-chega.  Os elementos fluxo acima (produtores e processadores) podem capturar
-esses eventos e usar a informação de retardo para ajustar a sua taxa de
-operação.
+Se os elementos que precedem os \en{sinks} operarem abaixo da taxa de consumo
+dos \en{sinks}, pode ser que a fila interna de um dos \en{sinks} fique vazia e,
+caso chegue o momento de exibir uma amostra, o \en{sink} simplesmente não tenha
+o que exibir, causando interrupções ou saltos na reprodução (amostras
+``atrasadas'' quando chegarem serão descartadas).  Há ainda o problema inverso.
+Se os elementos que precedem os \en{sink} operarem muito acima da taxa de
+consumo dos \en{sinks}, pode ser que a capacidade da fila interna seja excedida
+e amostras sejam~perdidas.  Para evitar ambos os problemas, esvaziamento ou
+estouro das filas, ou mesmo para limitar o uso de CPU, os \en{sinks}
+normalmente enviam eventos de QoS (\en{quality of service}) para os elementos
+que os precedem, que indicam o quão atrasada ou adiantada está cada amostra que
+chega.  Assim, os elementos anteriores (produtores e processadores) podem
+capturar esses eventos e usar a informação de retardo para ajustar a sua taxa
+de operação.
 
 Dois tipos de dados trafegam através das conexões (arestas) de um \en{pipeline}
 GStreamer: segmentos de dados (\en{buffers}) e eventos (\en{events}).  Os
@@ -335,10 +356,10 @@ partir da próxima seção, veremos como utilizar esses conceitos na prática.
 \section{Olá mundo: Tocando um vídeo}
 \label{sec:hello}
 
-Nosso objetivo nesta seção é usar o GStreamer para tocar um vídeo.  Para tal
-poderíamos implementar o \en{pipeline} da Figura~\ref{fig:pipe-tipico}, mas
-há uma maneira mais simples: basta usar o elemento ``playbin''.
-A Listagem~\ref{lst:hello} apresenta um programa~C que faz exatamente isso.
+Nosso objetivo nesta seção é usar o GStreamer para tocar um vídeo.  Para tal,
+poderíamos implementar o \en{pipeline} da Figura~\ref{fig:pipe-tipico}, mas há
+uma maneira mais simples: basta usar o elemento ``playbin''.  A
+Listagem~\ref{lst:hello} apresenta um programa~C que faz exatamente isso.
 
 \lstinputlisting[
 style=display,
@@ -360,17 +381,19 @@ A chamada~\C{gst_init}, linha~12, inicializa o GStreamer e trata os
 argumentos com prefixo ``-\,-gst-'' em \C{argv}.
 
 A próxima chamada, linha~14, cria um elemento ``playbin'' que é também o
-\en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é ele próprio um
+\en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é, ele próprio, um
 elemento---um elemento que contém outros elementos mas não possui \en{pads}.
-Tais elementos contêiner são chamados de ``\en{bins}''.  A função
-\C{gst_element_factory_make} aloca e retorna um novo elemento
-(\C{GstElement}) do tipo especificado.  O primeiro parâmetro da função é o
-nome da fábrica do tipo e o segundo parâmetro (opcional) é o nome a ser
-atribuído ao elemento retornado.  Nesse caso, a chamada cria e retorna um
-elemento do tipo ``playbin'' chamado ``hello''.  Um elemento ``playbin''
-nada mais é do que um \en{pipeline} que se autoconfigura.  Dada uma URI,
-assim que é inciado o ``playbin'' determina o tipo do conteúdo da URI e
-constrói um \en{pipeline} apropriado para reproduzi-lo.
+Tais elementos contêiner são chamados de ``\en{\rghl{bins}{Não deveria ter sido
+discutido na seção anterior?}''}.  A função \C{gst_element_factory_make} aloca
+e retorna um novo elemento (\C{GstElement}) do tipo especificado.  O primeiro
+parâmetro da função é o nome da fábrica do tipo e o segundo parâmetro
+(opcional) é o nome a ser atribuído ao elemento retornado.  O nome do elemento
+pode ser usado depois, por exemplo, para procurar esse elemento em um
+\en{pipeline}.  No exemplo da Listagem~\ref{lst:hello}, a chamada cria e
+retorna um elemento do tipo ``playbin'' chamado ``hello''.  Um elemento
+``playbin'' nada mais é do que um \en{pipeline} que se autoconfigura.  Dada uma
+URI, assim que o ``playbin'' é iniciado ele determina o tipo do conteúdo da URI
+e constrói um \en{pipeline} apropriado para reproduzi-la.
 
 A chamada \C{g_assert_nonnull}, linha~15, é uma asserção que garante que a
 chamada anterior funcionou corretamente, isto é, retornou um elemento válido
@@ -391,7 +414,7 @@ A propriedade ``uri'' do elemento ``playbin'' contém a URI do conteúdo de
 mídia a ser reproduzido.
 
 A chamada \C{g_free}, linha~20, libera a \en{string} alocada na linha~16.
-Nesse ponto a \en{string} já não é mais necessária pois foi copiada pela
+Nesse ponto, a \en{string} já não é mais necessária pois foi copiada pela
 chamada \C{g_object_set} anterior.
 
 A chamada \C{gst_element_set_state}, linha~22, inicia o \en{pipeline} da
@@ -417,7 +440,7 @@ aplicação através de mensagens assíncronas postadas em um barramento
 (\en{bus}) associado ao \en{pipeline}.  Essas mensagens informam a
 \en{thread} da aplicação sobre acontecimentos internos do \en{pipeline}, por
 exemplo, mudança de estado de elementos, fim do fluxo, erros, \en{warnings},
-etc., e permitem que aplicação reaja da maneira apropriada.
+etc., e permitem que a aplicação reaja da maneira apropriada.
 
 A chamada \C{gst_element_get_bus}, linha~25, obtém uma referência para o
 barramento de mensagens (\en{bus}) do \en{pipeline} do ``playbin''.
@@ -441,11 +464,12 @@ chamada da linha anterior.  Nesse ponto, ou houve um erro ou a reprodução
 chegou ao fim.
 
 A chamada \C{gst_object_unref}, linha~28, libera a referência para o
-\en{bus} do ``playbin'' obtida na linha~25.  A função \C{gst_object_unref} é
+\en{bus} do ``playbin'', obtida na linha~25.  A função \C{gst_object_unref} é
 um pseudônimo (\en{alias}) para a função \C{g_object_unref}, que libera uma
-referência para um \C{GObject}.  No GStreamer, a maioria dos tipos
-``objeto'' não herdam diretamente de \C{GObject}, mas sim de \C{GstObject}
-que por sua vez herda de \C{GObject}.
+referência para um \C{GObject}.  No GStreamer, a maioria dos \rghl{tipos
+``objeto''}{Entendi o que é. Mas não tem como falarmos isso de uma forma
+melhor?} não herdam diretamente de \C{GObject}, mas sim, de \C{GstObject} que,
+por sua vez, herda de \C{GObject}.
 
 A chamada \C{gst_element_set_state}, linha~30, para o \en{pipeline} da
 aplicação (caso ele ainda não esteja parado) e libera os recursos utilizados
@@ -453,7 +477,7 @@ durante o seu processamento, isto é, transiciona o elemento ``playbin'' de
 volta para o estado inicial \en{null}.
 
 Finalmente, a chamada \C{gst_object_unref}, linha~31, libera o próprio
-elemento ``playbin'' alocado na linha~14.
+elemento ``playbin'', alocado na linha~14.
 
 Se tudo correr bem, ao executar o programa ``Olá mundo'' anterior uma nova
 janela aparece na tela e o vídeo é reproduzido do inicio ao fim.
@@ -485,12 +509,12 @@ Esse comando compila e \en{link}-edita o programa da
 Listagem~\ref{lst:hello} (``hello.c'') e gera um executável chamado
 ``hello''.  As opções ``-\,-cflags'' e ``-\,-libs'' do comando
 \en{pkg-config} instruem-no a emitir as \en{flags} de compilação e
-\en{link}-edição apropriadas para módulos listados, no caso, ``glib-2.0'' e
+\en{link}-edição apropriadas para os módulos listados, no caso, ``glib-2.0'' e
 ``gstreamer-1.0''.  Observe que a chamada do comando \en{pkg-config} aparece
 entre crases.  Ou seja, antes de avaliar o comando mais externo, \en{cc},
 que é a chamada do compilador~C, o interpretador de comandos (\en{shell})
 executa o comando \en{pkg-config} e substitui o texto entre crases pelo
-resultado dessa execução.  Por exemplo, no nosso ambiente o comando anterior
+resultado dessa execução.  Por exemplo, no nosso ambiente, o comando anterior
 avalia para:
 \begin{lstlisting}[style=command]
 @\$@ cc -pthread\
@@ -502,6 +526,8 @@ avalia para:
      hello.c -o hello
 \end{lstlisting}
 
+\rg{Se precisarmos de espaço acho que essa parte de \en{makefile} é algo
+    que podemos remover.}
 Uma forma de tornar o processo de compilação menos trabalhoso é escrever um
 \en{makefile} com a descrição da sequência de comandos que constrói o
 programa.  A Listagem~\ref{lst:makefile} apresenta o \en{makefile} (arquivo
@@ -526,7 +552,7 @@ label={lst:makefile},
 ]{src/Makefile.hello}
 
 
-\section{Tocando um vídeo a partir de elementos básicos}
+\section{Tocando áudio e vídeo a partir de elementos básicos}
 \label{sec:dissec}
 
 Na Seção~\ref{sec:hello} utilizamos o elemento ``playbin'' para tocar um
@@ -538,8 +564,11 @@ Figura~\ref{fig:pipe-tipico}, Seção~\ref{sec:intro}, que lê um arquivo Ogg
 do disco, demultiplexa-o, e decodifica e reproduz os fluxos de áudio e vídeo
 resultantes.  Antes disso, porém, vejamos um exemplo mais simples.
 
+
+\subsection*{Tocando um arquivo de áudio MP3}
+
 A Listagem~\ref{lst:mp3} apresenta um programa que reproduz um arquivo de
-áudio~MP3~\cite{mp3} do disco.  Para tal o programa monta um \en{pipeline}
+áudio~MP3~\cite{mp3} do disco.  Para tal, o programa monta um \en{pipeline}
 com três elementos: ``filesrc'', ``mad'' e ``alsasink''.  Como vimos, no
 GStreamer o próprio \en{pipeline} é um elemento---um elemento sem \en{pads}
 que contém outros elementos.  Na listagem, a chamada da linha~15 aloca o
@@ -550,7 +579,7 @@ programa foi chamado corretamente, isto é, se o caminho para o arquivo~MP3
 está em \C{argv[1]}.)
 
 \lstinputlisting[
-float={h},
+%float={h},
 style=display,
 caption={Tocando um arquivo de áudio MP3.},
 label={lst:mp3},
@@ -560,7 +589,7 @@ label={lst:mp3},
 Na Seção~\ref{sec:intro}, discutimos a operação dos elementos ``filesrc'' e
 ``alsasink''.  O primeiro lê um arquivo do disco e gera um fluxo de bytes
 correspondente, e o segundo lê um fluxo de amostras de áudio PCM e as
-reproduz no dispositivo de saída de áudio.  Aqui a novidade é o elemento
+reproduz no dispositivo de saída de áudio.  Aqui, a novidade é o elemento
 processador, mais precisamente, decodificador ``mad''.  Ele lê da sua
 \en{source pad} um fluxo de bytes no formato~MP3, decodifica-o via
 MAD~\cite{mad} (biblioteca para decodificação de áudio MP3) e escreve na sua
@@ -568,6 +597,9 @@ MAD~\cite{mad} (biblioteca para decodificação de áudio MP3) e escreve na sua
 ``filesrc'', ``alsasink'' e ``mad'', fazerem parte do GStreamer, na prática,
 eles pertencem a pacotes diferentes, distribuídos separadamente.
 
+\rg{Sei que possivelmente não vai dá tempo, mas para mim, faz muito sentido
+tanto isso como a parte das ferramentas vir na Introdução.  A impressão que dá
+é que as coisas foram sendo jogadas na medida em que fomos lembrando.}
 A distribuição oficial do GStreamer possui cinco pacotes principais:
 (1)~\en{gstreamer}, contendo o núcleo do \en{framework};
 (2)~\en{gst-plugins-base}, contendo apenas os elementos básicos;
@@ -595,12 +627,12 @@ elemento de um \en{plugin} que não está instalado.  Na listagem, se isso
 acontecer a chamada \C{gst_element_factory_make} retornará~\C{NULL} e a
 asserção falhará, abortando o programa.
 
-Continuando, a chamada da linha~21 adiciona três filhos ao \en{pipeline}:
-``filesrc'', ``mad'' e ``alsasink''.  A função \C{gst_bin_add_many} recebe
-um \en{bin} (\C{GstBin}) e uma sequência de elementos (\C{GstElement})
-terminada por \C{NULL}, e adiciona os elementos da sequência ao \en{bin}.
-Note que antes da chamada precisamos usar a macro \C{GST_BIN} para converter
-a variável \C{pipeline} para o tipo da sua superclasse~\C{GstBin}.
+Continuando, a chamada da \C{gst_bin_add_many}, linha~21, adiciona três filhos
+ao \en{pipeline}: ``filesrc'', ``mad'' e ``alsasink''.  Essa função recebe um
+\en{bin} (\C{GstBin}) e uma sequência de elementos (\C{GstElement}) terminada
+por \C{NULL}, e adiciona os elementos da sequência ao \en{bin}.  Note, que antes
+da chamada precisamos usar a macro \C{GST_BIN} para converter a variável
+\C{pipeline} para o tipo da sua superclasse~\C{GstBin}.
 
 A chamada~\C{gst_element_link_many}, linha~22, conecta os elementos
 apontados pelas variáveis \C{src}, \C{filter} e \C{sink} em série.  Isto é,
@@ -637,41 +669,41 @@ servirá de fonte de bytes.
 A chamada \C{gst_element_set_state}, linha~25, transiciona o ``pipeline'' do
 seu estado atual (\en{null}) para o estado \en{playing} o que, como vimos na
 Seção~\ref{sec:hello}, faz com que os seus filhos ``filesrc'', ``mad'' e
-``alsasink'' comecem a operar.  No Gstreamer, todo elemento incluindo o
-\en{pipeline} possui um estado que pode ser nulo (\en{null}, identificado
+``alsasink'' comecem a operar.  No Gstreamer, todo elemento, incluindo o
+\en{pipeline}, possui um estado que pode ser nulo (\en{null}, identificado
 pela constante simbólica \C{GST_STATE_NULL}), pronto (\en{ready},
 \C{GST_STATE_READY}), pausado (\en{paused}, \C{GST_STATE_PAUSED}) ou tocando
-(\en{playing} \C{GST_STATE_PLAYING}).  No estado inicial, \en{null}, o
+(\en{playing}, \C{GST_STATE_PLAYING}).  No estado inicial, \en{null}, o
 elemento não possui recursos alocados.  No estado \en{ready}, o elemento
 aloca recursos globais que não dependem do conteúdo a ser processado.  No
 estado \en{paused}, o elemento aloca recursos que dependem do conteúdo a ser
 processado e se prepara para processá-lo.  Finalmente, no estado
-\en{playing} o elemento inicia o processamento.
+\en{playing}, o elemento inicia o processamento.
 
-Para chegar do estado \en{null} (inicial) ao estado \en{playing} (operante)
-todo elemento tem que passar primeiro pelo estados \en{ready} e \en{paused},
-nessa ordem.  De forma análoga, para sair do estado \en{playing} e voltar ao
-estado inicial \en{null}, o elemento tem que passar pelos estados
-\en{paused} e \en{ready}.  A Figura~\ref{fig:estados-elt} apresenta a
-máquina de estados de um elemento GStreamer (isto é, seus estados e
-transições possíveis).  Mudanças de estado do \en{pipeline}, na verdade de
-\en{bins} em geral, são propagadas nos elementos filhos, e a direção da
-propagação é sempre dos \en{sinks} para os \en{sources}---dessa forma dados
-não são gerados antes que os elementos fluxo abaixo estejam prontos para
-recebê-los.  Por exemplo, na Listagem~\ref{lst:mp3}, se bem sucedida, a
-chamada \C{gst_element_set_state} (linha~25) implica na seguinte sequência
-transições (sempre dos \en{sinks} para os \en{sources}): (1)~os elementos
-filhos ``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para
-\en{ready} e, em seguida, o \en{pipeline} transiciona para \en{ready};
-(2)~os filhos transicionam de \en{ready} para \en{paused} e, em seguida, o
-\en{pipeline} transiciona para \en{paused}; e~(3) os filhos transicionam
-de~\en{paused} para \en{playing} e, finalmente, o \en{pipeline} transiciona
-para \en{playing}.  Essa última transição completa a chamada e devolve o
-controle à função \C{main}.  Nesse ponto, a \en{thread} da aplicação está
-prestes a executar a asserção da linha~26, que aborta o programa em caso de
-falha da chamada anterior, e as \en{streaming threads} já começaram a operar
-o \en{pipeline}, ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink''
-já estão produzindo, processando e consumindo dados.
+Para chegar do estado \en{null} (inicial) ao estado \en{playing} (tocando) todo
+elemento tem que passar primeiro pelo estados \en{ready} e \en{paused}, nessa
+ordem.  De forma análoga, para sair do estado \en{playing} e voltar ao estado
+inicial \en{null}, o elemento tem que passar pelos estados \en{paused} e
+\en{ready}.  A Figura~\ref{fig:estados-elt} apresenta a máquina de
+estados---isto é, os estados e transições possíveis---de um elemento GStreamer.
+Mudanças de estado do \en{pipeline}, na verdade de \en{bins} em geral, são
+propagadas nos elementos filhos, e a direção da propagação é sempre dos
+\en{sinks} para os \en{sources}---dessa forma dados não são gerados antes que
+os elementos posteriores no \en{pipeline} estejam prontos para recebê-los.  Por
+exemplo, na Listagem~\ref{lst:mp3}, se bem sucedida, a chamada
+\C{gst_element_set_state} (linha~25) implica na seguinte sequência transições
+(sempre dos \en{sinks} para os \en{sources}): (1)~os elementos filhos
+``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para \en{ready}
+e, em seguida, o \en{pipeline} transiciona para \en{ready}; (2)~os filhos
+transicionam de \en{ready} para \en{paused} e, em seguida, o \en{pipeline}
+transiciona para \en{paused}; e~(3) os filhos transicionam de~\en{paused} para
+\en{playing} e, finalmente, o \en{pipeline} transiciona para \en{playing}.
+Somente após essa última transição é que a chamada está completa e o controle à
+função \C{main}.  Nesse ponto, a \en{thread} da aplicação está prestes a
+executar a asserção da linha~26, que aborta o programa em caso de falha da
+chamada anterior, e as \en{streaming threads} já começaram a operar o
+\en{pipeline}, ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink'' já
+estão produzindo, processando e consumindo dados.
 
 \begin{figure}[b]
   \centering
@@ -692,9 +724,9 @@ já estão produzindo, processando e consumindo dados.
 \end{figure}
 
 A chamada seguinte, linha~28, obtém uma referência para o barramento do
-\en{pipeline} e a próxima, linha~29, e bloqueia a \en{thread} da aplicação
-até que um erro aconteça ou até que o arquivo de áudio seja reproduzido
-completamente (EOS).
+\en{pipeline} e a próxima, linha~29, bloqueia a \en{thread} da aplicação até
+que um erro aconteça ou até que o arquivo de áudio seja reproduzido
+completamente~(EOS).
 
 Assim que a chamada \C{gst_bus_timed_pop_filtered} retorna, a \en{thread} da
 aplicação libera as referências do \en{bus} e da mensagem retornada
@@ -732,7 +764,7 @@ multiplexados no Ogg determina o número de \en{sink pads} no
 demultiplexador.  \en{Pads} desse tipo, criadas sob demanda pelo elemento,
 são chamadas de \en{sometimes pads}.
 
-No GStreamer, toda \en{pad} é instanciada de acordo um \en{template} que
+No GStreamer, toda \en{pad} é instanciada de acordo com um \en{template} que
 indica a sua direção, capacidade e disponibilidade.  A direção (\en{source}
 ou \en{sink}) determina se a \en{pad} produz ou consome \en{buffers}.
 A capacidade, ou \en{caps}, determina os tipos de \en{buffers} que podem
@@ -740,7 +772,7 @@ atravessá-la.  E a disponibilidade (\en{always}, \en{sometimes} ou
 \en{request}) determina o momento em que a \en{pad} é criada: (1)~\en{always
   pads} são criadas assim que o elemento é criado; (2)~\en{sometimes pads}
 são criadas pelo próprio elemento sob condições específicas que normalmente
-envolvem o conteúdo processado; e~(3)\en{request pads} são criada apenas
+envolvem o conteúdo processado; e~(3)~\en{request pads} são criada apenas
 quando requisitadas pela aplicação.
 
 No \en{pipeline} MP3 (Figura~\ref{fig:pipe-mp3}) todas as \en{pads} têm
@@ -770,10 +802,7 @@ Seção~\ref{sec:intro}---a~Figura~\ref{fig:pipe-tipico} é na verdade uma
 versão simplificada (não funcional) da Figura~\ref{fig:pipe-ogg}.
 A diferença aqui está nos elementos adicionais ``audioconvert'', que aparece
 entre os elementos ``vorbisdec'' e ``alsasink'', e ``queue'', que aparece
-entre os elementos ``oggdemux'' e ``theoradec''.  O elemento
-``audioconvert'' converte as amostras produzidas pelo elemento ``vorbisdec''
-para um formato que o ``alsasink'' aceita, e o elemento ``queue'' desacopla
-a operação dos elementos ``oggdemux'' e ``theoradec''.
+entre os elementos ``oggdemux'' e ``theoradec''. 
 
 O elemento ``audioconvert'' é necessário porque os elementos ``vorbisdec'' e
 ``alsasink'' não podem ser conectados diretamente---as \en{caps} da
@@ -781,6 +810,8 @@ O elemento ``audioconvert'' é necessário porque os elementos ``vorbisdec'' e
 \en{sink pad} do ``alsasink'', ou seja, interseção das \en{caps} dessas
 \en{pads} é vazia (podemos entender as \en{caps} de uma \en{pad} como o
 conjunto dos possíveis formatos dos \en{buffers} que podem atravessá-la).
+O elemento ``audioconvert'' então é responsável por converter as amostras
+produzidas pelo elemento ``vorbisdec'' para um formato que ``alsasink'' aceite.
 Já o elemento ``queue'' entre os elementos ``oggdemux'' e ``theoradec'' é
 necessário porque esses elementos precisam operar em \en{streaming threads}
 separadas.  O elemento ``queue'' é uma simples fila de \en{buffers}.  Quando
@@ -854,7 +885,7 @@ está no que acontece na transição intermediária do \en{pipeline} do estado
 \C{gst_element_set_state}, linha~77.
 
 Quando o \en{pipeline} da Listagem~\ref{lst:ogg} transiciona para o estado
-\en{paused} seus elementos (nesse ponto, ``filesrc'' e ``oggdemux'') já
+\en{paused} seus elementos (nesse ponto, apenas ``filesrc'' e ``oggdemux'') já
 estão pausados, ou seja, já carregaram os dados iniciais do fluxo Ogg e
 estão prontos para começar a operar.  Nesse momento, para cada subfluxo
 multiplexado no fluxo Ogg, o elemento ``oggdemux'' dispara um sinal
@@ -886,7 +917,7 @@ Nesse ponto, há três possibilidades:
   \en{flag} \C{has_vorbis_pad} (linha~28) para indicar que uma \en{pad}
   Vorbis foi encontrada.
 \item Se o tipo é Theora (``video/x-theora'') e uma \en{pad} Theora ainda
-  não foi encontrada, a \en{callback} procede de forma análoga mas agora
+  não foi encontrada, a \en{callback} procede de forma análoga, mas agora
   para os elementos ``queue'', ``theoradec'' e ``xvimagesink'', ou seja,
   aloca-os, adiciona-os ao \en{pipeline}, transiciona-os para o mesmo estado
   do \en{pipeline}, conecta-os em série, obtém a \en{source pad} do elemento
@@ -910,7 +941,7 @@ caption={Tocando um arquivo de vídeo Ogg usando elementos básicos.},
 label={lst:ogg},
 ]{src/ogg2.c}
 
-Quando iniciado o programa da Listagem~\ref{lst:ogg} demultiplexa o arquivo
+Quando iniciado, o programa da Listagem~\ref{lst:ogg} demultiplexa o arquivo
 Ogg fornecido e reproduz os primeiros subfluxos Vorbis e Theora que
 encontrar.  Se não houverem tais subfluxos, o elemento ``oggdemux'' posta
 uma mensagem de erro no \en{bus} (indicando que não há \en{sink pad}
@@ -919,9 +950,9 @@ consequentemente, o término do programa.
 
 Um detalhe sutil mas importante no código da Listagem~\ref{lst:ogg} é que a
 \en{callback} \C{pad_added_cb} e a função \C{main} executam em \en{threads}
-diferentes.  Consequentemente, caso as elas compartilhem dados, para evitar
+diferentes.  Consequentemente, caso elas compartilhem dados, para evitar
 condições de corrida, é necessário sincronizar o acesso a esses dados via
-\en{mutexes} e semáforos (tipos \C{GMutex} e~\C{GCond} da GLib).  Na
+\en{mutexes} e semáforos~(tipos \C{GMutex} e~\C{GCond} da GLib).  Na
 Listagem~\ref{lst:ogg} não precisamos fazer isso porque as chamadas
 \C{gst_element_$\ast$} e~\C{gst_bin_$\ast$} que usamos na \en{callback} para
 manipular o ``pipeline'' (único dado compartilhado) já são protegidas
@@ -1048,6 +1079,8 @@ caption={Saída do comando ``\texttt{gst-inspect equalizer}'' no Arch
 label={lst:equalizer},
 ]{src/equalizer.out}
 
+\rg{Esses dois próximos parágrafos também são candidatos a sair se precisarmos
+    de espaço.}
 Na Listagem~\ref{lst:equalizer}, as linhas~2--4 apresentam o nome do
 \en{plugin} (``equalizer''), a sua descrição (equalizadores de áudio) e o
 caminho da biblioteca dinâmica contendo o código do \en{plugin}.  As
@@ -1135,13 +1168,14 @@ apresenta alguns filtros de áudio e vídeo disponíveis no GStreamer.
 \end{table}
 \vskip-\baselineskip
 
-Todo filtro possui exatamente uma \en{source pad} e uma \en{sink pad}; ambas
-têm disponibilidade \en{always} e escoam apenas fluxos descomprimidos
-(``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, num \en{pipeline}
-os elementos filtros normalmente aparecem entre os decodificadores e os
-\en{sinks}.  Por exemplo, o comando seguinte adiciona o filtro ``volume'' ao
-\en{pipeline} da Listagem~\ref{lst:mp3}, que reproduz um arquivo de áudio
-MP3.
+Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.
+Ambas as \en{pads} têm disponibilidade \en{always} e escoam apenas fluxos
+descomprimidos (\en{mime type} ``audio/x-raw'' ou ``video/x-raw'').
+Consequentemente, num \en{pipeline} os elementos filtros normalmente
+aparecem entre os decodificadores e os \en{sinks}.  Por exemplo, o comando
+seguinte adiciona o filtro ``volume'' ao \en{pipeline} da
+Listagem~\ref{lst:mp3}/Figura~\ref{fig:pip-mp3}, que reproduz um arquivo de
+áudio MP3.
 \begin{lstlisting}[style=command]
 @\$@ gst-launch filesrc location=bunny.mp3\
                ! mad ! volume volume=.5 ! alsasink
@@ -1150,6 +1184,10 @@ Nesse caso, o áudio é reproduzido com a metade do volume original---a
 propriedade ``volume'' do elemento ``volume'', inicializada com o valor~.5,
 indica ao elemento que o volume das amostras deve ser reduzido à metade.
 
+\rg{Não vejo muita necessidade de termos esse shell script.  O nosso curso
+    não é de API~C do GStreamer?  O requisito para o leitor não é C?  Acho
+    que isso adiciona um requisito a mais.  Poderíamos focar só nesse
+    programa em C mesmo.}
 Vejamos agora um exemplo mais complexo.  O \en{shell script} da
 Listagem~\ref{lst:filtros-sh} usa o comando \en{gst-launch} para reproduzir
 um vídeo com um determinado efeito audiovisual.  O \en{script} recebe dois
@@ -1280,7 +1318,9 @@ selecionados).  Em seguida, a \en{thread} da aplicação transiciona o
 liberar os dados alocados e terminar o programa.  A operação da
 \en{callback} é similar àquela da Listagem~\ref{lst:ogg}.  A diferença aqui
 é que os filtros são criados de acordo com o segundo argumento da aplicação
-(passado por referência à \en{callback} via o parâmetro~\C{data}).
+(inteiro passado por referência à \en{callback} via o parâmetro~\C{data}).
+\rg{Por que não passar o nome do filtro como parâmetro para a aplicação?
+    Tornaria o programa mais genérico.}
 
 \lstinputlisting[
 style=display,
