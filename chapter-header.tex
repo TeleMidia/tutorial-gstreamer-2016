@@ -14,6 +14,10 @@
 \usepackage{multirow}
 \usepackage{natbib}
 \usepackage{paralist}
+\usepackage{xargs}
+\usepackage[prependcaption,textsize=tiny,textwidth=2.5cm]{todonotes}
+\usepackage{color}
+\usepackage{soulutf8}
 \setlength{\bibsep}{0.0pt}
 %% -------------------------------------------------------------------------
 \usepackage{tikz}
@@ -165,3 +169,7 @@
 \def\en#1{\foreignlanguage{english}{\emph{#1}}}
 \let\C\lstinline
 \def\<#1>{\ensuremath{\left<#1\right>}}
+
+\newcommandx{\rg}[1]{\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan]{#1}}
+\newcommandx{\rghl}[2]{{\sethlcolor{cyan}\hl{#1}}\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan]{#2}}
+

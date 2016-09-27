@@ -88,50 +88,61 @@ Seção~\ref{sec:conclusao} discutimos funcionalidades avançadas do
 \en{framework} e listamos algumas referências para estudos posteriores.
 
 Antes de programar nossa primeira aplicação GStreamer, porém, é preciso
-entender o modelo de computação no qual o \en{framework} se baseia, conhecido
-como \en{dataflow}.  No restante dessa seção apresentamos esse modelo e
-discutimos a forma como ele é instanciado no GStreamer.
+entender o modelo de computação \en{dataflow}, no qual o \en{framework} se
+baseia.  No restante desta seção apresentamos esse modelo e discutimos como ele
+é instanciado no GStreamer.
 
 
 \subsection*{O modelo \en{dataflow} e sua instanciação no GStreamer}
 
 No modelo de computação \en{dataflow} os dados são processados enquanto
-``fluem'' através de uma rede.  Essa rede estrutura-se como um grafo
-dirigido em que os nós representam elementos de processamento, ou atores, e
-as arestas representam conexões unidirecionais por onde fluem os dados.  Os
-atores recebem dados através de suas portas de entrada e emitem dados
-através de suas porta de saída.  Além disso, conceitualmente, atores são
-ativados por entrada, isto é, executam sempre que os dados necessários estão
-disponíveis em suas portas de entrada.  Um \en{pipeline} é um \en{dataflow}
-em que os dados fluem através das arestas na mesma ordem em que foram
-produzidos~\cite{Kahn-G-1977,Lee-E-A-1995}.  O modelo de computação
-\en{dataflow}, e em especial, o modelo de \en{pipeline} é interessante para
-multimídia porque aproxima a estrutura real do sistema da sua descrição
-abstrata, idealizada na forma de diagrama de blocos~\cite{Yviquel-H-2014}.
-Além disso, o modelo de \en{dataflow} induz implementações flexíveis e
-eficientes já que ele é naturalmente paralelo, modular e escalável:
-(1)~paralelo porque conceitualmente os atores executam independentemente uns
-dos outros; (2)~modular porque a lógica de processamento está encapsulada
-nos atores e pode ser reusada em diversos pontos do \en{dataflow};
-e~(3)~escalável porque a estrutura é naturalmente composicional (um
-\en{dataflow} pode ser visto como um ator e vice versa).
+``fluem'' através de uma rede.  Essa rede estrutura-se como um grafo dirigido
+em que os nós representam elementos de processamento, ou atores, e as arestas
+representam conexões unidirecionais por onde fluem os dados.  Os atores recebem
+dados através de suas portas de entrada e emitem dados através de suas porta de
+saída. %%
+%%
+  \rghl{Além disso, conceitualmente, atores são ativados por entrada, isto é,
+        executam sempre que os dados necessários estão disponíveis em suas
+        portas de entrada.}
+       {Eu removeria esta frase, porque tem elementos que apenas produzem.} %%
+%%
+Um \en{pipeline} é um \en{dataflow} em que os dados fluem através das arestas
+na mesma ordem em que foram produzidos~\cite{Kahn-G-1977,Lee-E-A-1995}.  O
+modelo de computação \en{dataflow}, e, em especial, o modelo de \en{pipeline} é
+interessante para multimídia porque aproxima %%
+%%
+  \rghl{a estrutura real do sistema da sua descrição abstrata,}
+     {Qual é a estrutura real do sistema? Qual é essa descrição abstrata?
+      Eu removeria esta frase e colocaria apenas as vantagens apresentadas a
+      seguir.}%%
+%%
+idealizada na forma de diagrama de blocos~\cite{Yviquel-H-2014}.  Além disso, o
+modelo de \en{dataflow} induz implementações flexíveis e eficientes já que ele
+é naturalmente paralelo, modular e escalável: (1)~paralelo porque
+conceitualmente os atores executam independentemente uns dos outros;
+(2)~modular porque a lógica de processamento está encapsulada nos atores e pode
+ser reusada em diversos pontos do \en{dataflow}; e~(3)~escalável porque a
+estrutura é naturalmente composicional (um \en{dataflow} pode ser visto como um
+ator e vice versa).
 
-A Figura~\ref{fig:pipe-tipico} apresenta o leiaute de um \en{pipeline}
-típico para processamento multimídia.  O leiaute nesse caso é uma versão
-simplificada do \en{pipeline} de uma aplicação GStreamer que reproduz um
-vídeo Ogg.  Os nós da figura representam atores e as arestas representam as
-conexões por onde fluem as amostras de áudio e vídeo e dados de controle.
-Na terminologia do GStreamer os atores do são chamados de ``elementos'' e as
-portas de~``\en{pads}''.  Há dois tipos de \en{pads}: \en{sink pads} e
-\en{source pads}.  As \en{sink pads} são as portas de entrada através das
-quais o elemento consome dados, e as \en{source pads} são as portas de saída
-através das quais o elemento produz dados.  Os elementos são classificados
-de acordo com o tipo de suas \en{pads}.  Elementos produtores (\en{sources})
-possuem apenas \en{source pads}, elementos processadores possuem ambos os
-tipos, \en{source pads} e \en{sink pads}, e elementos consumidores
+A Figura~\ref{fig:pipe-tipico} apresenta o leiaute de um \en{pipeline} típico
+para processamento multimídia.  O leiaute nesse caso é uma versão simplificada
+do \en{pipeline} de uma aplicação GStreamer que reproduz um vídeo
+Ogg~\cite{ogg-rfc-3533}.  Ogg~\cite{ogg-rfc-3533} é um formato para
+multiplexação de fluxos de áudio, vídeo e texto.  Os nós da figura representam
+atores e as arestas representam as conexões por onde fluem as amostras de áudio
+e vídeo e dados de controle.  Na terminologia do GStreamer os atores são
+chamados de ``elementos'' e as portas de~``\en{pads}''.  Há dois tipos de
+\en{pads}: \en{sink pads} e \en{source pads}.  As \en{sink pads} são as portas
+de entrada através das quais o elemento consome dados, e as \en{source pads}
+são as portas de saída através das quais o elemento produz dados.  Os elementos
+são classificados de acordo com o tipo de suas \en{pads}.  Elementos produtores
+(\en{sources}) possuem apenas \en{source pads}.  Elementos processadores possuem
+ambos os tipos, \en{source pads} e \en{sink pads}.  E, elementos consumidores
 (\en{sinks}) possuem apenas \en{sink pads}.  Consequentemente, produtores
-apenas produzem dados, processadores consomem e produzem dados, e
-consumidores apenas consomem dados.
+apenas produzem dados, processadores consomem e produzem dados, e consumidores
+apenas consomem dados.
 
 \begin{figure}[H]
   \centering
@@ -165,15 +176,19 @@ consumidores apenas consomem dados.
 \end{figure}
 \vskip-\baselineskip
 
-Na Figura~\ref{fig:pipe-tipico} há um elemento produtor (``filesrc''), três
-processadores (``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois consumidores
-(``alsasink'' e ``xvimagesink'').  O elemento ``filesrc'' possui uma única
-\en{source pad} que está conectada à \en{sink pad} do elemento subsequente,
-``oggdemux''.  Ou seja, os dados produzidos pelo elemento ``filesrc'' fluem
-através da sua \en{source pad} para a \en{sink pad} do elemento ``oggdemux''.
-No diagrama essa conexão entre as \en{pads} é representada pela aresta entre os
-elementos ``filesrc'' e ``oggdemux''.  Similarmente, as demais arestas denotam
-conexões entre \en{source pads} e \en{sink pads}.
+Na Figura~\ref{fig:pipe-tipico} %%
+%%
+  \rg{Vocês acham que a gente consegue representar as src/sink pads na figura?}
+%%
+há um elemento produtor (``filesrc''), três processadores (``oggdemux'',
+``vorbisdec'' e ``theoradec'') e dois consumidores (``alsasink'' e
+``xvimagesink'').  O elemento ``filesrc'' possui uma única \en{source pad} que
+está conectada à \en{sink pad} do elemento subsequente, ``oggdemux''.  Ou seja,
+os dados produzidos pelo elemento ``filesrc'' fluem através da sua \en{source
+pad} para a \en{sink pad} do elemento ``oggdemux''.  No diagrama, essa conexão
+entre as \en{pads} é representada pela aresta entre os elementos ``filesrc'' e
+``oggdemux''.  Similarmente, as demais arestas denotam conexões entre
+\en{source pads} e \en{sink pads}.
 
 O processo de desenvolvimento de uma aplicação GStreamer com \en{pipeline}
 estático (cuja topologia não muda em tempo de execução) é relativamente
@@ -184,12 +199,10 @@ forma.
 \begin{enumerate}
 \item O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de
   arquivos e escreve o fluxo de bytes resultante na sua \en{source pad}.
-  Ogg~\cite{ogg-rfc-3533} é um formato para multiplexação de fluxos de
-  áudio, vídeo e texto.  Vamos assumir que arquivo Ogg nesse caso contém
-  apenas dois fluxos multiplexados: um fluxo de áudio (sequência de amostras
-  de áudio) codificado no formato Vorbis~\cite{vorbis}, e um fluxo de vídeo
-  (sequência de quadros de imagem) codificado no formato
-  Theora~\cite{theora}.
+  Vamos assumir que o arquivo Ogg nesse caso contém apenas dois fluxos
+  multiplexados: um fluxo de áudio (sequência de amostras de áudio) codificado
+  no formato Vorbis~\cite{vorbis}; e um fluxo de vídeo (sequência de quadros
+  de imagem) codificado no formato Theora~\cite{theora}.
 \item O elemento ``oggdemux'' lê da sua \en{sink pad} um fluxo de bytes
   codificado no formato Ogg, demultiplexa-o e escreve os fluxos Vorbis
   (áudio) e Theora (vídeo) resultantes nas \en{source pads} correspondentes.
@@ -234,8 +247,8 @@ estão decodificando dados Vorbis e Theora.
 A descrição anterior seria suficiente se estivéssemos interessados apenas em
 exibir as amostras decodificadas o mais rápido possível.  Mas esse não é
 caso.  Queremos ``tocar'' o vídeo original em tempo real, isto é,
-reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Nesse
-caso, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
+reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Sendo
+assim, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
 e vídeo devem ser exibidas na taxa correta.  Valores típicos para essas
 taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo; ou
 seja, a cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
@@ -253,12 +266,12 @@ precedem os \en{sinks} (fluxo acima) operarem rápido o bastante, as filas
 dos \en{sinks} nunca ficarão vazias e todas as amostras serão exibidas no
 momento correto, mas esse nem sempre é o caso.
 
-Se os elementos fluxo acima operarem abaixo da taxa de consumo dos
+Se os \rghl{elementos fluxo}{?} acima operarem abaixo da taxa de consumo dos
 \en{sinks}, pode ser que a fila interna de um dos \en{sinks} fique vazia e,
 caso chegue o momento de exibir uma amostra, o \en{sink} simplesmente não
 tenha o que exibir, causando interrupções ou saltos na reprodução (amostras
 ``atrasadas'' quando chegarem serão descartadas).  Há ainda o problema
-inverso.  Se os elementos fluxo acima operarem muito acima da taxa de
+inverso.  Se os \rghl{elementos fluxo}{?} acima operarem muito acima da taxa de
 consumo dos \en{sinks}, pode ser que a capacidade da fila interna seja
 excedida e amostras sejam~perdidas.  Para evitar ambos os problemas,
 esvaziamento ou estouro das filas, ou mesmo para limitar o uso de CPU, os
@@ -268,7 +281,7 @@ chega.  Os elementos fluxo acima (produtores e processadores) podem capturar
 esses eventos e usar a informação de retardo para ajustar a sua taxa de
 operação.
 
-Dois tipos de dados trafegam através das conexões de um \en{pipeline}
+Dois tipos de dados trafegam através das conexões (arestas) de um \en{pipeline}
 GStreamer: segmentos de dados (\en{buffers}) e eventos (\en{events}).  Os
 \en{buffers} carregam segmentos do conteúdo processado entre \en{pads} (por
 exemplo, amostras de áudio e vídeo codificadas ou \en{raw}) e fluem
@@ -286,7 +299,7 @@ internos devem ser descarregados.
 conceitualmente cada conexão entre as \en{pads} dos elementos pode ser
 entendida como consistindo de dois canais, um canal unidirecional para
 \en{buffers} e outro canal bidirecional para eventos.
-A Figura~\ref{fig:conexao} ilustra a estrutura interna, conceitual de uma
+A Figura~\ref{fig:conexao} ilustra a estrutura interna conceitual de uma
 conexão entre \en{pads}.  Na figura,``B'' é o canal de \en{buffers} e ``E''
 é o canal de eventos.
 
@@ -315,8 +328,8 @@ conexão entre \en{pads}.  Na figura,``B'' é o canal de \en{buffers} e ``E''
 A discussão do modelo \en{dataflow} e da sua instanciação no GStreamer se
 encerra aqui.  Na maior parte do tempo, programar no GStreamer consiste em
 montar \en{pipelines} e controlar seu funcionamento.  Até agora discutimos
-de maneira abstrata os conceitos envolvidos nessa montagem e controle.  Está
-na hora de ver esses conceitos na~prática.
+de maneira abstrata os conceitos envolvidos nessa montagem e controle.  A
+partir da próxima seção, veremos como utilizar esses conceitos na prática.
 
 
 \section{Olá mundo: Tocando um vídeo}
