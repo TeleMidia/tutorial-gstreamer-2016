@@ -934,8 +934,8 @@ Listagens~\ref{lst:hello},~\ref{lst:mp3} e~\ref{lst:ogg}:
 @\$@ gst-launch filesrc location=bunny.mp3 ! mad ! alsasink
 
 @\$@ gst-launch filesrc location=bunny.ogg ! oggdemux name=demux\
-                  demux. ! vorbisdec ! audioconvert ! alsasink\
-                  demux. ! queue     ! theoradec    ! xvimagesink
+               demux. ! vorbisdec ! audioconvert ! alsasink\
+               demux. ! queue     ! theoradec    ! xvimagesink
 \end{lstlisting}
 
 O primeiro comando anterior cria um \en{pipeline} contendo apenas o elemento
@@ -1131,7 +1131,7 @@ seguinte adiciona o filtro ``volume'' ao \en{pipeline} da
 Listagem~\ref{lst:mp3}, que reproduz um arquivo de áudio MP3.
 \begin{lstlisting}[style=command]
 @\$@ gst-launch filesrc location=bunny.mp3\
-                  ! mad ! volume volume=.5 ! alsasink
+               ! mad ! volume volume=.5 ! alsasink
 \end{lstlisting}
 Nesse caso, o áudio é reproduzido com a metade do volume original---a
 propriedade ``volume'' do elemento ``volume'', inicializada com o valor~.5,
