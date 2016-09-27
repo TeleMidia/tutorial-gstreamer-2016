@@ -17,8 +17,8 @@ Até agora só vimos como usar elementos já definidos pelo Gstreamer (e.g.
 ``filesrc'', ``alsasink'').  Nesta seção iremos discutir de forma introdutória
 como é possível criar novos tipos de elementos.  O objetivo nesta seção não é
 detalhar cada uma das funções/classes do GStreamer que permitem que ele seja
-extendido~(para isso existe o manual e documentação do código GStreamer).  Por
-outro lado, o objetivo é permitir a partir de dois exemplos concretos que o
+estendido~(para isso existe o manual e documentação do código GStreamer), mas
+sim permitir, a partir da discussão de dois exemplos concretos, que o
 leitor possa ter uma visão geral de como desenvolver novos elementos.  A
 prática de desenvolvê-los irá nos permitir identificar as principais funções
 que devem ser implementadas por um novo elemento do Gstreamer e como
@@ -29,7 +29,7 @@ GStreamer, e possivelmente também o seu código.
 \subsection*{Elemento ``myfilter''}
 No Gstreamer, novos tipos de elementos podem ser criados estendendo a classe
 base \C{GstElement}.  Também é possível encapsular esses novos elementos em
-plugins que podem ser distribuidos separadamente, instalados e carregados
+plugins que podem ser distribuídos separadamente, instalados e carregados
 dinamicamente.  Para entendermos como desenvolver um novo elemento para o
 GStreamer, iremos começar com um exemplo simples (que chamaremos de
 ``myfilter'') que ao receber algum dado no seu \en{sink pad} irá apenas
@@ -41,16 +41,17 @@ seguir.
 O arquivo \C{myfilter.h} (Listagem~\ref{lst:myfilter_h}) declara uma classe que
 representa o novo tipo de elemento que queremos criar (\C{GstMyFilter}).  A
 definição dessa classe segue o padrão do \emph{framework} GObject, e deve
-estender a classe \C{GStElement} (definida no arquivo \C{gst/gst.h}).  Por
+estender a classe \C{GstElement} (definida no arquivo \C{gst/gst.h}).  Por
 isso, é necessário criar as estruturas \C{_GstMyFilter}~(linhas 6--9) e
 \C{_GstMyFilterClass}~(linhas 11--13).  A classe \C{GstMyFilter} deve estender
 a classe \C{GstElement}---por isso a estrutura \C{_GstMyFilter} define o campo
 \C{element} do tipo \C{GstElement}, linha 7, e a estrutura
 \C{_GstMyFilterClass} define o campo \C{parent_class} do tipo
 \C{GstElementClass}, linha 12.  As linhas 15--24 definem macros padrões que
-usam o \en{framework} GObject para checagem e \C{casting} do novo tipo
+usam o \en{framework} GObject para checagem e \en{casting} do novo tipo
 definido.  Por fim, a função \C{get_my_filter_get_type}, declarada na linha 26,
-é requerida pelo \en{framework} GObject.
+é requerida pelo \en{framework} GObject para criar novas instâncias da 
+classe \C{GstMyFilter}.
 
 \lstinputlisting[
 style=display,
@@ -59,11 +60,28 @@ label={lst:myfilter_h},
 ]{src/myfilter.h}
 
 O arquivo \C{myfilter.c}~(Listagem~\ref{lst:myfilter_c}) implementa as funções
-que permitem ao Gstreamer carregar instâncias deste novo elemento e utilizá-las
+que permitem ao GStreamer carregar instâncias deste novo elemento e utilizá-las
 em \en{pipeline}s, bem como a lógica do processamento realizado por esse
 elemento.  A principais funções são as funções de inicialização (\C{*_init}) e
-a de processamento (\C{*_chain}).
+a de processamento (\C{*_chain}). A Tabela~\ref{tab:funcs} descreve brevemente
+essas funções.
 
+\begin{table}
+  \centering
+  \begin{tabular}{ | l | c |}
+    \hline
+    Função         & Descrição \\ \hline\hline
+    *\_class\_init & Inicializa uma classe \\ \hline
+    *\_init        & Inicializa uma instância de uma classe \\ \hline
+    *\_chain       & Chamada quando há novos \textit{buffers} no 
+                      \textit{sink pad} \\ \hline
+  \end{tabular}
+  \caption{Principais funções para definição de um novo elemento.}
+  \label{tab:funcs}
+\end{table}
+
+%Rodrigo: Acho que esse parágrafo podia sair ou deixar apenas a primeira frase
+%         dele. Não sei se precisa entrar em tantos detalhes dessa função.%
 A função \C{gst_my_filter_class_init}~(linhas 30--48) é chamada na primeira vez
 que um objeto do tipo \C{GstMyFilter} for instanciado.  Essa função define
 metadados para a classe, por meio do método \C{gst_class_set_static_metadata},
@@ -119,8 +137,8 @@ As linhas 70 a 78 trazem as definições relacionadas ao encapsulamento do nosso
 novo elemento em um plugin.  A macro \C{GST_PLUGIN_DEFINE} é usada para
 definir o ponto de entrada (a função que será chamada quando o plugin for
 carregado pelo GStreamer) e metadados para um plugin.  A macro recebe a versão
-para do Gstreamer que é compatível com o  plugin (dividido em \en{major} e
-\en{minor}), o nome do plugin, uma descrição o plugin, um ponteiro para a
+do GStreamer que é compatível com o  plugin (dividido em \en{major} e
+\en{minor}), o nome do plugin, uma descrição do plugin, um ponteiro para a
 função de inicialização~(no nosso caso \C{my_filter_plugin_init}).  A função 
 \C{my_filter_plugin_init} é chamada quando o GStreamer carrega o plugin.  No
 nosso exemplo, ela apenas registra a classe \C{GstMyFilter}, por meio da função
@@ -223,8 +241,8 @@ será mapeado para uma posição $(x, y)$ no frame de saída segundo a fórmula:
   \end{cases}
   \label{eq:wave_filter}
 \end{equation}
-onde $FACTOR$ é um parâmetro (um valor real) especificado pelo usuário do
-elemento.
+onde $FACTOR$ é uma propriedade (um valor real) cujo valor pode ser atribuído
+após a instanciação do elemento.
 
 Assim como o exemplo anterior, o elemento \en{myvideofilter} também está
 dividido em dois arquivos: \C{myvideofilter.h} e \C{myvideofilter.c}.
@@ -246,10 +264,12 @@ label={lst:myvideofilter_h},
 O arquivo \C{myvideofilter.c}~(Listagem~\ref{lst:myvideofilter_c}) implementa
 as principais funções da classe \C{MyVideoFilter}.  Comparado com o exemplo
 anterior as principais diferenças são: as capacidades dos \en{pads}; a
-definição da propriedade \C{factor}, a partir da qual o usuário pode adaptar o
-filtro passar quando usar o elemento em um \en{pipeline}; e a função de
-transformação.
+definição da propriedade \C{factor}, a partir da qual o usuário pode controlar 
+o efeito do filtro; e a função de transformação.
 
+%Rodrigo: Eu dividiria as funções em listagens diferentes. Primeiro mostraria
+%         só as *_init e depois, quando comentasse sobre propriedade,
+%         mostraria o get e set. Mesmo vale pra função *_transform%
 \lstinputlisting[
 style=display,
 caption={myvideofilter.c},
@@ -269,9 +289,9 @@ A definição das propriedades do elemento é feita baseada no \en{framework}
 GObject, por isso a definição da enumeração, linhas 27--29, e das funções
 \C{gst_my_video_filter_set_property} e \C{gst_myvideo_filter_get_property}.  Na
 função de inicialização da classe \C{gst_my_video_filter_class_init} também
-definimos que essas funções seram chamadas para tratar alterações nessas
-propriedades, linhas 128--129, e ``instalamos'' a propriedade por meio da
-chamada \C{g_object_install_property}, linhas 132--136.  O GStreamer consulta
+definimos que essas funções são chamadas para tratar alterações nessas
+propriedades, linhas 121--122, e ``instalamos'' a propriedade por meio da
+chamada \C{g_object_install_property}, linhas 125--130.  O GStreamer consulta
 as propriedades definidas por meio do GObject para saber quais os parâmetros
 que podem ser passados para o elemento.  Como mencionado anteriormente, é
 possível consultar os parâmetros de um elemento por meio do comando
@@ -279,27 +299,27 @@ possível consultar os parâmetros de um elemento por meio do comando
 
 Diferente da classe \C{GstElement}, que requer uma função de transformação que
 trabalhe com um buffer arbitário~(\C{GstBuffer}), a classe \C{GstVideoFilter}
-já permite que criamos uma função que recebe como entrada e produz como saída
+já permite que criemos uma função que recebe como entrada e produz como saída
 frames de vídeo (\C{GstVideoFrame}s).  Para isso, temos que implementar a
 função \C{transform_frame}.  No nosso caso, criamos a função
-\C{gst_my_video_transform_frame}, linhas 64--104, e a registramos como a função
-de transformação do frame de vídeo na 140.
+\C{gst_my_video_transform_frame}, linhas 64--97, e a registramos como a função
+de transformação do frame de vídeo na 133.
 
 A função \C{gst_my_video_transform} é de fato a mais importante do nosso exemplo.
 É nessa função onde os pixels do frame de entrada são mapeados em suas posições
-no frame de saída, conforme a Equação~\ref{eq:wave_filter}, linhas 90--100.
-Para podermos fazer isso aqui, usamos algumas macros do GStreamer, tais como
-\C{GST_VIDEO_FRAME_COM_WIDTH} e \C{GST_VIDEO_FRAME_COMP_HEIGHT}.  Alguns
-detalhes de como os pixels estão organizados no frame são necessários para
-podermos ``andar'' corretamente no frame e copiarmos os seus pixels para o
-frame de saída. 
+no frame de saída, conforme a Equação~\ref{eq:wave_filter}, linhas 83--94.
+% Para podermos fazer isso aqui, usamos algumas macros do GStreamer, tais como
+% \C{GST_VIDEO_FRAME_COM_WIDTH} e \C{GST_VIDEO_FRAME_COMP_HEIGHT}.  Alguns
+% detalhes de como os pixels estão organizados no frame são necessários para
+% podermos ``andar'' corretamente no frame e copiarmos os seus pixels para o
+% frame de saída. 
 
 Por fim, a definição do plugin e a função \C{gst_my_video_plugin_init} são bem
 similares ao exemplo anterior e não necessitam de mais detalhes aqui.
 
 \subsection*{Compilando e testando o elemento ``myvideofilter''}
 Para compilar o element ``myvideofilter'' como um plugin é possível usar um
-comando similar ao do exemplo anteriro.  A única diferença é que agora estamos
+comando similar ao do exemplo anterior.  A única diferença é que agora estamos
 nos baseando na classe base \C{GstVideoFilter} e, por isso, também temos que
 incluir as flags de compilação e linkagem dos pacote \C{gstreamer-video-1.0}.
 
@@ -310,7 +330,8 @@ incluir as flags de compilação e linkagem dos pacote \C{gstreamer-video-1.0}.
      myvideofilter.c -o myvideofilter.so
 \end{lstlisting}
 
-Se tudo correr bem com o comando acima, o arquivo \C{myvideofilter.so} será
+Se tudo correr bem com o comando acima, o arquivo \C{myvideofilter.so} (ou .dll
+no caso do sistema operacional Windows) será
 gerado e já é possível usar elemento em \en{pipeline}s do GStreamer; como por
 exemplo:
 
