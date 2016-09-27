@@ -126,10 +126,12 @@
     {→}{$\rightarrow$}1%
 }
 \renewcommand{\lstlistingname}{Listagem}
+\newdimen\xdim
+\xdim=-.5\baselineskip
 \lstdefinestyle{command}{
   basicstyle=\small\ttfamily,
   aboveskip=\abovedisplayskip,
-  belowskip=\belowdisplayskip,
+  belowskip=.5\belowdisplayskip,
 }
 \lstdefinestyle{display}{
   aboveskip=\abovedisplayskip,
@@ -139,13 +141,6 @@
   frame=tb,
   numbers=left,
   numberstyle={\tiny\sffamily},
-}
-\lstdefinestyle{display-tiny}{
-  aboveskip=\abovedisplayskip,
-  basicstyle=\tiny\ttfamily,
-  belowskip=0pt,
-  captionpos=b,
-  frame=tblr,
 }
 %% -------------------------------------------------------------------------
 \def\en#1{\foreignlanguage{english}{\emph{#1}}}

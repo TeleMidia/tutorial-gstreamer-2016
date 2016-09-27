@@ -64,7 +64,7 @@ int main (int argc, char *argv[])
   if (argc != 2)
     return (g_printerr ("usage: %s FILE\n", g_get_prgname ()), 1);
 
-  pipeline = gst_pipeline_new ("ogg");
+  pipeline = gst_element_factory_make ("pipeline", "ogg");
   src = gst_element_factory_make ("filesrc", "src");
   demux = gst_element_factory_make ("oggdemux", "demux");
   g_assert (pipeline && src && demux);
