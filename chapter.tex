@@ -26,7 +26,7 @@
   às operações usuais de reprodução de vídeo (\en{start}, \en{stop},
   \en{seek}, \en{fast-forward} e~\en{rewind}).  Discutimos também
   filtros---elementos que manipulam as amostras de áudio e vídeo---e
-  apresnetamos os diversos filtros disponíveis nativamente no GStreamer.  Além
+  apresentamos os diversos filtros disponíveis nativamente no GStreamer.  Além
   disso, mostramos como estender o \en{framework} criando um \en{plugin} com um
   filtro simples que manipula amostras de vídeo.  O único pré-requisito para
   o minicurso é um conhecimento básico da linguagem de programação~C\null.
@@ -1122,13 +1122,13 @@ apresenta alguns filtros de áudio e vídeo disponíveis no GStreamer.
 \end{table}
 \vskip-\baselineskip
 
-Todo filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.
-Ambas as \en{pads} têm disponibilidade \en{always} e escoam apenas fluxos
-descomprimidos (\en{mime type} ``audio/x-raw'' ou ``video/x-raw'').
-Consequentemente, num \en{pipeline} os elementos filtros normalmente
-aparecem entre os decodificadores e os \en{sinks}.  Por exemplo, o comando
-seguinte adiciona o filtro ``volume'' ao \en{pipeline} da
-Listagem~\ref{lst:mp3}, que reproduz um arquivo de áudio MP3.
+Todo filtro possui exatamente uma \en{source pad} e uma \en{sink pad}; ambas
+têm disponibilidade \en{always} e escoam apenas fluxos descomprimidos
+(``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, num \en{pipeline}
+os elementos filtros normalmente aparecem entre os decodificadores e os
+\en{sinks}.  Por exemplo, o comando seguinte adiciona o filtro ``volume'' ao
+\en{pipeline} da Listagem~\ref{lst:mp3}, que reproduz um arquivo de áudio
+MP3.
 \begin{lstlisting}[style=command]
 @\$@ gst-launch filesrc location=bunny.mp3\
                ! mad ! volume volume=.5 ! alsasink
@@ -1159,7 +1159,7 @@ figura, os elementos~$\<\text{\en{audio filter}}>$
 e~$\<\text{\en{video filter}}>$ variam de acordo com o segundo argumento do
 \en{script}, e os elementos ``audioconvert'' e ``videoconvert'' garantem que
 os filtros selecionados gerem (e recebam, no caso do filtro de vídeo)
-amostras no formato esperado.  Há cinco possíveis combinações de filtros:
+amostras no formato esperado.  Há cinco combinações de filtros possíveis:
 \begin{itemize}
 \item Se o argumento é~0, pela linha~2, o \en{script} utiliza o filtro de
   áudio ``volume'' (com ``volume''~2) e o filtro de vídeo ``coloreffects''
@@ -1257,7 +1257,7 @@ Concluindo a seção, a Listagem~\ref{lst:filtros} apresenta um trecho do
 programa~C equivalente ao \en{script} da Listagem~\ref{lst:filtros-sh}.
 O trecho corresponde ao código da \en{callback} \C{pad_added_cb} disparada
 pelo sinal ``pad-added'' do elemento ``uridecodebin''.  O código da função
-\C{main} apesar de omitido é trivial.  Ela cria um elemento
+\C{main} apesar de omitido é trivial.  Ele cria um elemento
 ``uridecodebin'', atribui à sua propriedade ``uri'' o primeiro argumento do
 programa, registra em seu sinal ``pad-added'' a \en{callback}
 \C{pad_added_cb} e passa como dado opcional da \en{callback} o segundo
@@ -1267,7 +1267,7 @@ selecionados).  Em seguida, a \en{thread} da aplicação transiciona o
 liberar os dados alocados e terminar o programa.  A operação da
 \en{callback} é similar àquela da Listagem~\ref{lst:ogg}.  A diferença aqui
 é que os filtros são criados de acordo com o segundo argumento da aplicação
-(inteiro passado por referência à \en{callback} via o parâmetro~\C{data}).
+(passado por referência à \en{callback} via o parâmetro~\C{data}).
 
 \lstinputlisting[
 style=display,
@@ -1277,6 +1277,48 @@ caption={Trecho do programa~C equivalente ao \en{script}
 da Listagem~\ref{lst:filtros-sh}.},
 label={lst:filtros},
 ]{src/filter.c}
+
+
+\section{Adicionando os controles~\en{play}, \en{pause},
+\en{stop}, \en{seek}, \en{fast-foward} e~\en{rewind}}
+
+Os programas que vimos até agora não são interativos.  Assim que inciados,
+eles constroem um \en{pipeline} que reproduz o conteúdo do inicio ao fim uma
+única vez.  Nesta seção vamos adicionar os controles \en{play}, \en{pause},
+\en{stop}, \en{seek}, \en{fast-forward} e \en{rewind} ao programa ``Olá
+mundo'' da Listagem~\ref{lst:hello}.  Nosso objetivo é fazer com que o
+programa responda interativamente aos seguintes comandos de tecla:
+\begin{center}
+  \begin{tabular}{cl}
+    \keystroke{SPC} & pausa ou resume a reprodução
+                      (\en{pause} e \en{play})\\[2\jot]
+    \keystroke{$\to$} & avança~5s (\en{seek})\\[2\jot]
+    \keystroke{$\leftarrow$} & retrocede~5s (\en{seek})\\[2\jot]
+    \keystroke{F} & reproduz 2x mais rápido (\en{fast-foward})\\[2\jot]
+    \keystroke{R} & reproduz ao contrário 2x mais rápido
+                    (\en{rewind})\\[2\jot]
+    \keystroke{N} & reproduz na velocidade original\\[2\jot]
+    \keystroke{Q} & para a reprodução e termina o programa (\en{stop})
+  \end{tabular}
+\end{center}
+Observe que escolhemos o programa ``Olá mundo'' apenas para simplificar as
+listagens apresentadas.  Os mecanismos para captura de teclas e controle do
+\en{pipeline} descritos sobre esse exemplo são gerais e se aplicam a
+qualquer aplicação GStreamer.  Vejamos primeiro como adicionar os controles
+mais simples: \en{play}, \en{pause} e~\en{stop}.
+
+
+\subsection*{\en{Play}, \en{pause} e \en{stop}}
+
+\lstinputlisting[
+style=display,
+caption={Adicionando controles ao programa ``Olá mundo''
+  da Listagem~\ref{lst:hello}}.
+label={lst:controles},
+]{src/controls.c}
+
+
+\end{document}
 
 
 \clearpage
