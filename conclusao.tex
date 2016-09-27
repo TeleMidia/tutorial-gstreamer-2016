@@ -19,7 +19,7 @@ GStreamer, e como é possível estendê-lo.
 Apenas com o que se aprendeu neste minicurso e, facilmente usando outros
 elementos já suportados pelo GStreamer, já é possível que os leitores criem
 várias aplicações mais avançadas.  Por exemplo, é possível compor diversos
-vídeos e/ou áudios em um mesmo \en{pipeline}.  Elementos do tipo \en{mix}
+vídeos e/ou áudios em um mesmo \en{pipeline}.  Elementos \en{mixers}
 recebem vários fluxos de um mesmo tipo e geram uma única saída representando a
 composição daqueles fluxos. Exemplos de \en{mixers} de vídeo são os elementos
 \en{videomix} e \en{compositor}, enquanto os elementos \en{adder} e
@@ -88,7 +88,7 @@ por exemplo \en{rtpmanager}, \en{rtpbin}, \en{rtpjitterbuffer} etc.
 
 Outro tema importante, e relacionado tanto com aplicações locais como com
 aplicações em rede, diz respeito à QoS.  Neste minicurso, esse tema foi
-discutido apenas brevemente na Seção~\ref{}.  Porém, o GStreamer possui várias
+discutido apenas brevemente na Seção~\ref{sec:intro}.  Porém, o GStreamer possui várias
 funcionalidades avançadas com o objetivo de manter a QoS de aplicações
 multimídia.  Por exemplo, internamente, \en{pipelines} mantém um relógio do
 tipo \C{GstClock} usado para sincronizar a exibição dos \en{buffers}.
@@ -102,9 +102,9 @@ exemplo. É possível ainda criar relógios sincronizados com um servidor NTP
 (\C{GstNtpClock}) ou PTP (\C{GstPtpClock}).  Usando tais mecanismos, é possível
 usar o GStreamer como base para o desenvolvimento de aplicações multimídia
 avançadas, tais como aplicações que requerem a sincronização de mídias em
-múltiplos destinos~\cite{}, bem como aplicações que requerem a sincronização de
+múltiplos destinos, bem como aplicações que requerem a sincronização de
 mídias vindas de múltiplos \en{sources}~(por exemplo, cenários de TV digital
-híbridas)~\cite{}.
+híbridas)~\cite{Cesar-2016}.
 
 Este minicurso, obviamente, não teve a pretensão de exaurir todas essas
 funcionalidades do GStreamer, mas sim de servir como um material introdutório.
@@ -112,12 +112,12 @@ Consideramos que os leitores que tenham conseguido assimilar os conceitos aqui
 apresentados estejam aptos a se aventurar em outros tópicos mais avançados.  No
 site oficial do framework~\cite{gstreamer} há diversos materiais detalhando o
 funcionamento interno do GStreamer, bem como alguns tópicos não abordados aqui.
-Apesar de não ser essencial para o uso do GStreamer, para aqueles que querem se
-aventurar a trabalhar diretamente no código do GStreamer, noções do
-\en{framework} GObject também serão bem úteis.  Mais ainda, caso C não seja a
-sua linguagem favorita, existem também vários~\en{bindings} do GStreamer para
-outras
+Apesar de não ser essencial, àqueles que querem se aventurar a trabalhar 
+diretamente no código do GStreamer, ou mesmo estendê-lo por meio de
+\en{plugins}, noções do \en{framework} GObject~\cite{glib} serão bem úteis.  
+Mais ainda, caso C não seja a sua linguagem favorita, existem também 
+vários~\en{bindings} do GStreamer para outras
 linguagens\footnote{\url{https://gstreamer.freedesktop.org/bindings/}}---tais 
 como Python, Java, C++, Qt, Android, Vala, Ruby, Haskell etc---por meio das
-quais você também pode tirar proveito do poder do GStreamer.
+quais você pode tirar proveito do poder do GStreamer.
 
