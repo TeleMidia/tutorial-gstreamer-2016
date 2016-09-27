@@ -1168,13 +1168,14 @@ apresenta alguns filtros de áudio e vídeo disponíveis no GStreamer.
 \end{table}
 \vskip-\baselineskip
 
-Todo filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.
+Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.
 Ambas as \en{pads} têm disponibilidade \en{always} e escoam apenas fluxos
 descomprimidos (\en{mime type} ``audio/x-raw'' ou ``video/x-raw'').
 Consequentemente, num \en{pipeline} os elementos filtros normalmente
 aparecem entre os decodificadores e os \en{sinks}.  Por exemplo, o comando
 seguinte adiciona o filtro ``volume'' ao \en{pipeline} da
-Listagem~\ref{lst:mp3}, que reproduz um arquivo de áudio MP3.
+Listagem~\ref{lst:mp3}/Figura~\ref{fig:pip-mp3}, que reproduz um arquivo de
+áudio MP3.
 \begin{lstlisting}[style=command]
 @\$@ gst-launch filesrc location=bunny.mp3\
                ! mad ! volume volume=.5 ! alsasink
@@ -1183,6 +1184,10 @@ Nesse caso, o áudio é reproduzido com a metade do volume original---a
 propriedade ``volume'' do elemento ``volume'', inicializada com o valor~.5,
 indica ao elemento que o volume das amostras deve ser reduzido à metade.
 
+\rg{Não vejo muita necessidade de termos esse shell script.  O nosso curso
+    não é de API~C do GStreamer?  O requisito para o leitor não é C?  Acho
+    que isso adiciona um requisito a mais.  Poderíamos focar só nesse
+    programa em C mesmo.}
 Vejamos agora um exemplo mais complexo.  O \en{shell script} da
 Listagem~\ref{lst:filtros-sh} usa o comando \en{gst-launch} para reproduzir
 um vídeo com um determinado efeito audiovisual.  O \en{script} recebe dois
@@ -1314,6 +1319,8 @@ liberar os dados alocados e terminar o programa.  A operação da
 \en{callback} é similar àquela da Listagem~\ref{lst:ogg}.  A diferença aqui
 é que os filtros são criados de acordo com o segundo argumento da aplicação
 (inteiro passado por referência à \en{callback} via o parâmetro~\C{data}).
+\rg{Por que não passar o nome do filtro como parâmetro para a aplicação?
+    Tornaria o programa mais genérico.}
 
 \lstinputlisting[
 style=display,
