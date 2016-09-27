@@ -70,7 +70,11 @@ pode ser usado para construir diversos tipos de aplicações multimídia tais co
 editores de vídeo, transcodificadores, transmissores de fluxos de mídia,
 \en{players} de mídia e motores de renderização de linguagens multimídia.
 
-O restante do capítulo está organizado da seguinte forma.  Na
+O restante do capítulo está %%
+%%
+\rc{organizado da seguinte forma.}{Rever essa descrição}
+%%
+Na
 Seção~\ref{sec:hello} apresentamos uma versão preliminar do exemplo base do
 minicurso: um \en{player} de vídeo simples, porém funcional.  Na
 Seção~\ref{sec:dissec} discutimos o que está por trás do código aparentemente
@@ -129,8 +133,8 @@ ator e vice versa).
 A Figura~\ref{fig:pipe-tipico} apresenta o leiaute de um \en{pipeline} típico
 para processamento multimídia.  O leiaute nesse caso é uma versão simplificada
 do \en{pipeline} de uma aplicação GStreamer que reproduz um vídeo
-Ogg~\cite{ogg-rfc-3533}.  Ogg~\cite{ogg-rfc-3533} é um formato para
-multiplexação de fluxos de áudio, vídeo e texto.  Os nós da figura representam
+Ogg~\cite{ogg-rfc-3533} (formato para multiplexação de fluxos de áudio, 
+vídeo e texto).  Os nós da figura representam
 atores e as arestas representam as conexões por onde fluem as amostras de áudio
 e vídeo e dados de controle.  Na terminologia do GStreamer os atores são
 chamados de ``elementos'' e as portas de~``\en{pads}''.  Há dois tipos de
@@ -170,6 +174,23 @@ apenas consomem dados.
                           -- (theoradec.west);
     \draw [->, arrow] (vorbisdec) -- (alsasink);
     \draw [->, arrow] (theoradec) -- (xvimagesink);
+
+    %%pads
+    \filldraw[black] ($(filesrc.east)-(0,.05)$) rectangle ($(filesrc.east)+(.05,.05)$);
+
+    \filldraw[black] ($(oggdemux.west)+(0,.05)$) rectangle ($(oggdemux.west)-(.05,.05)$);
+    \filldraw[black] ($(oggdemux.north east)-(0,.3)$) rectangle ($(oggdemux.north east)+(.05,-.15)$);
+    \filldraw[black] ($(oggdemux.south east)+(0,.3)$) rectangle ($(oggdemux.south east)+(.05,.15)$);
+
+    \filldraw[black] ($(vorbisdec.west)-(0,.05)$) rectangle ($(vorbisdec.west)+(-.05,.05)$);
+    \filldraw[black] ($(vorbisdec.east)-(0,.05)$) rectangle ($(vorbisdec.east)+(.05,.05)$);
+    
+    \filldraw[black] ($(theoradec.west)-(0,.05)$) rectangle ($(theoradec.west)+(-.05,.05)$);
+    \filldraw[black] ($(theoradec.east)-(0,.05)$) rectangle ($(theoradec.east)+(.05,.05)$);
+    
+    \filldraw[black] ($(alsasink.west)-(0,.05)$) rectangle ($(alsasink.west)+(-.05,.05)$);
+
+    \filldraw[black] ($(xvimagesink.west)-(0,.05)$) rectangle ($(xvimagesink.west)+(-.05,.05)$);
   \end{tikzpicture}
   \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
   \label{fig:pipe-tipico}
