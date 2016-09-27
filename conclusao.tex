@@ -1,0 +1,107 @@
+\section{Conclusão}
+\label{sec:conclusao}
+Neste minicurso apresentamos uma visão introdutória do \en{framework} GStreamer. 
+Discutimos o modelo de \en{dataflow} no qual ele se baseia e como esse modelo
+é implementado internamente utilizando os conceitos de elementos, \en{pads} e 
+\en{pipeline}. Por meio da implementação de vários exemplos mostramos como
+se dá o processo de desenvolvimento de aplicações no GStreamer. No entanto,
+como o \en{framework} é bastante abrangente, alguns tópicos avançados não
+foram apresentados. Aqui discutimos rapidamente alguns desses tópicos 
+para nortear os leitores sobre a existência dessas funcionalidades. 
+
+O GStreamer dá suporte à implementação de aplicações que transmitem e/ou
+recebem dados pela rede. Por exemplo, o pacote \en{gst-plugins-good} implementa
+vários elementos que podem ser usados para criar servidores de \en{streaming}
+RTP/RTCP/RTSP. Em linhas gerais, um servidor RTP deve empacotar fluxos
+codificados em um dado formato em pacotes RTP e enviá-los por meio do 
+protocolo UDP, como ilustrado no \en{pipeline} da Figura~\ref{fig:rtp-server}.
+O elemento \en{rtptheorapay} recebe um fluxo de vídeo Theora e o encapsula
+em pacotes RTP que são enviados pela rede pelo elemento \en{udpsink} usando
+o protocolo UDP. De forma análoga, um cliente para esse servidor poderia ser 
+implementado usando o elemento \en{udpsrc}, que recebe um fluxo de dados UDP,
+conectado ao elemento \en{rtptheoradepay}, que desempacota os pacotes RTP gerando
+como saída um fluxo de vídeo Theora, como ilustrado no \en{pipeline} da
+Figura~\ref{fig:rtp-client}. Além de elementos que encapsulam e desencapsulam 
+formatos específicos de fluxos em pacotes RTP, no GStreamer há diversos outros 
+elementos que facilitam a implementação de aplicações de \en{streaming}, como
+por exemplo \en{rtpmanager}, \en{rtpbin}, \en{rtpjitterbuffer}, etc.
+
+\begin{figure}[H]
+  \centering
+  \subfigure [Servidor RTP]
+  {
+    \begin{tikzpicture}
+      \node (filesrc) [element] {filesrc};
+      \node (oggdemux) [element, right of=filesrc] {oggdemux};
+      \node (rtptheorapay) [element, right of=oggdemux] {rtptheorapay};
+      \node (udpsink) [element, right of=rtptheorapay] {udpsink};
+      \draw [->, arrow] (filesrc) -- (oggdemux);
+      \draw [->, arrow] (oggdemux) -- (rtptheorapay);
+      \draw [->, arrow] (rtptheorapay) -- (udpsink);
+    \end{tikzpicture}
+    \label{fig:rtp-server}
+  }
+  \subfigure [Cliente RTP]
+  {
+    \begin{tikzpicture}
+      \node (udpsrc) [element] {udpsrc};
+      \node (rtptheoradepay) [element, right of=udpsrc] {rtptheoradepay};
+      \node (theoradec) [element, right of=rtptheoradepay] {theoradec};
+      \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
+      \draw [->, arrow] (udpsrc) -- (rtptheoradepay);
+      \draw [->, arrow] (rtptheoradepay) -- (theoradec);
+      \draw [->, arrow] (theoradec) -- (xvimagesink);
+    \end{tikzpicture}
+    \label{fig:rtp-client}
+  }
+  \caption{\en{Pipeline}s de um servidor e cliente RTP para vídeos 
+    OGG codificados no formato Theora.}
+  \label{fig:pipe-rtp-server}
+\end{figure}
+
+Internamente, \en{pipelines} mantém um relógio do tipo \C{GstClock} usado
+para sincronizar a exibição dos \en{buffers}. Elementos \en{sink} usam esse
+relógio para controlar a renderização dos dados, bem como para descartar
+\en{buffers} que chegam atrasados. É possível sincronizar o relógio de 
+\en{pipelines} diferentes (mesmo em máquinas separadas) por meio dos objetos
+\C{GstNetTimeProvider} (expõe o tempo de um \C{GstClock} para a rede) 
+e \C{GstNetClientClock} (sincroniza o relógio de um \en{pipeline} a um
+objeto provedor de tempo -- \C{GstNetTimeProvider}), por exemplo. É possível
+ainda criar relógios sincronizados com um servidor NTP (\C{GstNtpClock}) 
+ou PTP (\C{GstPtpClock}).
+
+O GStremaer permite que dados sejam adicionados ou removidos do \en{pipeline}
+por meio dos elementos \en{appsrc} e \en{appsink}, respectivamente. \en{Appsrc}
+é um elemento do tipo \en{source} e é usado para injetar dados customizados em
+um \en{pipeline}. Um típico exemplo de uso desse elemento é na renderização
+de um formato de dados não suportado nativamente pelos elementos disponíveis
+no GStreamer (essa funcionalidade também pode ser implementada por meio da
+criação de um novo elemento, como ilustrado na Seção~\ref{sec:plugins}).
+\en{Appsink} é um elemento do tipo \en{sink} usado para receber os \en{buffers}
+de saída de uma aplicação. Um cenário de uso para o \en{appsink} é quando se
+deseja embutir a saída de um \en{pipeline} em outra uma outra aplicação.
+
+É possível ainda compor diversos vídeos e/ou áudios em um mesmo \en{pipeline}.
+Elementos do tipo \en{mix} recebem vários fluxos de um mesmo tipo e geram uma
+única saída representando a composição daqueles fluxos. Exemplos de \en{mixers}
+de vídeo são os elementos \en{videomix} e \en{compositor}, enquanto os elementos
+\en{adder} e \en{audiomixer} são exemplos de \en{mixers} de áudio. 
+
+Um caso de uso alternativo do GStreamer é na transcodificação de mídias. 
+É possível criar \en{pipelines} que combinem elementos que decodifiquem
+um determinado formato produzindo um fluxo \en{raw} com elementos que recebem
+esse fluxo \en{raw} e o codifiquem em outro formato. Nesses casos, o \en{sink}
+\en{filesink} pode ser usado para escrever a saída do pipeline em um arquivo.
+
+Este minicurso não tem a pretensão ousada de exaurir todos as funcionalidades
+do GStreamer, mas servir como um material introdutório. Consideramos que os 
+leitores que tenham conseguido assimilar boa parte dos conceitos aqui
+apresentados estejam aptos a se aventurar em outros tópicos mais avançados.
+No site oficial do framework~\cite{gstreamer} há diversos materiais (a maioria
+em inglês) detalhando o funcionamento interno do GStreamer, bem como alguns
+tópicos não abordados aqui. Apesar de não ser essencial, noções do 
+\en{framework} GObject ajudam no melhor entendimento do 
+funcionamento do GStreamer. Há ainda \en{bindings} do \en{framework} para
+outras linguagens\footnote{\url{https://gstreamer.freedesktop.org/bindings/}},
+como Python, Java, C++, Qt, Android, Vala, Ruby, Haskell, etc.
+
