@@ -24,8 +24,8 @@
   implementamos sobre o exemplo, incrementando-o, de forma que ao final do
   minicurso obtemos um \en{player} de vídeo interativo completo, com suporte
   às operações usuais de reprodução de vídeo (\en{start}, \en{stop},
-  \en{seek}, \en{fast-forward} e~\en{rewind}).  Discutimos também filtros de
-  amostras---elementos que manipulam as amostras de áudio e vídeo.
+  \en{seek}, \en{fast-forward} e~\en{rewind}).  Discutimos também
+  filtros---elementos que manipulam as amostras de áudio e vídeo.
   Apresentamos os diversos filtros disponíveis nativamente no GStreamer e
   mostramos como estender o \en{framework} criando um \en{plugin} com um
   filtro simples que manipula amostras de vídeo.  O único pré-requisito para
@@ -45,7 +45,7 @@ flexível, ele suporta diversos formatos de áudio e vídeo, e é amplamente
 utilizado na indústria e na academia~\cite{gstreamer-apps}.
 O \en{framework} em si consiste de um conjunto de bibliotecas~C e
 ferramentas relacionadas.  Neste minicurso, apresentamos tanto a parte
-conceitual quanto a prática do \en{framework}.
+conceitual quanto a prática do GStreamer.
 
 Na parte conceitual, discutimos o modelo de computação \en{dataflow} no qual
 o GStreamer se baseia, e que também é adotado por outros \en{frameworks} e
@@ -54,45 +54,43 @@ Pure Data~\cite{Puckette-M-S-2007}, CLAM~\cite{Amatriain-X-2008},
 ChucK~\cite{Wang-G-2003}, Faust~\cite{Orlarey-Y-2009}, etc.  Nesse modelo,
 uma aplicação multimídia estrutura-se como um grafo em que os nós são
 elementos processadores e as arestas representam conexões entre elementos
-por onde fluem as amostras de áudio e vídeo e dados de controle.  O modelo
-de \en{dataflow} é particularmente interessante para multimídia porque
+por onde fluem os dados--e.g. as amostras de áudio e vídeo e dados de controle.
+O modelo de \en{dataflow} é particularmente interessante para multimídia porque
 possibilita implementações naturalmente paralelas, modulares e escaláveis.
 
 Na parte prática, apresentamos os principais conceitos da
-API~C~\cite{Kernighan-B-W-1988} básica do GStreamer~1.10, sua versão estável
-mais atual, e ilustramos o uso dessa API a partir da construção de um
-reprodutor (\en{player}) de vídeo.  Apesar de aqui estarmos interessados
+API~C~\cite{Kernighan-B-W-1988} básica (de baixo nível) do GStreamer~1.10, sua
+versão estável mais atual, e ilustramos o uso dessa API a partir da construção
+de um reprodutor (\en{player}) de vídeo.  Apesar de aqui estarmos interessados
 apenas na reprodução (decodificação e apresentação) de fluxos de mídia, essa
 mesma API pode ser utilizada para capturar fluxos de áudio e vídeo,
-codificá-los e transmiti-los na rede.  O GStreamer possui uma grande
-variedade de componentes para tratar cada uma dessas fases de processamento
-e, portanto, pode ser usado para construir diversos tipos de aplicações
-multimídia tais como editores de vídeo, transcodificadores, transmissores de
-fluxos de mídia, \en{players} de mídia e motores de renderização de
-linguagens multimídia.
+codificá-los e transmiti-los na rede.  O GStreamer possui uma grande variedade
+de componentes para tratar cada uma dessas fases de processamento e, portanto,
+pode ser usado para construir diversos tipos de aplicações multimídia tais como
+editores de vídeo, transcodificadores, transmissores de fluxos de mídia,
+\en{players} de mídia e motores de renderização de linguagens multimídia.
 
 O restante do capítulo está organizado da seguinte forma.  Na
 Seção~\ref{sec:hello} apresentamos uma versão preliminar do exemplo base do
-minicurso: um \en{player} de vídeo simples porém funcional.  Na
-Seção~\ref{sec:dissec} discutimos o que está por trás do código
-aparentemente simples do exemplo anterior e reconstruímos o mesmo exemplo
-usando a API básica (baixo nível) do GStreamer; essa versão reconstruída é o
-ponto de partida dos incrementos posteriores.  Na Seção~\ref{sec:filtros}
-apresentamos os principais filtros de áudio e vídeo disponíveis no GStreamer
-e discutimos como integrá-los ao exemplo.  Na Seção~\ref{sec:ops} discutimos
-a teoria por trás das operações usuais de controle de reprodução
-(\en{pause}, \en{seek}, \en{fast-foward} e~\en{rewind}) e implementamos o
-suporte a cada uma delas no exemplo.  Na Seção~\ref{sec:plugins}
-apresentamos a arquitetura de \en{plugins} do GStreamer e mostramos como
-implementar e integrar ao exemplo um \emph{plugin} simples contendo um
-elemento que manipula amostras de vídeo.  Finalmente, na
+minicurso: um \en{player} de vídeo simples, porém funcional.  Na
+Seção~\ref{sec:dissec} discutimos o que está por trás do código aparentemente
+simples do exemplo anterior e reconstruímos o mesmo exemplo usando a API básica
+do GStreamer; essa versão reconstruída é o ponto de partida dos incrementos
+posteriores.  Na Seção~\ref{sec:filtros} apresentamos os principais filtros de
+áudio e vídeo disponíveis no GStreamer e discutimos como integrá-los ao
+exemplo.  Na Seção~\ref{sec:ops} discutimos a teoria por trás das operações
+usuais de controle de reprodução (\en{pause}, \en{seek}, \en{fast-foward}
+e~\en{rewind}) e implementamos o suporte a cada uma delas no exemplo.  Na
+Seção~\ref{sec:plugins} apresentamos a arquitetura de \en{plugins} do GStreamer
+e mostramos como implementar e integrar ao exemplo um \en{plugin} simples
+contendo um elemento que manipula amostras de vídeo.  Finalmente, na
 Seção~\ref{sec:conclusao} discutimos funcionalidades avançadas do
 \en{framework} e listamos algumas referências para estudos posteriores.
 
 Antes de programar nossa primeira aplicação GStreamer, porém, é preciso
-entender o modelo de computação no qual o \en{framework} se baseia.  No
-restante dessa seção apresentamos esse modelo, \emph{dataflow}, e discutimos
-a forma como ele é instanciado no GStreamer.
+entender o modelo de computação no qual o \en{framework} se baseia, conhecido
+como \en{dataflow}.  No restante dessa seção apresentamos esse modelo e
+discutimos a forma como ele é instanciado no GStreamer.
 
 
 \subsection*{O modelo \en{dataflow} e sua instanciação no GStreamer}
@@ -167,15 +165,15 @@ consumidores apenas consomem dados.
 \end{figure}
 \vskip-\baselineskip
 
-Na figura acima há um elemento produtor (``filesrc''), três processadores
-(``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois consumidores
+Na Figura~\ref{fig:pipe-tipico} há um elemento produtor (``filesrc''), três
+processadores (``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois consumidores
 (``alsasink'' e ``xvimagesink'').  O elemento ``filesrc'' possui uma única
 \en{source pad} que está conectada à \en{sink pad} do elemento subsequente,
 ``oggdemux''.  Ou seja, os dados produzidos pelo elemento ``filesrc'' fluem
-através da sua \en{source pad} para a \en{sink pad} do elemento
-``oggdemux''.  No diagrama essa conexão entre as \en{pads} é representada
-pela aresta entre os elementos ``filesrc'' e ``oggdemux''.  Similarmente, as
-demais arestas denotam conexões entre \en{source pads} e \en{sink pads}.
+através da sua \en{source pad} para a \en{sink pad} do elemento ``oggdemux''.
+No diagrama essa conexão entre as \en{pads} é representada pela aresta entre os
+elementos ``filesrc'' e ``oggdemux''.  Similarmente, as demais arestas denotam
+conexões entre \en{source pads} e \en{sink pads}.
 
 O processo de desenvolvimento de uma aplicação GStreamer com \en{pipeline}
 estático (cuja topologia não muda em tempo de execução) é relativamente
@@ -390,8 +388,8 @@ aplicação, isto é, transiciona elemento ``playbin'' do seu estado inicial
 detalhes as consequências internas dessa transição.  Por enquanto, basta
 dizer que nesse ponto o elemento ``playbin''~(1) inspeciona o conteúdo
 apontado pela URI configurada, (2)~instancia e interconecta os elementos
-necessários para reproduzir esse conteúdo, (3)~inicia a sua reprodução numa
-\en{thread} separada e~(4) devolve o controle à \en{thread} principal da
+necessários para reproduzir esse conteúdo, (3)~inicia a sua reprodução em 
+uma \en{thread} separada e~(4) devolve o controle à \en{thread} principal da
 aplicação.
 
 A chamada \C{g_assert}, linha~23, é uma asserção que garante que a
@@ -402,7 +400,7 @@ executar a linha~23, e uma ou mais \en{threads} secundárias, que operam o
 \en{pipeline}.  A \en{thread} principal é chamada de ``\en{thread} da
 aplicação'' e as \en{threads} secundárias são chamadas de ``\en{streaming
   threads}''.  As \en{streaming threads} se comunicam com a \en{thread} da
-aplicação através de mensagens assíncronas postadas num barramento
+aplicação através de mensagens assíncronas postadas em um barramento
 (\en{bus}) associado ao \en{pipeline}.  Essas mensagens informam a
 \en{thread} da aplicação sobre acontecimentos internos do \en{pipeline}, por
 exemplo, mudança de estado de elementos, fim do fluxo, erros, \en{warnings},
@@ -520,7 +518,7 @@ label={lst:makefile},
 
 Na Seção~\ref{sec:hello} utilizamos o elemento ``playbin'' para tocar um
 vídeo Ogg no GStreamer.  Nesta seção, nosso objetivo é construir a mesma
-aplicação mas dessa vez sem usar o elemento ``playbin''.  Usando apenas
+aplicação, mas dessa vez sem usar o elemento ``playbin''.  Usando apenas
 elementos básicos (\en{sources}, demultiplexadores, decodificadores e
 \en{sinks}) vamos construir um \en{pipeline} semelhante ao da
 Figura~\ref{fig:pipe-tipico}, Seção~\ref{sec:intro}, que lê um arquivo Ogg
@@ -700,7 +698,7 @@ os elementos alocados nas linhas~15--28 são liberados.
 
 \subsection*{De volta ao problema inicial}
 
-Agora que vimos como alocar, adicionar e interconectar elementos num
+Agora que vimos como alocar, adicionar e interconectar elementos em um
 \en{pipeline} podemos voltar ao nosso problema inicial: construir um
 \en{pipeline} semelhante ao da Seção~\ref{sec:intro} que usa apenas
 elementos básicos para tocar um vídeo~Ogg.  Há uma diferença importante
@@ -940,7 +938,7 @@ Listagens~\ref{lst:hello},~\ref{lst:mp3} e~\ref{lst:ogg}:
                   demux. ! queue     ! theoradec    ! xvimagesink
 \end{lstlisting}
 
-O primeiro comando anterior cria um \en{pipeline} contento apenas o elemento
+O primeiro comando anterior cria um \en{pipeline} contendo apenas o elemento
 ``playbin'', atribui a URI do vídeo a ser tocado à propriedade ``uri'' do
 elemento e inicia o \en{pipeline}.  O segundo comando cria um \en{pipeline}
 com os elementos ``filesrc'', ``mad'' e ``alsasink'' conectados em série,
