@@ -1127,13 +1127,13 @@ apresenta alguns filtros de áudio e vídeo disponíveis no GStreamer.
 \end{table}
 \vskip-\baselineskip
 
-Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.  Ambas
-as \en{pads} têm disponibilidade \en{always} e escoam apenas fluxos
-descomprimidos (``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, num
-\en{pipeline} os elementos filtros normalmente aparecem entre os
-decodificadores e os \en{sinks}.  Por exemplo, o comando seguinte adiciona o
-filtro ``volume'' ao \en{pipeline} da Figura~\ref{fig:pipe-mp3}, que
-reproduz um arquivo de áudio MP3.
+Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.  Ambas as
+\en{pads} têm disponibilidade \en{always} e escoam apenas fluxos descomprimidos
+(``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, em um \en{pipeline} os
+elementos filtros normalmente aparecem entre os decodificadores e os
+\en{sinks}.  Por exemplo, o comando a seguir adiciona o filtro ``volume'' ao
+\en{pipeline} da Figura~\ref{fig:pipe-mp3}, que reproduz um arquivo de áudio
+MP3.
 \begin{lstlisting}[style=command]
 @\$@ gst-launch filesrc location=bunny.mp3\
                ! mad ! volume volume=.5 ! alsasink
