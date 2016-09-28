@@ -585,21 +585,21 @@ caption={Tocando um arquivo de áudio MP3.},
 label={lst:mp3},
 ]{src/mp3.c}
 
-\clearpage
 Na Seção~\ref{sec:intro}, discutimos a operação dos elementos ``filesrc'' e
 ``alsasink''.  O primeiro lê um arquivo do disco e gera um fluxo de bytes
 correspondente, e o segundo lê um fluxo de amostras de áudio PCM e as
 reproduz no dispositivo de saída de áudio.  Aqui, a novidade é o elemento
-processador, mais precisamente, decodificador ``mad''.  Ele lê da sua
+processador, mais precisamente, o decodificador ``mad''.  Ele lê da sua
 \en{source pad} um fluxo de bytes no formato~MP3, decodifica-o via
 MAD~\cite{mad} (biblioteca para decodificação de áudio MP3) e escreve na sua
-\en{sink pad} o fluxo de áudio PCM resultante.  Apesar de os três elementos,
+\en{sink pad} o fluxo de áudio PCM resultante.  
+Apesar de os três elementos,
 ``filesrc'', ``alsasink'' e ``mad'', fazerem parte do GStreamer, na prática,
 eles pertencem a pacotes diferentes, distribuídos separadamente.
 
-\rg{Sei que possivelmente não vai dá tempo, mas para mim, faz muito sentido
-tanto isso como a parte das ferramentas vir na Introdução.  A impressão que dá
-é que as coisas foram sendo jogadas na medida em que fomos lembrando.}
+% \rg{Sei que possivelmente não vai dá tempo, mas para mim, faz muito sentido
+% tanto isso como a parte das ferramentas vir na Introdução.  A impressão que dá
+% é que as coisas foram sendo jogadas na medida em que fomos lembrando.}
 A distribuição oficial do GStreamer possui cinco pacotes principais:
 (1)~\en{gstreamer}, contendo o núcleo do \en{framework};
 (2)~\en{gst-plugins-base}, contendo apenas os elementos básicos;
@@ -627,7 +627,7 @@ elemento de um \en{plugin} que não está instalado.  Na listagem, se isso
 acontecer a chamada \C{gst_element_factory_make} retornará~\C{NULL} e a
 asserção falhará, abortando o programa.
 
-Continuando, a chamada da \C{gst_bin_add_many}, linha~21, adiciona três filhos
+Continuando, a chamada da \C{gst_bin_add_many}, linha~21, adiciona três elementos 
 ao \en{pipeline}: ``filesrc'', ``mad'' e ``alsasink''.  Essa função recebe um
 \en{bin} (\C{GstBin}) e uma sequência de elementos (\C{GstElement}) terminada
 por \C{NULL}, e adiciona os elementos da sequência ao \en{bin}.  Note, que antes
@@ -640,8 +640,8 @@ conecta a \en{source pad} do ``filesrc'' à \en{sink pad} do ``mad'', e
 conecta a \en{source pad} do ``mad'' à \en{sink pad} do ``videosink''.
 A função \C{gst_element_link_many} recebe uma sequência de elementos
 terminada por \C{NULL} e conecta-os em série apenas se suas \en{pads} são
-compatíveis e se todos possuem o mesmo elemento pai (isto é, são todos
-filhos do mesmo \en{bin}).  A Figura~\ref{fig:pipe-mp3} apresenta a
+compatíveis e se todos possuem o mesmo elemento pai (isto é, se todos
+foram adicionados ao mesmo \en{bin}).  A Figura~\ref{fig:pipe-mp3} apresenta a
 estrutura interna do elemento ``pipeline'', variável~\C{pipeline}, após a
 chamada da linha~22.
 
