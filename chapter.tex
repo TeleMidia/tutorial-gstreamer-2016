@@ -668,7 +668,7 @@ chamada anterior, e as \en{streaming threads} já começaram a operar o
 \en{pipeline}, ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink'' já
 estão produzindo, processando e consumindo dados.
 
-\begin{figure}[b]
+\begin{figure}[h]
   \centering
   \begin{tikzpicture}[node distance=1.5\hdim+\odim]
     \node [state] (NULL) {null};
@@ -715,7 +715,7 @@ entre esse \en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico}) e o
 Enquanto no \en{pipeline} MP3 o número total de \en{pads} é fixo (conhecido
 em tempo de compilação) no \en{pipeline} Ogg esse número é variável.  Em
 particular, no \en{pipeline} Ogg o número de \en{sink pads} do elemento
-``oggdemux'' depende do número de subfluxos multiplexados fluxo Ogg de
+``oggdemux'' depende do número de subfluxos multiplexados no fluxo Ogg de
 entrada.  Por exemplo, se o fluxo Ogg possuir apenas um subfluxo Vorbis, o
 elemento ``oggdemux'' terá uma única \en{sink pad} que deverá ser conectada
 à \en{source pad} do elemento ``vorbisdec''.  No entanto, se o fluxo Ogg
@@ -897,7 +897,6 @@ do elemento ``queue'' se \C{srcpad} é do tipo Theora.  Finalmente, a chamada
 \C{gst_pad_link} (linha~48) conecta as \en{pads} \C{srcpad} e \C{sinkpad}, e
 as chamadas seguintes (linhas~50--53) liberam as referências utilizadas.
 
-\clearpage
 \lstinputlisting[
 style=display,
 caption={Tocando um arquivo de vídeo Ogg usando elementos básicos.},
@@ -911,7 +910,7 @@ uma mensagem de erro no \en{bus} (indicando que não há \en{sink pad}
 conectada) o que causa o desbloqueio da \en{thread} da aplicação e,
 consequentemente, o término do programa.
 
-Um detalhe sutil mas importante no código da Listagem~\ref{lst:ogg} é que a
+Um detalhe sutil, mas importante no código da Listagem~\ref{lst:ogg} é que a
 \en{callback} \C{pad_added_cb} e a função \C{main} executam em \en{threads}
 diferentes.  Consequentemente, caso elas compartilhem dados, para evitar
 condições de corrida, é necessário sincronizar o acesso a esses dados via
@@ -1042,8 +1041,6 @@ caption={Saída do comando ``\texttt{gst-inspect equalizer}'' no Arch
 label={lst:equalizer},
 ]{src/equalizer.out}
 
-\rg{Esses dois próximos parágrafos também são candidatos a sair se precisarmos
-    de espaço.}
 Na Listagem~\ref{lst:equalizer}, as linhas~2--4 apresentam o nome do
 \en{plugin} (``equalizer''), a sua descrição (equalizadores de áudio) e o
 caminho da biblioteca dinâmica contendo o código do \en{plugin}.  As
@@ -1304,7 +1301,7 @@ eles constroem um \en{pipeline} que reproduz o conteúdo uma única vez, do
 inicio ao fim.  Nesta seção vamos adicionar os controles \en{play},
 \en{pause}, \en{stop}, \en{seek}, \en{fast-forward} e \en{rewind} ao
 programa ``Olá mundo'' da Listagem~\ref{lst:hello}.  Nosso objetivo é fazer
-com que o programa responda interativamente aos seguintes comandos de tecla:
+com que o programa responda aos seguintes comandos de tecla:
 \begin{center}
   \begin{tabular}{cl}
     \keystroke{SPC} & pausa ou resume a reprodução
@@ -1368,12 +1365,12 @@ obtida na linha~28.
 
 A chamada \C{g_main_loop_run} (linha~35) inicia o \en{loop} de eventos da
 GLib.  A partir desse ponto a aplicação torna-se orientada a eventos, isto
-é, \en{thread} da aplicação passa a ser controlada pela GLib que apenas
-espera eventos e repassa-os as \en{callbacks} registradas (apenas
-\C{bus_cb}, no caso).  O controle só volta à \C{main} quando o \en{loop} é
+é, a \en{thread} da aplicação passa a ser controlada pela GLib que apenas
+espera eventos e repassa-os às \en{callbacks} registradas (apenas
+\C{bus_cb}, no caso).  O controle só volta para a \C{main} quando o \en{loop} é
 terminado explicitamente via uma chamada \C{g_main_loop_quit}---o que ocorre
-\en{callback} do \en{bus}.  Nesse caso, as chamadas restantes
-(linhas~37--39) liberam os dados alocados e terminam o programa.
+na \en{callback} do \en{bus}.  Nesse caso, as chamadas
+restantes~(linhas~37--39) liberam os dados alocados e terminam o programa.
 
 \lstinputlisting[
 style=display,
@@ -1382,18 +1379,18 @@ caption={Função~\texttt{main} do programa ``Olá mundo'' com controles.},
 label={lst:controles-main},
 ]{src/controls.c}
 
-Vejamos agora a operação da \en{callback} \C{bus_cb} cujo código é
-apresentado na Listagem~\ref{lst:controles-cb}.  A cada mensagem postada no
-\en{bus}, o \en{loop} de eventos chama essa \en{callback} com os seguintes
-argumentos: o \en{bus} (\C{bus}), a mensagem postada (\C{msg}) e o dado
-adicional passado à função \C{gst_bus_add_watch} (linha~32 da
-Listagem~\ref{lst:controles-main}) no momento do registro da \en{callback}
-(no caso, \C{NULL}).
+Vejamos agora a operação da \en{callback} \C{bus_cb}, cujo código é apresentado
+na Listagem~\ref{lst:controles-cb}.  A cada mensagem postada no \en{bus}, o
+\en{loop} de eventos chama essa \en{callback} com os seguintes argumentos: o
+\en{bus}, a mensagem postada e o dado adicional passado à função
+\C{gst_bus_add_watch} (linha~32 da Listagem~\ref{lst:controles-main}) no
+momento do registro da \en{callback} (no caso, \C{NULL}).
 
 Na Listagem~\ref{lst:controles-cb}, as chamadas das linhas~3 e~4 obtém as
-referências para o \en{pipeline} e para o \en{loop} armazenadas na \en{hash}
-do \en{bus}, e comando \C{switch} seguinte (linhas~5--37) trata a mensagem
-recebida de acordo com o seu tipo.  Há três possibilidades:
+referências, respectivamente, para o \en{pipeline} e para o \en{loop}
+armazenadas na \en{hash} do \en{bus}.  O comando \C{switch} seguinte
+(linhas~5--37) trata a mensagem recebida de acordo com o seu tipo.  Há três
+possibilidades:
 \begin{enumerate}
 \item Se a mensagem indica um erro ou o fim do fluxo (EOS), a \en{callback}
   termina o \en{loop} de eventos (linha~40) e remove a si mesmo da lista de
@@ -1408,7 +1405,7 @@ recebida de acordo com o seu tipo.  Há três possibilidades:
   função auxiliar \C{seek} se a tecla é ``right'' ou ``left'', chama a
   função auxiliar \C{speed} se a tecla é ``f'', ``r'' ou ``n'', e termina o
   \en{loop} se a tecla é ``q''.
-\item Caso contrário, a mensagem é ignorada (linha~38).
+\item Em todos os outros casos, a mensagem é ignorada (linha~38).
 \end{enumerate}
 
 \lstinputlisting[
@@ -1428,9 +1425,9 @@ entre \en{paused} e \en{playing} dependendo do estado atual:  se o
 ela o pausa.
 
 A função \C{seek} (linhas~14--23) requisita um salto de \C{offset}
-nanosegundos na reprodução do conteúdo a partir do seu ponto atual.
+nanosegundos (ns) na reprodução do conteúdo a partir do seu ponto atual.
 A chamada da linha~17 obtém o tempo absoluto do \en{pipeline} (ns) e
-armazena-o em \C{from}.  O atribuição seguinte calcula o tempo absoluto (ns)
+armazena-o em \C{from}.  A atribuição seguinte calcula o tempo absoluto (ns)
 em que o \en{pipeline} deve estar após o salto e armazena em \C{to}.
 Finalmente, a chamada \C{gst_element_seek_simple} (linhas~19--22) requisita
 o salto para o novo tempo absoluto~\C{to}.  A função
@@ -1448,19 +1445,19 @@ quadros chave (\en{key~frames}) devem ser decodificados.
 
 A última função, \C{speed}, (linhas~25--49) requisita uma mudança na taxa de
 reprodução do \en{pipeline} de acordo com o parâmetro \en{rate}.  Esse tipo
-de mudança de taxa é feita por meio da à função \C{gst_element_seek}, que é
+de mudança de taxa é feita por meio da função \C{gst_element_seek}, que é
 também utilizada para realizar operações de \en{seek} complexas.  Essa
 função recebe oito argumentos: (1)~o elemento alvo; (2)~a nova taxa de
 reprodução; (3)~o formato dos deslocamentos; (4)~\en{flags} opcionais; (5)~o
 tipo do início do desolamento; (6)~o novo inicio; (7)~o tipo do fim do
 deslocamento; e~(8) o novo fim.  Como aqui nosso objetivo é apenas alterar a
 taxa de reprodução o deslocamento é a própria posição atual do \en{fluxo}
-(variável \C{from} preenchida na linha~37).  Se a taxa é positiva o
-deslocamento é relativo relação ao início (linhas~32--38), caso contrário
+(variável \C{from} preenchida na linha~37).  Se a taxa é positiva, o
+deslocamento é relativo ao início (linhas~32--38), caso contrário
 ele é relativo ao fim (linhas~39--45).  Na pratica, valores de taxa
 superiores a~1 aumentam a velocidade de reprodução.  Valores entre~0 e~1
 fazem o conteúdo tocar em câmera lenta.  E valores negativos fazem o
-conteúdo tocar ao contrário
+conteúdo tocar ao contrário.
 
 \lstinputlisting[
 style=display,
