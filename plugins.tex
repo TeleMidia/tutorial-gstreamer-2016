@@ -331,14 +331,15 @@ Por exemplo, no GNU/Linux, podemos compilar com o seguinte comando:
 
 \begin{lstlisting}[style=command]
 @\$@ cc -shared  -fPIC \
-     `pkg-config --libs --cflags gstreamer-1.0 gstreamer-base-1.0 \
+     `pkg-config --libs --cflags gstreamer-1.0 \
+                                 gstreamer-base-1.0 \
                                  gstreamer-video-1.0` \
      myvideofilter.c -o myvideofilter.so
 \end{lstlisting}
 
 Se tudo correr bem com a compilação, o arquivo \C{myvideofilter.so} (ou .dll no
-caso do sistema operacional Windows) será gerado e já é possível usar elemento
-em \en{pipeline}s do GStreamer; como, por exemplo:
+caso do sistema operacional Windows) será gerado e já é possível usar o
+elemento ``myvideofilter'' em \en{pipeline}s do GStreamer; como, por exemplo:
 \begin{lstlisting}[style=command]
 @\$@ gst-launch --gst-plugin-path=. filesrc location=bunny.ogg ! \
      oggdemux ! theoradec ! videoconvert ! \
