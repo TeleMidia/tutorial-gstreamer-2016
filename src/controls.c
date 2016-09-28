@@ -13,7 +13,6 @@ int main (int argc, char *argv[])
   GMainLoop *loop;
 
   gst_init (&argc, &argv);
-
   playbin = gst_element_factory_make ("playbin", "hello");
   g_assert_nonnull (playbin);
 
@@ -37,7 +36,6 @@ int main (int argc, char *argv[])
   g_main_loop_unref (loop);
   gst_element_set_state (playbin, GST_STATE_NULL);
   gst_object_unref (playbin);
-
   return 0;
 }
 

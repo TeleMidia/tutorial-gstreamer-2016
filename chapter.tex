@@ -1292,8 +1292,8 @@ Os programas que vimos até agora não são interativos.  Assim que inciados,
 eles constroem um \en{pipeline} que reproduz o conteúdo uma única vez, do
 inicio ao fim.  Nesta seção vamos adicionar os controles \en{play},
 \en{pause}, \en{stop}, \en{seek}, \en{fast-forward} e \en{rewind} ao
-programa ``Olá mundo'' da Listagem~\ref{lst:hello}\footnotemark.  Nosso 
-objetivo é fazer com que o programa responda aos seguintes comandos de tecla:
+programa ``Olá mundo'' da Listagem~\ref{lst:hello}.  Nosso objetivo é fazer
+com que o programa responda aos seguintes comandos de tecla:
 \begin{center}
   \begin{tabular}{cl}
     \keystroke{SPC} & pausa ou resume a reprodução
@@ -1307,9 +1307,6 @@ objetivo é fazer com que o programa responda aos seguintes comandos de tecla:
     \keystroke{Q} & para a reprodução e termina o programa (\en{stop})
   \end{tabular}
 \end{center}
-
-\footnotetext{Para compilar o exemplo desta seção, precisamos adicionar
-o módulo ``gstreamer-video-1.0'' à ferramenta \en{pkg-config}.}
 
 Observe que escolhemos o programa ``Olá mundo'' apenas para simplificar as
 listagens apresentadas.  Os mecanismos para captura de teclas e controle do
@@ -1325,61 +1322,61 @@ posição e na taxa de reprodução do conteúdo.
 
 A Listagem~\ref{lst:controles-main} apresenta o trecho de código contendo a
 função \C{main} do novo programa ``Olá mundo'' (versão com controles).  Até
-a linha~28, o código da função é idêntico ao código correspondente na
+a linha~27, o código da função é idêntico ao código correspondente na
 Listagem~\ref{lst:hello}.  A diferença aqui está na forma como capturamos
 mensagens postadas no \en{bus}.  Até agora, para obter mensagens do
 \en{bus}, usamos a função \C{gst_bus_timed_pop_filtered}, que bloqueia a
 \en{thread} da aplicação até que tipos específicos de mensagens sejam
 postados.  Na Listagem~\ref{lst:controles-main}, como a aplicação é
 orientada a eventos, usamos uma técnica diferente, baseada no \en{loop} de
-eventos da~GLib~(\C{GMainLoop}).
+eventos da~GLib.
 
-O \en{loop} de eventos é criado pela chamada~\C{g_main_loop_new} na linha~29
+O \en{loop} de eventos é criado pela chamada~\C{g_main_loop_new} na linha~28
 da Listagem~\ref{lst:controles-main}.  O primeiro argumento da
 chamada~(\C{NULL}) indica que o \en{loop} irá receber eventos de qualquer
-fonte registrada via~GLib\footnote{Veja~\cite{glib} para mais informações
-  sobre \en{loops} de eventos na GLib.}, e o segundo argumento~(\C{FALSE})
-indica que o \en{loop} não deve ser iniciado imediatamente (iniciaremos o
-\en{loop} posteriormente).
+fonte registrada via~GLib, e o segundo argumento~(\C{FALSE}) indica que o
+\en{loop} não deve ser iniciado imediatamente (iniciaremos o \en{loop}
+posteriormente).
 
-As chamadas \C{g_object_set_data} seguintes (linhas~30--31) armazenam no
-\en{bus} ponteiros para o \en{pipeline} e para o \en{loop}.  Observe que o
-\en{bus} (\C{GstBus}) também é um objeto (\C{GObject}) e, como todo objeto,
-possui uma tabela \en{hash} em que podem ser armazenados dados de usuário
-(\en{user~data}).  No caso, a chamada das linhas~30--31 armazenam na
+As chamadas \C{g_object_set_data} seguintes (linhas~29--30) armazenam no
+\en{bus} ponteiros para o \en{pipeline} e para o \en{loop}.  O \en{bus}
+(\C{GstBus}) também é um objeto (\C{GObject}) e, como todo objeto, possui
+uma tabela \en{hash} em que podem ser armazenados dados de usuário
+(\en{user~data}).  No caso, a chamada das linhas~29--30 armazenam na
 \en{hash} do \en{bus} um ponteiro para o \en{pipeline}, indexado pela chave
 ``pipeline'', e um ponteiro para o \en{loop}, indexado pelo \en{loop}.  Isso
 é necessário porque mais tarde, na \en{callback} do \en{bus}, não temos
 acesso direto à esses objetos.
 
-A chamada \C{gst_bus_add_watch} (linha~32) registra a \en{callback}
+A chamada \C{gst_bus_add_watch} (linha~31) registra a \en{callback}
 \C{bus_cb} como tratadora (\en{listener}) de mensagens \en{bus}.  Ou seja, a
 \en{callback} será chamada no \en{loop} de eventos sempre que uma mensagem é
-postada no \en{bus}.  E a chamada seguinte (linha~33) libera a referência
-obtida na linha~28.
+postada no \en{bus}.  E a chamada seguinte (linha~32) libera a referência
+obtida na linha~27.
 
-A chamada \C{g_main_loop_run} (linha~35) inicia o \en{loop} de eventos da
+A chamada \C{g_main_loop_run} (linha~34) inicia o \en{loop} de eventos da
 GLib.  A partir desse ponto a aplicação torna-se orientada a eventos, isto
 é, a \en{thread} da aplicação passa a ser controlada pela GLib que apenas
 espera eventos e repassa-os às \en{callbacks} registradas (apenas
-\C{bus_cb}, no caso).  O controle só volta para a \C{main} quando o \en{loop} é
-terminado explicitamente via uma chamada \C{g_main_loop_quit}---o que ocorre
-na \en{callback} do \en{bus}.  Nesse caso, as chamadas
-restantes~(linhas~37--39) liberam os dados alocados e terminam o programa.
+\C{bus_cb}, no caso).  O controle só volta para a \C{main} quando o
+\en{loop} é terminado explicitamente via uma chamada
+\C{g_main_loop_quit}---o que ocorre na \en{callback} do \en{bus}.  Nesse
+caso, as chamadas restantes~(linhas~36--38) liberam os dados alocados e
+terminam o programa.
 
 \lstinputlisting[
 style=display,
-lastline=42,
+lastline=40,
 caption={Função~\texttt{main} do programa ``Olá mundo'' com controles.},
 label={lst:controles-main},
 ]{src/controls.c}
 
-Vejamos agora a operação da \en{callback} \C{bus_cb}, cujo código é apresentado
-na Listagem~\ref{lst:controles-cb}.  A cada mensagem postada no \en{bus}, o
-\en{loop} de eventos chama essa \en{callback} com os seguintes argumentos: o
-\en{bus}, a mensagem postada e o dado adicional passado à função
-\C{gst_bus_add_watch} (linha~32 da Listagem~\ref{lst:controles-main}) no
-momento do registro da \en{callback} (no caso, \C{NULL}).
+Vejamos agora a operação da \en{callback} \C{bus_cb}, cujo código é
+apresentado na Listagem~\ref{lst:controles-cb}.  A cada mensagem postada no
+\en{bus}, o \en{loop} de eventos chama essa \en{callback} com os seguintes
+argumentos: o \en{bus}, a mensagem postada e o dado adicional passado à
+função \C{gst_bus_add_watch} (linha~31 da Listagem~\ref{lst:controles-main})
+no momento do registro da \en{callback} (no caso, \C{NULL}).
 
 Na Listagem~\ref{lst:controles-cb}, as chamadas das linhas~3 e~4 obtém as
 referências, respectivamente, para o \en{pipeline} e para o \en{loop}
@@ -1393,19 +1390,17 @@ possibilidades:
 \item Se a mensagem é uma mensagem de elemento (linha~10), é também mensagem
   de evento de navegação (linhas~14--15) e indica um evento de
   pressionamento de tecla (linhas~18--19), então a \en{callback} executa a
-  operação associada à tecla pressionada.\footnote{Além de teclas, as
-    mensagens de evento de navegação podem ser usadas para capturar a
-    movimentação e cliques de botões do mouse.}  Ou seja, a \en{callback}
-  chama a função auxiliar \C{toggle_pause} se a tecla é ``space'', chama a
-  função auxiliar \C{seek} se a tecla é ``right'' ou ``left'', chama a
-  função auxiliar \C{speed} se a tecla é ``f'', ``r'' ou ``n'', e termina o
+  operação associada à tecla pressionada.  Ou seja, a \en{callback} chama a
+  função auxiliar \C{toggle_pause} se a tecla é ``space'', chama a função
+  auxiliar \C{seek} se a tecla é ``right'' ou ``left'', chama a função
+  auxiliar \C{speed} se a tecla é ``f'', ``r'' ou ``n'', e termina o
   \en{loop} se a tecla é ``q''.
-\item Em todos os outros casos, a mensagem é ignorada (linha~38).
+\item Caso contrário, a mensagem é ignorada (linha~38).
 \end{enumerate}
 
 \lstinputlisting[
 style=display,
-firstline=94,
+firstline=92,
 caption={Função~\texttt{bus\_cb} do programa ``Olá mundo'' com controles.},
 label={lst:controles-cb},
 ]{src/controls.c}
@@ -1431,7 +1426,7 @@ operação, o formato do deslocamento, \en{flags} opcionais e o valor do
 deslocamento.  O formato (segundo argumento) indica o formato em que o
 descolocamento está especificado---no caso, usamos \C{GST_FORMAT_TIME} para
 indicar um deslocamento no tempo.  As \en{flags} (terceiro argumento)
-determinam a característica da operação: a \en{flag}
+determinam as características da operação: a \en{flag}
 \C{GST_SEEK_FLAG_ACCURATE} indica que a operação deve ter uma precisão
 razoável, a \en{flag} \C{GST_SEEK_FLAG_FLUSH} indica que \en{caches}
 internos de elementos subsequentes devem ser descartados e a \en{flag}
@@ -1456,8 +1451,8 @@ conteúdo tocar ao contrário.
 
 \lstinputlisting[
 style=display,
-firstline=44,
-lastline=92,
+firstline=42,
+lastline=90,
 caption={Funções~\texttt{toggle\_paused}, \texttt{seek} e~\texttt{speed}
 do programa ``Olá mundo'' com controles.},
 label={lst:controles-aux},
