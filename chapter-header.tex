@@ -21,7 +21,7 @@
 \setlength{\bibsep}{0.0pt}
 %% -------------------------------------------------------------------------
 \usepackage{tikz}
-\usetikzlibrary{arrows,calc,positioning,shapes,trees}
+\usetikzlibrary{arrows,calc,positioning,shadows,shapes,trees}
 \newdimen\hdim                  % element height
 \newdimen\wdim                  % element width
 \newdimen\odim                  % offset distance
@@ -77,10 +77,29 @@
   outer sep=0pt,
   text centered,
 ]
+\tikzstyle{keystroke}=[
+  draw,
+  drop shadow={
+    shadow xshift=0.25ex,
+    shadow yshift=-0.25ex,
+    fill=black,
+    opacity=0.75,
+  },
+  fill=white,
+  font=\scriptsize\sffamily,
+  inner sep=2.5pt,
+  line width=0.5pt,
+  minimum width={1.7em},
+  rectangle,
+  rounded corners=2pt,
+]
 \tikzset{
   node distance=\wdim+\odim,
   >=stealth,
   shorten >=.5pt,
+}
+\newcommand*\keystroke[1]{%
+  \tikz[baseline=(key.base)]\node[keystroke](key) {#1\strut};
 }
 %% -------------------------------------------------------------------------
 \usepackage{listings}
