@@ -1292,8 +1292,8 @@ Os programas que vimos até agora não são interativos.  Assim que inciados,
 eles constroem um \en{pipeline} que reproduz o conteúdo uma única vez, do
 inicio ao fim.  Nesta seção vamos adicionar os controles \en{play},
 \en{pause}, \en{stop}, \en{seek}, \en{fast-forward} e \en{rewind} ao
-programa ``Olá mundo'' da Listagem~\ref{lst:hello}.  Nosso objetivo é fazer
-com que o programa responda aos seguintes comandos de tecla:
+programa ``Olá mundo'' da Listagem~\ref{lst:hello}\footnotemark.  Nosso 
+objetivo é fazer com que o programa responda aos seguintes comandos de tecla:
 \begin{center}
   \begin{tabular}{cl}
     \keystroke{SPC} & pausa ou resume a reprodução
@@ -1307,6 +1307,9 @@ com que o programa responda aos seguintes comandos de tecla:
     \keystroke{Q} & para a reprodução e termina o programa (\en{stop})
   \end{tabular}
 \end{center}
+
+\footnotetext{Para compilar o exemplo desta seção, precisamos adicionar
+o módulo ``gstreamer-video-1.0'' à ferramenta \en{pkg-config}.}
 
 Observe que escolhemos o programa ``Olá mundo'' apenas para simplificar as
 listagens apresentadas.  Os mecanismos para captura de teclas e controle do
