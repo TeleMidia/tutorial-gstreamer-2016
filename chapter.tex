@@ -658,7 +658,7 @@ filhos ``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para
 \en{pipeline} transiciona para \en{paused}; e~(3) os filhos transicionam
 de~\en{paused} para \en{playing} e, finalmente, o \en{pipeline} transiciona
 para \en{playing}.  A sequência de transições pode ser realizada
-sincronamente ou assincronamente.  Se sequência for realizada sincronamente,
+sincronamente ou assincronamente.  Se a sequência for realizada sincronamente,
 a \en{thread} da aplicação bloqueia até a que todas as transições sejam
 realizadas.  Caso contrário, se a sequência for realizada assincronamente, a
 chamada da linha~25 retorna imediatamente e as transições são realizadas em
@@ -1127,13 +1127,13 @@ apresenta alguns filtros de áudio e vídeo disponíveis no GStreamer.
 \end{table}
 \vskip-\baselineskip
 
-Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.  Ambas
-as \en{pads} têm disponibilidade \en{always} e escoam apenas fluxos
-descomprimidos (``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, num
-\en{pipeline} os elementos filtros normalmente aparecem entre os
-decodificadores e os \en{sinks}.  Por exemplo, o comando seguinte adiciona o
-filtro ``volume'' ao \en{pipeline} da Figura~\ref{fig:pipe-mp3}, que
-reproduz um arquivo de áudio MP3.
+Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.  Ambas as
+\en{pads} têm disponibilidade \en{always} e escoam apenas fluxos descomprimidos
+(``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, em um \en{pipeline} os
+elementos filtros normalmente aparecem entre os decodificadores e os
+\en{sinks}.  Por exemplo, o comando a seguir adiciona o filtro ``volume'' ao
+\en{pipeline} da Figura~\ref{fig:pipe-mp3}, que reproduz um arquivo de áudio
+MP3.
 \begin{lstlisting}[style=command]
 @\$@ gst-launch filesrc location=bunny.mp3\
                ! mad ! volume volume=.5 ! alsasink
