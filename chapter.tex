@@ -1325,19 +1325,19 @@ função \C{main} do novo programa ``Olá mundo'' (versão com controles).  Até
 a linha~28, o código da função é idêntico ao código correspondente na
 Listagem~\ref{lst:hello}.  A diferença aqui está na forma como capturamos
 mensagens postadas no \en{bus}.  Até agora, para obter mensagens do
-\en{bus}, usamos função \C{gst_bus_timed_pop_filtered}, que bloqueia a
+\en{bus}, usamos a função \C{gst_bus_timed_pop_filtered}, que bloqueia a
 \en{thread} da aplicação até que tipos específicos de mensagens sejam
 postados.  Na Listagem~\ref{lst:controles-main}, como a aplicação é
 orientada a eventos, usamos uma técnica diferente, baseada no \en{loop} de
-eventos da~GLib (\C{GMainLoop}).
+eventos da~GLib~(\C{GMainLoop}).
 
-O \en{loop} de eventos é criado pela chamada~\C{g_main_loop_new} na linha~28
+O \en{loop} de eventos é criado pela chamada~\C{g_main_loop_new} na linha~29
 da Listagem~\ref{lst:controles-main}.  O primeiro argumento da
 chamada~(\C{NULL}) indica que o \en{loop} irá receber eventos de qualquer
 fonte registrada via~GLib\footnote{Veja~\cite{glib} para mais informações
   sobre \en{loops} de eventos na GLib.}, e o segundo argumento~(\C{FALSE})
 indica que o \en{loop} não deve ser iniciado imediatamente (iniciaremos o
-\en{loop} posteriormente na linha~35).
+\en{loop} posteriormente).
 
 As chamadas \C{g_object_set_data} seguintes (linhas~30--31) armazenam no
 \en{bus} ponteiros para o \en{pipeline} e para o \en{loop}.  Observe que o
