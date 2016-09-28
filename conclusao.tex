@@ -1,0 +1,123 @@
+\section{Conclusão}
+\label{sec:conclusao}
+Neste minicurso apresentamos uma visão introdutória do \en{framework}
+GStreamer.  Discutimos o modelo de \en{dataflow}, no qual ele se baseia, e como
+esse modelo é implementado pelo \en{framework}.  Por meio da implementação de
+exemplos mostramos como se dá o processo de desenvolvimento de aplicações no
+GStreamer, e como é possível estendê-lo. 
+%O GStreamer permite que dados sejam adicionados ou removidos do \en{pipeline}
+%por meio dos elementos \en{appsrc} e \en{appsink}, respectivamente. \en{Appsrc}
+%é um elemento do tipo \en{source} e é usado para injetar dados customizados em
+%um \en{pipeline}. Um típico exemplo de uso desse elemento é na renderização
+%de um formato de dados não suportado nativamente pelos elementos disponíveis
+%no GStreamer (essa funcionalidade também pode ser implementada por meio da
+%criação de um novo elemento, como ilustrado na Seção~\ref{sec:plugins}).
+%\en{Appsink} é um elemento do tipo \en{sink} usado para receber os \en{buffers}
+%de saída de uma aplicação. Um cenário de uso para o \en{appsink} é quando se
+%deseja embutir a saída de um \en{pipeline} em outra uma outra aplicação.
+
+Apenas com o que se aprendeu neste minicurso e, facilmente usando outros
+elementos já suportados pelo GStreamer, já é possível que os leitores criem
+várias aplicações mais avançadas.  Por exemplo, é possível compor diversos
+vídeos e/ou áudios em um mesmo \en{pipeline}.  Elementos \en{mixers}
+recebem vários fluxos de um mesmo tipo e geram uma única saída representando a
+composição daqueles fluxos. Exemplos de \en{mixers} de vídeo são os elementos
+\en{videomix} e \en{compositor}, enquanto os elementos \en{adder} e
+\en{audiomixer} são exemplos de \en{mixers} de áudio.  Outro caso de uso
+interessante é o uso do GStreamer para transcodificar mídias.  Podemos
+facilmente criar \en{pipelines} que combinem elementos que decodifiquem um
+determinado formato produzindo um fluxo \en{raw} com elementos que recebem esse
+fluxo \en{raw} e o codifiquem em outro formato.  Nesses casos, o \en{sink}
+\en{filesink} pode ser usado para escrever a saída do pipeline em um arquivo.
+
+Ainda assim, vários tópicos avançados não foram apresentados aqui.  No restante
+desta seção discutimos brevemente alguns desses tópicos com o objetivo de
+direcionar os leitores em aprofundamentos futuros.
+
+Um dos temas mais desafiadores em sistemas multimídia, sem dúvida é
+transmissão/recepção de dados multimídia em tempo real.  Embora não tratados
+aqui, o GStreamer tem vários elementos que dão suporte à implementação de
+aplicações multimídia em rede. Por exemplo, o pacote \en{gst-plugins-good}
+implementa vários elementos que podem ser usados para criar servidores de
+\en{streaming} RTP/RTCP/RTSP. Em linhas gerais, um servidor RTP deve empacotar
+fluxos codificados em um dado formato em pacotes RTP e enviá-los por meio do
+protocolo UDP, como ilustrado no \en{pipeline} da Figura~\ref{fig:rtp-server}.
+O elemento \en{rtptheorapay} recebe um fluxo de vídeo Theora e o encapsula em
+pacotes RTP que são enviados pela rede pelo elemento \en{udpsink} usando o
+protocolo UDP. De forma análoga, um cliente para esse servidor poderia ser
+implementado usando o elemento \en{udpsrc}, que recebe um fluxo de dados UDP,
+conectado ao elemento \en{rtptheoradepay}, que desempacota os pacotes RTP
+gerando como saída um fluxo de vídeo Theora, como ilustrado no \en{pipeline} da
+Figura~\ref{fig:rtp-client}. Além de elementos que encapsulam e desencapsulam
+formatos específicos de fluxos em pacotes RTP, no GStreamer há diversos outros
+elementos que facilitam a implementação de aplicações de \en{streaming}, como
+por exemplo \en{rtpmanager}, \en{rtpbin}, \en{rtpjitterbuffer} etc.
+
+\begin{figure}[H]
+  \centering
+  \subfigure [Servidor RTP]
+  {
+    \begin{tikzpicture}
+      \node (filesrc) [element] {filesrc};
+      \node (oggdemux) [element, right of=filesrc] {oggdemux};
+      \node (rtptheorapay) [element, right of=oggdemux] {rtptheorapay};
+      \node (udpsink) [element, right of=rtptheorapay] {udpsink};
+      \draw [->, arrow] (filesrc) -- (oggdemux);
+      \draw [->, arrow] (oggdemux) -- (rtptheorapay);
+      \draw [->, arrow] (rtptheorapay) -- (udpsink);
+    \end{tikzpicture}
+    \label{fig:rtp-server}
+  }
+  \subfigure [Cliente RTP]
+  {
+    \begin{tikzpicture}
+      \node (udpsrc) [element] {udpsrc};
+      \node (rtptheoradepay) [element, right of=udpsrc] {rtptheoradepay};
+      \node (theoradec) [element, right of=rtptheoradepay] {theoradec};
+      \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
+      \draw [->, arrow] (udpsrc) -- (rtptheoradepay);
+      \draw [->, arrow] (rtptheoradepay) -- (theoradec);
+      \draw [->, arrow] (theoradec) -- (xvimagesink);
+    \end{tikzpicture}
+    \label{fig:rtp-client}
+  }
+  \caption{\en{Pipeline}s de um servidor e cliente RTP para vídeos 
+    OGG codificados no formato Theora.}
+  \label{fig:pipe-rtp-server}
+\end{figure}
+
+Outro tema importante, e relacionado tanto com aplicações locais como com
+aplicações em rede, diz respeito à QoS.  Neste minicurso, esse tema foi
+discutido apenas brevemente na Seção~\ref{sec:intro}.  Porém, o GStreamer possui várias
+funcionalidades avançadas com o objetivo de manter a QoS de aplicações
+multimídia.  Por exemplo, internamente, \en{pipelines} mantém um relógio do
+tipo \C{GstClock} usado para sincronizar a exibição dos \en{buffers}.
+Elementos \en{sink} usam esse relógio para controlar a renderização dos dados,
+bem como para descartar \en{buffers} que chegam atrasados. É possível
+sincronizar o relógio de \en{pipelines} diferentes (mesmo em máquinas
+separadas) por meio dos objetos \C{GstNetTimeProvider} (expõe o tempo de um
+\C{GstClock} para a rede) e \C{GstNetClientClock} (sincroniza o relógio de um
+\en{pipeline} a um objeto provedor de tempo -- \C{GstNetTimeProvider}), por
+exemplo. É possível ainda criar relógios sincronizados com um servidor NTP
+(\C{GstNtpClock}) ou PTP (\C{GstPtpClock}).  Usando tais mecanismos, é possível
+usar o GStreamer como base para o desenvolvimento de aplicações multimídia
+avançadas, tais como aplicações que requerem a sincronização de mídias em
+múltiplos destinos, bem como aplicações que requerem a sincronização de
+mídias vindas de múltiplos \en{sources}~(por exemplo, cenários de TV digital
+híbridas)~\cite{Cesar-2016}.
+
+Este minicurso, obviamente, não teve a pretensão de exaurir todas essas
+funcionalidades do GStreamer, mas sim de servir como um material introdutório.
+Consideramos que os leitores que tenham conseguido assimilar os conceitos aqui
+apresentados estejam aptos a se aventurar em outros tópicos mais avançados.  No
+site oficial do framework~\cite{gstreamer} há diversos materiais detalhando o
+funcionamento interno do GStreamer, bem como alguns tópicos não abordados aqui.
+Apesar de não ser essencial, àqueles que querem se aventurar a trabalhar 
+diretamente no código do GStreamer, ou mesmo estendê-lo por meio de
+\en{plugins}, noções do \en{framework} GObject~\cite{glib} serão bem úteis.  
+Mais ainda, caso C não seja a sua linguagem favorita, existem também 
+vários~\en{bindings} do GStreamer para outras
+linguagens\footnote{\url{https://gstreamer.freedesktop.org/bindings/}}---tais 
+como Python, Java, C++, Qt, Android, Vala, Ruby, Haskell etc---por meio das
+quais você pode tirar proveito do poder do GStreamer.
+
