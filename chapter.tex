@@ -658,7 +658,7 @@ filhos ``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para
 \en{pipeline} transiciona para \en{paused}; e~(3) os filhos transicionam
 de~\en{paused} para \en{playing} e, finalmente, o \en{pipeline} transiciona
 para \en{playing}.  A sequência de transições pode ser realizada
-sincronamente ou assincronamente.  Se sequência for realizada sincronamente,
+sincronamente ou assincronamente.  Se a sequência for realizada sincronamente,
 a \en{thread} da aplicação bloqueia até a que todas as transições sejam
 realizadas.  Caso contrário, se a sequência for realizada assincronamente, a
 chamada da linha~25 retorna imediatamente e as transições são realizadas em
