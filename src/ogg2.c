@@ -83,6 +83,5 @@ int main (int argc, char *argv[])
   gst_object_unref (bus);
   gst_element_set_state (pipeline, GST_STATE_NULL);
   gst_object_unref (pipeline);
-
   return 0;
 }

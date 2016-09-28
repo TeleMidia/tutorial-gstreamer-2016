@@ -514,7 +514,8 @@ label={lst:makefile},
 ]{src/Makefile.hello}
 
 
-\section{Tocando áudio e vídeo a partir de elementos básicos}
+\section{Tocando áudio e vídeo
+a partir de elementos básicos}
 \label{sec:dissec}
 
 Na Seção~\ref{sec:hello} utilizamos o elemento ``playbin'' para tocar um
@@ -541,7 +542,7 @@ programa foi chamado corretamente, isto é, se o caminho para o arquivo~MP3
 está em \C{argv[1]}.)
 
 \lstinputlisting[
-%float={h},
+float={h},
 style=display,
 caption={Tocando um arquivo de áudio MP3.},
 label={lst:mp3},
@@ -550,18 +551,14 @@ label={lst:mp3},
 Na Seção~\ref{sec:intro}, discutimos a operação dos elementos ``filesrc'' e
 ``alsasink''.  O primeiro lê um arquivo do disco e gera um fluxo de bytes
 correspondente, e o segundo lê um fluxo de amostras de áudio PCM e as
-reproduz no dispositivo de saída de áudio.  Aqui, a novidade é o elemento
+reproduz no dispositivo de saída de áudio.  Aqui a novidade é o elemento
 processador, mais precisamente, o decodificador ``mad''.  Ele lê da sua
 \en{source pad} um fluxo de bytes no formato~MP3, decodifica-o via
 MAD~\cite{mad} (biblioteca para decodificação de áudio MP3) e escreve na sua
-\en{sink pad} o fluxo de áudio PCM resultante.  
-Apesar de os três elementos,
+\en{sink pad} o fluxo de áudio PCM resultante.  Apesar de os três elementos,
 ``filesrc'', ``alsasink'' e ``mad'', fazerem parte do GStreamer, na prática,
 eles pertencem a pacotes diferentes, distribuídos separadamente.
 
-% \rg{Sei que possivelmente não vai dá tempo, mas para mim, faz muito sentido
-% tanto isso como a parte das ferramentas vir na Introdução.  A impressão que dá
-% é que as coisas foram sendo jogadas na medida em que fomos lembrando.}
 A distribuição oficial do GStreamer possui cinco pacotes principais:
 (1)~\en{gstreamer}, contendo o núcleo do \en{framework};
 (2)~\en{gst-plugins-base}, contendo apenas os elementos básicos;
@@ -642,30 +639,35 @@ estado \en{paused}, o elemento aloca recursos que dependem do conteúdo a ser
 processado e se prepara para processá-lo.  Finalmente, no estado
 \en{playing}, o elemento inicia o processamento.
 
-Para chegar do estado \en{null} (inicial) ao estado \en{playing} (tocando) todo
-elemento tem que passar primeiro pelo estados \en{ready} e \en{paused}, nessa
-ordem.  De forma análoga, para sair do estado \en{playing} e voltar ao estado
-inicial \en{null}, o elemento tem que passar pelos estados \en{paused} e
-\en{ready}.  A Figura~\ref{fig:estados-elt} apresenta a máquina de
-estados---isto é, os estados e transições possíveis---de um elemento GStreamer.
-Mudanças de estado do \en{pipeline}, na verdade de \en{bins} em geral, são
-propagadas nos elementos filhos, e a direção da propagação é sempre dos
-\en{sinks} para os \en{sources}---dessa forma dados não são gerados antes que
-os elementos posteriores no \en{pipeline} estejam prontos para recebê-los.  Por
-exemplo, na Listagem~\ref{lst:mp3}, se bem sucedida, a chamada
-\C{gst_element_set_state} (linha~25) implica na seguinte sequência transições
-(sempre dos \en{sinks} para os \en{sources}): (1)~os elementos filhos
-``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para \en{ready}
-e, em seguida, o \en{pipeline} transiciona para \en{ready}; (2)~os filhos
-transicionam de \en{ready} para \en{paused} e, em seguida, o \en{pipeline}
-transiciona para \en{paused}; e~(3) os filhos transicionam de~\en{paused} para
-\en{playing} e, finalmente, o \en{pipeline} transiciona para \en{playing}.
-Somente após essa última transição é que a chamada está completa e o controle à
-função \C{main}.  Nesse ponto, a \en{thread} da aplicação está prestes a
-executar a asserção da linha~26, que aborta o programa em caso de falha da
-chamada anterior, e as \en{streaming threads} já começaram a operar o
-\en{pipeline}, ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink'' já
-estão produzindo, processando e consumindo dados.
+Para chegar do estado \en{null} (inicial) ao estado \en{playing} (tocando)
+todo elemento tem que passar primeiro pelo estados \en{ready} e \en{paused},
+nessa ordem.  De forma análoga, para sair do estado \en{playing} e voltar ao
+estado inicial \en{null}, o elemento tem que passar pelos estados
+\en{paused} e \en{ready}.  A Figura~\ref{fig:estados-elt} apresenta a
+máquina de estados (os estados e transições possíveis) de um elemento
+GStreamer.  Mudanças de estado do \en{pipeline}, na verdade de \en{bins} em
+geral, são propagadas nos elementos filhos, e a direção da propagação é
+sempre dos \en{sinks} para os \en{sources}---dessa forma dados não são
+gerados antes que os elementos posteriores no \en{pipeline} estejam prontos
+para recebê-los.  Por exemplo, na Listagem~\ref{lst:mp3}, se bem sucedida, a
+chamada \C{gst_element_set_state} (linha~25) implica na seguinte sequência
+transições (sempre dos \en{sinks} para os \en{sources}): (1)~os elementos
+filhos ``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para
+\en{ready} e, em seguida, o \en{pipeline} transiciona para \en{ready};
+(2)~os filhos transicionam de \en{ready} para \en{paused} e, em seguida, o
+\en{pipeline} transiciona para \en{paused}; e~(3) os filhos transicionam
+de~\en{paused} para \en{playing} e, finalmente, o \en{pipeline} transiciona
+para \en{playing}.  A sequência de transições pode ser realizada
+sincronamente ou assincronamente.  Se sequência for realizada sincronamente,
+a \en{thread} da aplicação bloqueia até a que todas as transições sejam
+realizadas.  Caso contrário, se a sequência for realizada assincronamente, a
+chamada da linha~25 retorna imediatamente e as transições são realizadas em
+paralelo (\en{background}).  Em ambos os casos, podemos assumir que nesse
+ponto a \en{thread} da aplicação está prestes a executar a asserção da
+linha~26, que aborta o programa em caso de falha da chamada anterior, e que
+as \en{streaming threads} já começaram a operar o \en{pipeline}, ou seja, os
+elementos ``filesrc'', ``mad'' e ``alsasink'' já estão produzindo,
+processando e consumindo dados.
 
 \begin{figure}[h]
   \centering
@@ -772,19 +774,19 @@ O elemento ``audioconvert'' é necessário porque os elementos ``vorbisdec'' e
 \en{sink pad} do ``alsasink'', ou seja, interseção das \en{caps} dessas
 \en{pads} é vazia (podemos entender as \en{caps} de uma \en{pad} como o
 conjunto dos possíveis formatos dos \en{buffers} que podem atravessá-la).
-O elemento ``audioconvert'' então é responsável por converter as amostras
-produzidas pelo elemento ``vorbisdec'' para um formato que ``alsasink'' aceite.
-Já o elemento ``queue'' entre os elementos ``oggdemux'' e ``theoradec'' é
-necessário porque esses elementos precisam operar em \en{streaming threads}
-separadas.  O elemento ``queue'' é uma simples fila de \en{buffers}.  Quando
-inserido entre dois elementos, produtor e consumidor, o ``queue'' força a
-criação de duas \en{streaming threads}, uma que opera o produtor e outra que
-opera o consumidor, e ao mesmo tempo, age como elemento de sincronização
-dessas \en{threads}.  Isto é, o ``queue'' bloqueia a \en{thread} produtora
-caso a fila fique cheia e bloqueia a \en{thread} consumidora caso ela
-esvazie.  Sem o elemento \en{queue} o \en{pipeline} da
-Figura~\ref{fig:pipe-ogg} simplesmente não funciona pois não completa a
-transição do estado \en{paused} para \en{playing}.
+O elemento ``audioconvert'' converte as amostras produzidas pelo elemento
+``vorbisdec'' para um formato que ``alsasink'' aceita.  Já o elemento
+``queue'' entre os elementos ``oggdemux'' e ``theoradec'' é necessário
+porque esses elementos precisam operar em \en{streaming threads} separadas.
+O elemento ``queue'' é uma simples fila de \en{buffers}.  Quando inserido
+entre dois elementos, produtor e consumidor, o ``queue'' força a criação de
+duas \en{streaming threads}, uma que opera o produtor e outra que opera o
+consumidor, e ao mesmo tempo, age como elemento de sincronização dessas
+\en{threads}.  Isto é, o ``queue'' bloqueia a \en{thread} produtora caso a
+fila fique cheia e bloqueia a \en{thread} consumidora caso a fila esvazie.
+Sem o elemento \en{queue} o \en{pipeline} da Figura~\ref{fig:pipe-ogg} não
+funciona pois não completa a transição do estado \en{paused} para
+\en{playing}.
 
 \begin{figure}[H]
   \centering
@@ -935,9 +937,7 @@ iniciam \en{pipelines} idênticos aos das
 Listagens~\ref{lst:hello},~\ref{lst:mp3} e~\ref{lst:ogg}:
 \begin{lstlisting}[style=command]
 @\$@ gst-launch playbin uri="file://@\$@PWD/bunny.ogg"
-
 @\$@ gst-launch filesrc location=bunny.mp3 ! mad ! alsasink
-
 @\$@ gst-launch filesrc location=bunny.ogg ! oggdemux name=demux\
                demux. ! vorbisdec ! audioconvert ! alsasink\
                demux. ! queue     ! theoradec    ! xvimagesink
