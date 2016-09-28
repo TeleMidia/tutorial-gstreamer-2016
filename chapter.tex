@@ -71,12 +71,13 @@ multimídia tais como editores de vídeo, transcodificadores, transmissores de
 fluxos de mídia, \en{players} de mídia e motores de renderização de
 linguagens multimídia.
 
-O restante do capítulo está Na Seção~\ref{sec:hello} apresentamos uma versão
-preliminar do exemplo base do minicurso: um \en{player} de vídeo simples,
-porém funcional.  Na Seção~\ref{sec:dissec} discutimos o que está por trás
-do código aparentemente simples do exemplo anterior e reconstruímos o mesmo
-exemplo usando a API básica do GStreamer; essa versão reconstruída é o ponto
-de partida dos incrementos posteriores.  Na Seção~\ref{sec:filtros}
+O restante do capítulo está organizado da seguinte forma.  Na
+Seção~\ref{sec:hello} apresentamos uma versão preliminar do exemplo base do
+minicurso: um \en{player} de vídeo simples, porém funcional.  Na
+Seção~\ref{sec:dissec} discutimos o que está por trás do código
+aparentemente simples do exemplo anterior e reconstruímos o mesmo exemplo
+usando a API básica do GStreamer; essa versão reconstruída é o ponto de
+partida dos incrementos posteriores.  Na Seção~\ref{sec:filtros}
 apresentamos alguns do principais filtros de áudio e vídeo disponíveis no
 GStreamer e discutimos como integrá-los ao exemplo.  Na Seção~\ref{sec:ops}
 adicionamos ao exemplo suporte às operações usuais de controle de reprodução
@@ -311,6 +312,7 @@ canal de eventos.
     GStreamer.}
   \label{fig:conexao}
 \end{figure}
+\vskip-\baselineskip
 
 A discussão do modelo \en{dataflow} e da sua instanciação no GStreamer se
 encerra aqui.  Na maior parte do tempo, programar no GStreamer consiste em
@@ -322,10 +324,10 @@ partir da próxima seção, veremos como utilizar esses conceitos na prática.
 \section{Olá mundo: Tocando um vídeo}
 \label{sec:hello}
 
-Nosso objetivo nesta seção é usar o GStreamer para tocar um vídeo.  Para tal,
-poderíamos implementar o \en{pipeline} da Figura~\ref{fig:pipe-tipico}, mas há
-uma maneira mais simples: basta usar o elemento ``playbin''.  A
-Listagem~\ref{lst:hello} apresenta um programa~C que faz exatamente isso.
+Nosso objetivo nesta seção é usar o GStreamer para tocar um vídeo.  Para
+tal, poderíamos implementar o \en{pipeline} da Figura~\ref{fig:pipe-tipico},
+mas há uma maneira mais simples: basta usar o elemento ``playbin''.
+A Listagem~\ref{lst:hello} apresenta um programa~C que faz exatamente isso.
 
 \lstinputlisting[
 style=display,
@@ -347,19 +349,19 @@ A chamada~\C{gst_init}, linha~12, inicializa o GStreamer e trata os
 argumentos com prefixo ``-\,-gst-'' em \C{argv}.
 
 A próxima chamada, linha~14, cria um elemento ``playbin'' que é também o
-\en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é, ele próprio, um
-elemento---que contém outros elementos mas não possui \en{pads}.
-Tais elementos contêiner são chamados de ``\en{bins}''.  
-A função \C{gst_element_factory_make} aloca
-e retorna um novo elemento (\C{GstElement}) do tipo especificado.  O primeiro
-parâmetro da função é o nome da fábrica do tipo e o segundo parâmetro
-(opcional) é o nome a ser atribuído ao elemento retornado.  O nome do elemento
-pode ser usado depois, por exemplo, para procurar esse elemento em um
-\en{pipeline}.  No exemplo da Listagem~\ref{lst:hello}, a chamada cria e
-retorna um elemento do tipo ``playbin'' chamado ``hello''.  Um elemento
-``playbin'' nada mais é do que um \en{pipeline} que se autoconfigura.  Dada uma
-URI, assim que o ``playbin'' é iniciado ele determina o tipo do conteúdo da URI
-e constrói um \en{pipeline} apropriado para reproduzi-la.
+\en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é, ele próprio,
+um elemento---que contém outros elementos mas não possui \en{pads}.  Tais
+elementos contêiner são chamados de ``\en{bins}''.  A função
+\C{gst_element_factory_make} aloca e retorna um novo elemento
+(\C{GstElement}) do tipo especificado.  O primeiro parâmetro da função é o
+nome da fábrica do tipo e o segundo parâmetro (opcional) é o nome a ser
+atribuído ao elemento retornado.  O nome do elemento pode ser usado depois,
+por exemplo, para procurar esse elemento em um \en{pipeline}.  No exemplo da
+Listagem~\ref{lst:hello}, a chamada cria e retorna um elemento do tipo
+``playbin'' chamado ``hello''.  Um elemento ``playbin'' nada mais é do que
+um \en{pipeline} que se autoconfigura.  Dada uma URI, assim que o
+``playbin'' é iniciado ele determina o tipo do conteúdo da URI e constrói um
+\en{pipeline} apropriado para reproduzi-la.
 
 A chamada \C{g_assert_nonnull}, linha~15, é uma asserção que garante que a
 chamada anterior funcionou corretamente, isto é, retornou um elemento válido
@@ -376,8 +378,6 @@ propriedade ``uri'' do elemento ``playbin''.  Note que \C{g_object_set} é
 uma função do GObject.  Todo elemento (\C{GstElement}) é também um objeto
 (\C{GObject}), e todo objeto possui propriedades cujos valores podem ser
 obtidos via \C{g_object_get} e alterados via \C{g_object_set}.
-A propriedade ``uri'' do elemento ``playbin'' contém a URI do conteúdo de
-mídia a ser reproduzido.
 
 A chamada \C{g_free}, linha~20, libera a \en{string} alocada na linha~16.
 Nesse ponto, a \en{string} já não é mais necessária pois foi copiada pela
@@ -385,14 +385,13 @@ chamada \C{g_object_set} anterior.
 
 A chamada \C{gst_element_set_state}, linha~22, inicia o \en{pipeline} da
 aplicação, isto é, transiciona o elemento ``playbin'' do seu estado inicial
-\en{null} (\C{GST_STATE_NULL}) para o estado \en{playing}
-(\C{GST_STATE_PLAYING}).  Na Seção~\ref{sec:dissec}, vamos discutir em
-detalhes as consequências internas dessa transição.  Por enquanto, basta
-dizer que nesse ponto o elemento ``playbin''~(1) inspeciona o conteúdo
-apontado pela URI configurada, (2)~instancia e interconecta os elementos
-necessários para reproduzir esse conteúdo, (3)~inicia a sua reprodução em 
-uma \en{thread} separada e~(4) devolve o controle à \en{thread} principal da
-aplicação.
+\en{null} para o estado \en{playing}.  Na Seção~\ref{sec:dissec}, vamos
+discutir em detalhes as consequências internas dessa transição.  Por
+enquanto, basta dizer que nesse ponto o elemento ``playbin''~(1) inspeciona
+o conteúdo apontado pela URI configurada, (2)~instancia e interconecta os
+elementos necessários para reproduzir esse conteúdo, (3)~inicia a sua
+reprodução numa \en{thread} separada e~(4) devolve o controle à \en{thread}
+principal da aplicação.
 
 A chamada \C{g_assert}, linha~23, é uma asserção que garante que a
 requisição de transição de estado anterior foi bem sucedida.  Após essa
