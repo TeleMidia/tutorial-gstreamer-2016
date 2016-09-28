@@ -384,9 +384,9 @@ argumentos com prefixo ``-\,-gst-'' em \C{argv}.
 
 A próxima chamada, linha~14, cria um elemento ``playbin'' que é também o
 \en{pipeline} da aplicação.  No GStreamer, o \en{pipeline} é, ele próprio, um
-elemento---um elemento que contém outros elementos mas não possui \en{pads}.
-Tais elementos contêiner são chamados de ``\en{\rghl{bins}{Não deveria ter sido
-discutido na seção anterior?}''}.  A função \C{gst_element_factory_make} aloca
+elemento---que contém outros elementos mas não possui \en{pads}.
+Tais elementos contêiner são chamados de ``\en{bins}''.  
+A função \C{gst_element_factory_make} aloca
 e retorna um novo elemento (\C{GstElement}) do tipo especificado.  O primeiro
 parâmetro da função é o nome da fábrica do tipo e o segundo parâmetro
 (opcional) é o nome a ser atribuído ao elemento retornado.  O nome do elemento
@@ -409,7 +409,7 @@ Creative Commons.
 
 A chamada \C{g_object_set}, linha~19, atribui a URI criada anteriormente à
 propriedade ``uri'' do elemento ``playbin''.  Note que \C{g_object_set} é
-uma função da GObject.  Todo elemento (\C{GstElement}) é também um objeto
+uma função do GObject.  Todo elemento (\C{GstElement}) é também um objeto
 (\C{GObject}), e todo objeto possui propriedades cujos valores podem ser
 obtidos via \C{g_object_get} e alterados via \C{g_object_set}.
 A propriedade ``uri'' do elemento ``playbin'' contém a URI do conteúdo de
@@ -420,7 +420,7 @@ Nesse ponto, a \en{string} já não é mais necessária pois foi copiada pela
 chamada \C{g_object_set} anterior.
 
 A chamada \C{gst_element_set_state}, linha~22, inicia o \en{pipeline} da
-aplicação, isto é, transiciona elemento ``playbin'' do seu estado inicial
+aplicação, isto é, transiciona o elemento ``playbin'' do seu estado inicial
 \en{null} (\C{GST_STATE_NULL}) para o estado \en{playing}
 (\C{GST_STATE_PLAYING}).  Na Seção~\ref{sec:dissec}, vamos discutir em
 detalhes as consequências internas dessa transição.  Por enquanto, basta
@@ -450,7 +450,7 @@ barramento de mensagens (\en{bus}) do \en{pipeline} do ``playbin''.
 A próxima chamada, linha~26, bloqueia a \en{thread} da aplicação até que uma
 mensagem de erro ou de EOS (\en{end-of-stream}, ``fim do fluxo'') seja
 postada no barramento.  Ou seja, a \en{thread} da aplicação aguarda nessa
-chamada até um erro aconteça ou até que o vídeo seja reproduzido
+chamada até que um erro aconteça ou até que o vídeo seja reproduzido
 completamente.  A função \C{gst_bus_timed_pop_filtered} recebe o \en{bus}, o
 tempo máximo de espera e a máscara dos tipos das mensagens a serem
 aguardadas, e bloqueia até que o tempo máximo seja atingido ou até que uma
@@ -468,10 +468,8 @@ chegou ao fim.
 A chamada \C{gst_object_unref}, linha~28, libera a referência para o
 \en{bus} do ``playbin'', obtida na linha~25.  A função \C{gst_object_unref} é
 um pseudônimo (\en{alias}) para a função \C{g_object_unref}, que libera uma
-referência para um \C{GObject}.  No GStreamer, a maioria dos \rghl{tipos
-``objeto''}{Entendi o que é. Mas não tem como falarmos isso de uma forma
-melhor?} não herdam diretamente de \C{GObject}, mas sim, de \C{GstObject} que,
-por sua vez, herda de \C{GObject}.
+referência para um \C{GObject}.  No GStreamer, a maioria dos tipos que são
+``objeto'' herdam  de \C{GstObject} que, por sua vez, herda de \C{GObject}.
 
 A chamada \C{gst_element_set_state}, linha~30, para o \en{pipeline} da
 aplicação (caso ele ainda não esteja parado) e libera os recursos utilizados
@@ -500,11 +498,11 @@ Para compilar o programa da Listagem~\ref{lst:hello} precisamos informar ao
 compilador~C o caminho do diretório contendo os cabeçalhos da GLib e do
 GStreamer.  Além disso, precisamos informar ao \en{linker} o caminho e o
 nome das bibliotecas dinâmicas correspondentes.  No GNU/Linux, a maneira
-mais fácil de se fazer isso é através ferramenta \en{pkg-config}.  Por
+mais fácil de se fazer isso é através da ferramenta \en{pkg-config}.  Por
 exemplo:
 \begin{lstlisting}[style=command]
-@\$@ cc `pkg-config --cflags --libs glib-2.0 gstreamer-1.0`\
-      hello.c -o hello
+@\$@ cc hello.c -o hello `pkg-config --cflags --libs glib-2.0\
+        gstreamer-1.0`
 \end{lstlisting}
 
 Esse comando compila e \en{link}-edita o programa da
@@ -519,13 +517,13 @@ executa o comando \en{pkg-config} e substitui o texto entre crases pelo
 resultado dessa execução.  Por exemplo, no nosso ambiente, o comando anterior
 avalia para:
 \begin{lstlisting}[style=command]
-@\$@ cc -pthread\
+@\$@ cc hello.c -o hello\
+     -pthread\
      -I/usr/include/gstreamer-1.0\
      -I/usr/lib/gstreamer-1.0/include\
      -I/usr/include/glib-2.0\
      -I/usr/lib/glib-2.0/include\
-     -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0\
-     hello.c -o hello
+     -lgstreamer-1.0 -lgobject-2.0 -lglib-2.0
 \end{lstlisting}
 
 \rg{Se precisarmos de espaço acho que essa parte de \en{makefile} é algo
