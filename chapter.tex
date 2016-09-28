@@ -705,7 +705,7 @@ chamada anterior, e as \en{streaming threads} já começaram a operar o
 \en{pipeline}, ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink'' já
 estão produzindo, processando e consumindo dados.
 
-\begin{figure}[b]
+\begin{figure}[h]
   \centering
   \begin{tikzpicture}[node distance=1.5\hdim+\odim]
     \node [state] (NULL) {null};
@@ -752,7 +752,7 @@ entre esse \en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico}) e o
 Enquanto no \en{pipeline} MP3 o número total de \en{pads} é fixo (conhecido
 em tempo de compilação) no \en{pipeline} Ogg esse número é variável.  Em
 particular, no \en{pipeline} Ogg o número de \en{sink pads} do elemento
-``oggdemux'' depende do número de subfluxos multiplexados fluxo Ogg de
+``oggdemux'' depende do número de subfluxos multiplexados no fluxo Ogg de
 entrada.  Por exemplo, se o fluxo Ogg possuir apenas um subfluxo Vorbis, o
 elemento ``oggdemux'' terá uma única \en{sink pad} que deverá ser conectada
 à \en{source pad} do elemento ``vorbisdec''.  No entanto, se o fluxo Ogg
@@ -934,7 +934,6 @@ do elemento ``queue'' se \C{srcpad} é do tipo Theora.  Finalmente, a chamada
 \C{gst_pad_link} (linha~48) conecta as \en{pads} \C{srcpad} e \C{sinkpad}, e
 as chamadas seguintes (linhas~50--53) liberam as referências utilizadas.
 
-\clearpage
 \lstinputlisting[
 style=display,
 caption={Tocando um arquivo de vídeo Ogg usando elementos básicos.},
@@ -948,7 +947,7 @@ uma mensagem de erro no \en{bus} (indicando que não há \en{sink pad}
 conectada) o que causa o desbloqueio da \en{thread} da aplicação e,
 consequentemente, o término do programa.
 
-Um detalhe sutil mas importante no código da Listagem~\ref{lst:ogg} é que a
+Um detalhe sutil, mas importante no código da Listagem~\ref{lst:ogg} é que a
 \en{callback} \C{pad_added_cb} e a função \C{main} executam em \en{threads}
 diferentes.  Consequentemente, caso elas compartilhem dados, para evitar
 condições de corrida, é necessário sincronizar o acesso a esses dados via
@@ -1079,8 +1078,6 @@ caption={Saída do comando ``\texttt{gst-inspect equalizer}'' no Arch
 label={lst:equalizer},
 ]{src/equalizer.out}
 
-\rg{Esses dois próximos parágrafos também são candidatos a sair se precisarmos
-    de espaço.}
 Na Listagem~\ref{lst:equalizer}, as linhas~2--4 apresentam o nome do
 \en{plugin} (``equalizer''), a sua descrição (equalizadores de áudio) e o
 caminho da biblioteca dinâmica contendo o código do \en{plugin}.  As
