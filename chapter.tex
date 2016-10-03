@@ -6,11 +6,12 @@
 \author{%
   Guilherme F\null.~Lima,
   Rodrigo C\null.\,M.~Santos,
-  Roberto G\null.\,~de~A.~Azevedo
+  Roberto G\null.\,~de~A.~Azevedo\\[\smallskipamount]
+  \small{Departamento de Informática, PUC-Rio, Rio de Janeiro, Brasil}
 }
 \begin{document}
 \maketitle
-\vskip-1.525\baselineskip\strut
+\vskip-2.5\baselineskip\strut
 \begin{abstract}
   \input{chapter-abstract-en}
 \end{abstract}
@@ -236,38 +237,38 @@ A descrição anterior seria suficiente se estivéssemos interessados apenas em
 exibir as amostras decodificadas o mais rápido possível.  Mas esse não é
 caso.  Queremos ``tocar'' o vídeo original em tempo real, isto é,
 reproduzi-lo nas mesmas condições em que ele foi gravado (amostrado).  Sendo
-assim, para que o vídeo seja reproduzido corretamente, suas amostras de áudio
-e vídeo devem ser exibidas na taxa correta.  Valores típicos para essas
-taxas são~44100Hz para amostras de áudio e~30Hz para amostras de vídeo; ou
-seja, a cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser enviada ao
-dispositivo de saída de áudio, e a cada~33{,}33ms uma nova amostra de vídeo
-deve ser enviada ao dispositivo de saída de~vídeo.
+assim, para que o vídeo seja reproduzido corretamente, suas amostras de
+áudio e vídeo devem ser exibidas na taxa correta.  Valores típicos para
+essas taxas são~44100Hz para amostras de áudio e~30Hz para amostras de
+vídeo; ou seja, a cada~22{,}67\textmu{s} uma nova amostra de áudio deve ser
+enviada ao dispositivo de saída de áudio, e a cada~33{,}33ms uma nova
+amostra de vídeo deve ser enviada ao dispositivo de saída de~vídeo.
 
 No GStreamer, em geral, são os elementos \en{sink} os responsáveis por
-controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline} da
-Figura~\ref{fig:pipe-tipico}, para manter a taxa de reprodução necessária, os
-\en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as amostras recebidas numa
-fila interna e exibem-nas (consomem-nas) apenas no momento adequado.  Já os
-outros elementos operam livres---consomem e produzem dados em taxas
-arbitrárias.  Se durante a execução os elementos que precedem os \en{sinks}
-operarem rápido o bastante, as filas dos \en{sinks} nunca ficarão vazias e
-todas as amostras serão exibidas no momento correto, mas esse nem sempre é o
-caso.
+controlar as taxas de exibição de amostras.  Por exemplo, no \en{pipeline}
+da Figura~\ref{fig:pipe-tipico}, para manter a taxa de reprodução
+necessária, os \en{sinks} ``alsasink'' e ``xvimagesink'' armazenam as
+amostras recebidas numa fila interna e exibem-nas (consomem-nas) apenas no
+momento adequado.  Já os outros elementos operam livres---consomem e
+produzem dados em taxas arbitrárias.  Se durante a execução os elementos que
+precedem os \en{sinks} operarem rápido o bastante, as filas dos \en{sinks}
+nunca ficarão vazias e todas as amostras serão exibidas no momento correto,
+mas esse nem sempre é o caso.
 
-Se os elementos que precedem os \en{sinks} operarem abaixo da taxa de consumo
-dos \en{sinks}, pode ser que alguma das filas internas fique vazia e,
-caso chegue o momento de exibir uma amostra, o \en{sink} simplesmente não tenha
-o que exibir, causando interrupções ou saltos na reprodução (amostras
-``atrasadas'' quando chegarem serão descartadas).  Há ainda o problema inverso.
-Se os elementos que precedem os \en{sink} operarem muito acima da taxa de
-consumo dos \en{sinks}, pode ser que a capacidade da fila interna seja excedida
-e amostras sejam~perdidas.  Para evitar ambos os problemas, esvaziamento ou
-estouro das filas, ou mesmo para limitar o uso de CPU, os \en{sinks}
-normalmente enviam eventos de QoS (\en{quality of service}) para os elementos
-que os precedem, que indicam o quão atrasada ou adiantada está cada amostra que
-chega.  Assim, os elementos anteriores (produtores e processadores) podem
-capturar esses eventos e usar a informação de retardo para ajustar a sua taxa
-de operação.
+Se os elementos que precedem os \en{sinks} operarem abaixo da taxa de
+consumo dos \en{sinks}, pode ser que alguma das filas internas fique vazia
+e, caso chegue o momento de exibir uma amostra, o \en{sink} simplesmente não
+tenha o que exibir, causando interrupções ou saltos na reprodução (amostras
+``atrasadas'' quando chegarem serão descartadas).  Há ainda o problema
+inverso.  Se os elementos que precedem os \en{sink} operarem muito acima da
+taxa de consumo dos \en{sinks}, pode ser que a capacidade da fila interna
+seja excedida e amostras sejam~perdidas.  Para evitar ambos os problemas,
+esvaziamento ou estouro das filas, ou mesmo para limitar o uso de CPU, os
+\en{sinks} enviam aos elementos que os precedem eventos de QoS (\en{quality
+  of service}), que indicam o quão atrasada ou adiantada está cada amostra
+que chega.  Os elementos anteriores (produtores e processadores) podem
+capturar esses eventos e usar a informação de retardo para ajustar a sua
+taxa de operação.
 
 Dois tipos de dados trafegam através das conexões (arestas) de um
 \en{pipeline} GStreamer: segmentos de dados (\en{buffers}) e eventos
@@ -355,9 +356,9 @@ elementos contêiner são chamados de ``\en{bins}''.  A função
 \C{gst_element_factory_make} aloca e retorna um novo elemento
 (\C{GstElement}) do tipo especificado.  O primeiro parâmetro da função é o
 nome da fábrica do tipo e o segundo parâmetro (opcional) é o nome a ser
-atribuído ao elemento retornado.  O nome do elemento pode ser usado depois,
-por exemplo, para procurar esse elemento em um \en{pipeline}.  No exemplo da
-Listagem~\ref{lst:hello}, a chamada cria e retorna um elemento do tipo
+atribuído ao elemento retornado---esse nome pode ser usado mais tarde para
+obter uma referência para o elemento a partir do \en{pipeline}.  No exemplo
+da Listagem~\ref{lst:hello}, a chamada cria e retorna um elemento do tipo
 ``playbin'' chamado ``hello''.  Um elemento ``playbin'' nada mais é do que
 um \en{pipeline} que se autoconfigura.  Dada uma URI, assim que o
 ``playbin'' é iniciado ele determina o tipo do conteúdo da URI e constrói um
@@ -402,7 +403,7 @@ executar a linha~23, e uma ou mais \en{threads} secundárias, que operam o
 \en{pipeline}.  A \en{thread} principal é chamada de ``\en{thread} da
 aplicação'' e as \en{threads} secundárias são chamadas de ``\en{streaming
   threads}''.  As \en{streaming threads} se comunicam com a \en{thread} da
-aplicação através de mensagens assíncronas postadas em um barramento
+aplicação através de mensagens assíncronas postadas num barramento
 (\en{bus}) associado ao \en{pipeline}.  Essas mensagens informam a
 \en{thread} da aplicação sobre acontecimentos internos do \en{pipeline}, por
 exemplo, mudança de estado de elementos, fim do fluxo, erros, \en{warnings},
@@ -644,13 +645,13 @@ todo elemento tem que passar primeiro pelo estados \en{ready} e \en{paused},
 nessa ordem.  De forma análoga, para sair do estado \en{playing} e voltar ao
 estado inicial \en{null}, o elemento tem que passar pelos estados
 \en{paused} e \en{ready}.  A Figura~\ref{fig:estados-elt} apresenta a
-máquina de estados (os estados e transições possíveis) de um elemento
-GStreamer.  Mudanças de estado do \en{pipeline}, na verdade de \en{bins} em
-geral, são propagadas nos elementos filhos, e a direção da propagação é
-sempre dos \en{sinks} para os \en{sources}---dessa forma dados não são
-gerados antes que os elementos posteriores no \en{pipeline} estejam prontos
-para recebê-los.  Por exemplo, na Listagem~\ref{lst:mp3}, se bem sucedida, a
-chamada \C{gst_element_set_state} (linha~25) implica na seguinte sequência
+máquina de estados de um elemento GStreamer.  Mudanças de estado do
+\en{pipeline}, na verdade de \en{bins} em geral, são propagadas nos
+elementos filhos, e a direção da propagação é sempre dos \en{sinks} para os
+\en{sources}---dessa forma, dados não são gerados antes que os elementos
+posteriores no \en{pipeline} estejam prontos para recebê-los.  Por exemplo,
+na Listagem~\ref{lst:mp3}, se bem sucedida, a chamada
+\C{gst_element_set_state} (linha~25) implica na seguinte sequência
 transições (sempre dos \en{sinks} para os \en{sources}): (1)~os elementos
 filhos ``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para
 \en{ready} e, em seguida, o \en{pipeline} transiciona para \en{ready};
@@ -658,16 +659,16 @@ filhos ``alsasink'', ``mad'' e ``filesrc'' transicionam de \en{null} para
 \en{pipeline} transiciona para \en{paused}; e~(3) os filhos transicionam
 de~\en{paused} para \en{playing} e, finalmente, o \en{pipeline} transiciona
 para \en{playing}.  A sequência de transições pode ser realizada
-sincronamente ou assincronamente.  Se a sequência for realizada sincronamente,
-a \en{thread} da aplicação bloqueia até a que todas as transições sejam
-realizadas.  Caso contrário, se a sequência for realizada assincronamente, a
-chamada da linha~25 retorna imediatamente e as transições são realizadas em
-paralelo (\en{background}).  Em ambos os casos, podemos assumir que nesse
-ponto a \en{thread} da aplicação está prestes a executar a asserção da
-linha~26, que aborta o programa em caso de falha da chamada anterior, e que
-as \en{streaming threads} já começaram a operar o \en{pipeline}, ou seja, os
-elementos ``filesrc'', ``mad'' e ``alsasink'' já estão produzindo,
-processando e consumindo dados.
+sincronamente ou assincronamente.  Se a sequência for realizada
+sincronamente, a \en{thread} da aplicação bloqueia até a que todas as
+transições sejam realizadas.  Caso contrário, se a sequência for realizada
+assincronamente, a chamada da linha~25 retorna imediatamente e as transições
+são realizadas em paralelo (\en{background}).  Em ambos os casos, podemos
+assumir que nesse ponto a \en{thread} da aplicação está prestes a executar a
+asserção da linha~26, que aborta o programa em caso de falha da chamada
+anterior, e que as \en{streaming threads} já começaram a operar o
+\en{pipeline}, ou seja, os elementos ``filesrc'', ``mad'' e ``alsasink'' já
+estão produzindo, processando e consumindo dados.
 
 \begin{figure}[h]
   \centering
@@ -707,19 +708,19 @@ os elementos alocados nas linhas~15--28 são liberados.
 
 \subsection*{De volta ao problema inicial}
 
-Agora que vimos como alocar, adicionar e interconectar elementos em um
+Agora que vimos como alocar, adicionar e interconectar elementos num
 \en{pipeline} podemos voltar ao nosso problema inicial: construir um
-\en{pipeline} semelhante ao da Seção~\ref{sec:intro} que usa apenas
-elementos básicos para tocar um vídeo~Ogg.  Há uma diferença importante
-entre esse \en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico}) e o
-\en{pipeline} MP3 (Figura~\ref{fig:pipe-mp3}) que construímos anteriormente.
-Enquanto no \en{pipeline} MP3 o número total de \en{pads} é fixo (conhecido
-em tempo de compilação) no \en{pipeline} Ogg esse número é variável.  Em
-particular, no \en{pipeline} Ogg o número de \en{sink pads} do elemento
-``oggdemux'' depende do número de subfluxos multiplexados no fluxo Ogg de
-entrada.  Por exemplo, se o fluxo Ogg possuir apenas um subfluxo Vorbis, o
-elemento ``oggdemux'' terá uma única \en{sink pad} que deverá ser conectada
-à \en{source pad} do elemento ``vorbisdec''.  No entanto, se o fluxo Ogg
+\en{pipeline} similar ao da Seção~\ref{sec:intro} que usa apenas elementos
+básicos para tocar um vídeo~Ogg.  Há uma diferença importante entre esse
+\en{pipeline} Ogg (Figura~\ref{fig:pipe-tipico}) e o \en{pipeline} MP3
+(Figura~\ref{fig:pipe-mp3}) que construímos anteriormente.  Enquanto no
+\en{pipeline} MP3 o número total de \en{pads} é fixo (conhecido em tempo de
+compilação) no \en{pipeline} Ogg esse número é variável.  Em particular, no
+\en{pipeline} Ogg o número de \en{sink pads} do elemento ``oggdemux''
+depende do número de subfluxos multiplexados no fluxo Ogg de entrada.  Por
+exemplo, se o fluxo Ogg possuir apenas um subfluxo Vorbis, o elemento
+``oggdemux'' terá uma única \en{sink pad} que deverá ser conectada à
+\en{source pad} do elemento ``vorbisdec''.  No entanto, se o fluxo Ogg
 possuir dois subfluxos, Vorbis e Theora, o elemento ``oggdemux'' terá duas
 \en{sink pads}, uma para o subfluxo Vorbis que deverá ser conectada ao
 elemento ``vorbisdec'', e outra para o subfluxo Theora que deverá ser
@@ -766,7 +767,7 @@ Seção~\ref{sec:intro}---a~Figura~\ref{fig:pipe-tipico} é na verdade uma
 versão simplificada (não funcional) da Figura~\ref{fig:pipe-ogg}.
 A diferença aqui está nos elementos adicionais ``audioconvert'', que aparece
 entre os elementos ``vorbisdec'' e ``alsasink'', e ``queue'', que aparece
-entre os elementos ``oggdemux'' e ``theoradec''. 
+entre os elementos ``oggdemux'' e ``theoradec''.
 
 O elemento ``audioconvert'' é necessário porque os elementos ``vorbisdec'' e
 ``alsasink'' não podem ser conectados diretamente---as \en{caps} da
@@ -778,9 +779,9 @@ O elemento ``audioconvert'' converte as amostras produzidas pelo elemento
 ``vorbisdec'' para um formato que ``alsasink'' aceita.  Já o elemento
 ``queue'' entre os elementos ``oggdemux'' e ``theoradec'' é necessário
 porque esses elementos precisam operar em \en{streaming threads} separadas.
-O elemento ``queue'' é uma simples fila de \en{buffers}.  Quando inserido
-entre dois elementos, produtor e consumidor, o ``queue'' força a criação de
-duas \en{streaming threads}, uma que opera o produtor e outra que opera o
+O elemento ``queue'' é uma fila de \en{buffers}; quando inserido entre dois
+elementos, produtor e consumidor, o ``queue'' força a criação de duas
+\en{streaming threads}, uma que opera o produtor e outra que opera o
 consumidor, e ao mesmo tempo, age como elemento de sincronização dessas
 \en{threads}.  Isto é, o ``queue'' bloqueia a \en{thread} produtora caso a
 fila fique cheia e bloqueia a \en{thread} consumidora caso a fila esvazie.
@@ -849,8 +850,8 @@ está no que acontece na transição intermediária do \en{pipeline} do estado
 \C{gst_element_set_state}, linha~77.
 
 Quando o \en{pipeline} da Listagem~\ref{lst:ogg} transiciona para o estado
-\en{paused} seus elementos (nesse ponto, apenas ``filesrc'' e ``oggdemux'') já
-estão pausados, ou seja, já carregaram os dados iniciais do fluxo Ogg e
+\en{paused} seus elementos (nesse ponto, apenas ``filesrc'' e ``oggdemux'')
+já estão pausados, ou seja, já carregaram os dados iniciais do fluxo Ogg e
 estão prontos para começar a operar.  Nesse momento, para cada subfluxo
 multiplexado no fluxo Ogg, o elemento ``oggdemux'' dispara um sinal
 ``pad-added'' que resulta numa chamada à função \C{pad_added_cb}
@@ -939,8 +940,8 @@ Listagens~\ref{lst:hello},~\ref{lst:mp3} e~\ref{lst:ogg}:
 @\$@ gst-launch playbin uri="file://@\$@PWD/bunny.ogg"
 @\$@ gst-launch filesrc location=bunny.mp3 ! mad ! alsasink
 @\$@ gst-launch filesrc location=bunny.ogg ! oggdemux name=demux\
-               demux. ! vorbisdec ! audioconvert ! alsasink\
-               demux. ! queue     ! theoradec    ! xvimagesink
+               demux.@@ ! vorbisdec ! audioconvert ! alsasink\
+               demux.@@ ! queue     ! theoradec    ! xvimagesink
 \end{lstlisting}
 
 O primeiro comando anterior cria um \en{pipeline} contendo apenas o elemento
@@ -963,11 +964,11 @@ genérica do \en{pipeline} da Listagem~\ref{lst:ogg}, isto é, construir um
 \en{pipeline} que demultiplexa e decodifica um fluxo de mídia arbitrário
 (não apenas Ogg), obtido de uma fonte arbitrária (não apenas do disco), e
 que reproduz os fluxos resultantes num ambiente arbitrário (não apenas
-GNU/Linux).  O comando nesse caso é o seguinte:
+GNU/Linux).  O comando, nesse caso, é o seguinte:
 \begin{lstlisting}[style=command]
-gst-launch uridecodebin uri="file://@\$@PWD/bunny.ogg" name=decbin\
-             decbin. ! audioconvert ! autoaudiosink\
-             decbin. ! autovideosink
+@\$@ gst-launch uridecodebin uri="file://@\$@PWD/bunny.ogg" name=decbin\
+               decbin.@@ ! audioconvert ! autoaudiosink\
+               decbin.@@ ! autovideosink
 \end{lstlisting}
 
 Esse \en{pipeline} possui quatro elementos: ``uridecodebin'',
@@ -982,8 +983,8 @@ adequados para um dado ambiente.  Por exemplo, no nosso ambiente GNU/Linux
 os elementos ``autoaudiosink'' e ``autovideosink'' utilizam os \en{sinks}
 concretos ``alsasink'' e ``xvimagesink'', os mesmos que usamos nos programas
 das Listagens~\ref{lst:mp3} e~\ref{lst:ogg}, mas em outro ambiente essa
-escolha pode variar.  A Figura~\ref{fig:pipe-gen} apresenta a estrutura do
-\en{pipeline} criado pelo comando \en{gst-launch} anterior.
+escolha pode ser diferente.  A Figura~\ref{fig:pipe-gen} apresenta a
+estrutura do \en{pipeline} criado pelo comando \en{gst-launch} anterior.
 
 \begin{figure}[H]
   \centering
@@ -1070,16 +1071,17 @@ caption={Trecho da seção ``Element Properties'' da saída do comando
 label={lst:equalizer-3bands},
 ]{src/equalizer-3bands-prop.out}
 
-Os elementos equalizadores instalados pelo \en{plugin} ``equalizer'' são
-processadores de áudio que permitem modificar o ganho dos graves, médios e
-agudos das amostras de um fluxo de áudio descomprimido.  Os três elementos,
-``equalizer-nbands'', ``equalizer-3bands'' e~``equalizer-10bands'', possuem
-a mesma estrutura: todos têm uma \en{source pad} que consome áudio
-descomprimido e uma \en{sink pad} que produz audio descomprimido, e todos
-eles processam uma amostra por vez, isto é, leem uma amostra da sua
-\en{source pad}, modificam-na acordo com os valores de ganho especificados
-em suas propriedades e escrevem a amostra resultante na sua \en{sink pad}.
-Elementos que realizam esse tipo de processamento são chamados de filtros.
+Os elementos equalizadores instalados pelo \en{plugin} ``equalizer''
+anterior são processadores de áudio que permitem modificar o ganho dos
+graves, médios e agudos das amostras de um fluxo de áudio descomprimido.  Os
+três elementos, ``equalizer-nbands'', ``equalizer-3bands''
+e~``equalizer-10bands'', possuem a mesma estrutura: todos têm uma \en{source
+  pad} que consome áudio descomprimido e uma \en{sink pad} que produz audio
+descomprimido, e todos eles processam uma amostra por vez, isto é, leem uma
+amostra da sua \en{source pad}, modificam-na acordo com os valores de ganho
+especificados em suas propriedades e escrevem a amostra resultante na sua
+\en{sink pad}.  Elementos que realizam esse tipo de processamento são
+chamados de filtros.
 
 
 \section{Filtros}
@@ -1113,10 +1115,10 @@ apresenta alguns filtros de áudio e vídeo disponíveis no GStreamer.
     \multicolumn{4}{l}{\dotfill}\\
     \textbf{Vídeo}
     &coloreffects& coloreffects& Efeito de colorização\\
-    &effectv     & shagadelictv& Efeito de espiral caleidoscópica\\
     &effectv     & dicetv      & Efeito de fatiamento\\
     &effectv     & edgetv      & Efeito de borda\\
     &effectv     & revtv       & Efeito de relevo\\
+    &effectv     & shagadelictv& Efeito de espiral caleidoscópica\\
     &videocrop   & videocrop   & Recorte\\
     &videofilter & videobalance& Brilho, cor e saturação\\
     &videoscale  & videoscale  & Redimensionamento\\
@@ -1127,13 +1129,13 @@ apresenta alguns filtros de áudio e vídeo disponíveis no GStreamer.
 \end{table}
 \vskip-\baselineskip
 
-Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}.  Ambas as
-\en{pads} têm disponibilidade \en{always} e escoam apenas fluxos descomprimidos
-(``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, em um \en{pipeline} os
-elementos filtros normalmente aparecem entre os decodificadores e os
-\en{sinks}.  Por exemplo, o comando a seguir adiciona o filtro ``volume'' ao
-\en{pipeline} da Figura~\ref{fig:pipe-mp3}, que reproduz um arquivo de áudio
-MP3.
+Um filtro possui exatamente uma \en{source pad} e uma \en{sink pad}; ambas
+as \en{pads} têm disponibilidade \en{always} e escoam apenas fluxos
+descomprimidos (``audio/x-raw'' ou ``video/x-raw'').  Consequentemente, num
+\en{pipeline} os elementos filtros normalmente aparecem entre os
+decodificadores e os \en{sinks}.  Por exemplo, o comando a seguir adiciona o
+filtro ``volume'' ao \en{pipeline} da Figura~\ref{fig:pipe-mp3}, que
+reproduz um arquivo de áudio MP3.
 \begin{lstlisting}[style=command]
 @\$@ gst-launch filesrc location=bunny.mp3\
                ! mad ! volume volume=.5 ! alsasink
@@ -1146,7 +1148,7 @@ Vejamos agora um exemplo mais complexo.  O \en{shell script} da
 Listagem~\ref{lst:filtros-sh} usa o comando \en{gst-launch} para reproduzir
 um vídeo com um determinado efeito audiovisual.  O \en{script} recebe dois
 argumentos, a URI do vídeo a ser reproduzido e o efeito a ser aplicado
-(número entre~0--4), e usa o comando \en{gst-launch} para montar o
+(número entre~0--4) e usa o comando \en{gst-launch} para montar o
 \en{pipeline} correspondente.
 
 \lstinputlisting[
@@ -1258,18 +1260,17 @@ amostras no formato esperado.  Há cinco combinações de filtros possíveis:
 \end{figure*}
 \vskip-\baselineskip
 
-Concluindo a seção, a Listagem~\ref{lst:filtros} apresenta um trecho do
-programa~C equivalente ao \en{script} da Listagem~\ref{lst:filtros-sh}.
-O trecho corresponde ao código da \en{callback} \C{pad_added_cb} disparada
-pelo sinal ``pad-added'' do elemento ``uridecodebin''.  O código da função
-\C{main} apesar de omitido é trivial.  Ele cria um elemento
-``uridecodebin'', atribui à sua propriedade ``uri'' o primeiro argumento do
-programa, registra em seu sinal ``pad-added'' a \en{callback}
-\C{pad_added_cb} e passa como dado opcional da \en{callback} o segundo
-argumento do programa (número entre~0--4 que determina os filtros
-selecionados).  Em seguida, a \en{thread} da aplicação transiciona o
-\en{pipeline} para \en{playing} e aguarda o fim da reprodução antes de
-liberar os dados alocados e terminar o programa.  A operação da
+A Listagem~\ref{lst:filtros} apresenta um trecho do programa~C equivalente
+ao \en{script} da Listagem~\ref{lst:filtros-sh}.  O trecho corresponde ao
+código da \en{callback} \C{pad_added_cb} disparada pelo sinal ``pad-added''
+do elemento ``uridecodebin''.  O código da função \C{main} apesar de omitido
+é trivial.  Ele cria um elemento ``uridecodebin'', atribui à sua propriedade
+``uri'' o primeiro argumento do programa, registra em seu sinal
+``pad-added'' a \en{callback} \C{pad_added_cb} e passa como dado opcional da
+\en{callback} o segundo argumento do programa (número entre~0--4 que
+determina os filtros selecionados).  Em seguida, a \en{thread} da aplicação
+transiciona o \en{pipeline} para \en{playing} e aguarda o fim da reprodução
+antes de liberar os dados alocados e terminar o programa.  A operação da
 \en{callback} é similar àquela da Listagem~\ref{lst:ogg}.  A diferença aqui
 é que os filtros são criados de acordo com o segundo argumento da aplicação
 (inteiro passado por referência à \en{callback} via o parâmetro~\C{data}).
@@ -1289,8 +1290,8 @@ label={lst:filtros},
 \label{sec:ops}
 
 Os programas que vimos até agora não são interativos.  Assim que inciados,
-eles constroem um \en{pipeline} que reproduz o conteúdo uma única vez, do
-inicio ao fim.  Nesta seção vamos adicionar os controles \en{play},
+eles constroem um \en{pipeline} que reproduz o conteúdo uma única vez do
+inicio ao fim.  Nesta seção, vamos adicionar os controles \en{play},
 \en{pause}, \en{stop}, \en{seek}, \en{fast-forward} e \en{rewind} ao
 programa ``Olá mundo'' da Listagem~\ref{lst:hello}.  Nosso objetivo é fazer
 com que o programa responda aos seguintes comandos de tecla:
@@ -1300,25 +1301,25 @@ com que o programa responda aos seguintes comandos de tecla:
                       (\en{pause} e \en{play})\\[2\jot]
     \keystroke{$\to$} & avança~5s (\en{seek})\\[2\jot]
     \keystroke{$\leftarrow$} & retrocede~5s (\en{seek})\\[2\jot]
-    \keystroke{F} & reproduz 2x mais rápido (\en{fast-foward})\\[2\jot]
-    \keystroke{R} & reproduz ao contrário 2x mais rápido
+    \keystroke{F} & reproduz~2x mais rápido (\en{fast-foward})\\[2\jot]
+    \keystroke{R} & reproduz ao contrário~2x mais rápido
                     (\en{rewind})\\[2\jot]
     \keystroke{N} & reproduz na velocidade original\\[2\jot]
     \keystroke{Q} & para a reprodução e termina o programa (\en{stop})
   \end{tabular}
 \end{center}
 
-Observe que escolhemos o programa ``Olá mundo'' apenas para simplificar as
-listagens apresentadas.  Os mecanismos para captura de teclas e controle do
+Escolhemos o programa ``Olá mundo'' apenas para simplificar as listagens
+apresentadas.  Os mecanismos para captura de teclas e controle do
 \en{pipeline} descritos sobre esse exemplo são gerais e se aplicam a
-qualquer aplicação GStreamer.  Nesse caso, para obter teclas vamos capturar
-as mensagens de eventos de navegação (\C{GST_NAVIGATION_MESSAGE_EVENT})
-postadas pelo \en{sink} de vídeo no \en{bus} do \en{pipeline}.  Já para
-implementar as operações de \en{play}, \en{pause} e \en{stop}, vamos
-transicionar o \en{pipeline} para os estados correspondentes.  E para
-implementar as operações \en{seek}, \en{fast-foward} e \en{rewind}, vamos
-postar eventos de \en{seek} (\C{GST_EVENT_SEEK}) que requisitam mudanças na
-posição e na taxa de reprodução do conteúdo.
+qualquer aplicação GStreamer.  Para obter teclas vamos capturar as mensagens
+de eventos de navegação (\C{GST_NAVIGATION_MESSAGE_EVENT}) postadas pelo
+\en{sink} de vídeo no \en{bus} do \en{pipeline}.  Para implementar as
+operações de \en{play}, \en{pause} e \en{stop}, vamos transicionar o
+\en{pipeline} para os estados correspondentes.  E para implementar as
+operações \en{seek}, \en{fast-foward} e \en{rewind}, vamos postar eventos de
+\en{seek} (\C{GST_EVENT_SEEK}) que requisitam mudanças na posição e na taxa
+de reprodução do conteúdo.
 
 A Listagem~\ref{lst:controles-main} apresenta o trecho de código contendo a
 função \C{main} do novo programa ``Olá mundo'' (versão com controles).  Até
@@ -1342,11 +1343,11 @@ As chamadas \C{g_object_set_data} seguintes (linhas~29--30) armazenam no
 \en{bus} ponteiros para o \en{pipeline} e para o \en{loop}.  O \en{bus}
 (\C{GstBus}) também é um objeto (\C{GObject}) e, como todo objeto, possui
 uma tabela \en{hash} em que podem ser armazenados dados de usuário
-(\en{user~data}).  No caso, a chamada das linhas~29--30 armazenam na
-\en{hash} do \en{bus} um ponteiro para o \en{pipeline}, indexado pela chave
-``pipeline'', e um ponteiro para o \en{loop}, indexado pelo \en{loop}.  Isso
-é necessário porque mais tarde, na \en{callback} do \en{bus}, não temos
-acesso direto à esses objetos.
+(\en{user~data}).  As chamadas das linhas~29--30 armazenam na \en{hash} do
+\en{bus} um ponteiro para o \en{pipeline}, indexado pela chave ``pipeline'',
+e um ponteiro para o \en{loop}, indexado pelo \en{loop}.  Isso é necessário
+porque mais tarde, na \en{callback} do \en{bus}, não temos acesso direto à
+esses objetos.
 
 A chamada \C{gst_bus_add_watch} (linha~31) registra a \en{callback}
 \C{bus_cb} como tratadora (\en{listener}) de mensagens \en{bus}.  Ou seja, a
@@ -1357,12 +1358,11 @@ obtida na linha~27.
 A chamada \C{g_main_loop_run} (linha~34) inicia o \en{loop} de eventos da
 GLib.  A partir desse ponto a aplicação torna-se orientada a eventos, isto
 é, a \en{thread} da aplicação passa a ser controlada pela GLib que apenas
-espera eventos e repassa-os às \en{callbacks} registradas (apenas
-\C{bus_cb}, no caso).  O controle só volta para a \C{main} quando o
-\en{loop} é terminado explicitamente via uma chamada
-\C{g_main_loop_quit}---o que ocorre na \en{callback} do \en{bus}.  Nesse
-caso, as chamadas restantes~(linhas~36--38) liberam os dados alocados e
-terminam o programa.
+espera eventos e repassa-os às \en{callbacks} registradas (\C{bus_cb}, no
+caso).  O controle só volta à \C{main} quando o \en{loop} é terminado
+explicitamente via uma chamada \C{g_main_loop_quit}---o que ocorre na
+\en{callback} do \en{bus}.  Nesse caso, as chamadas
+restantes~(linhas~36--38) liberam os dados alocados e terminam o programa.
 
 \lstinputlisting[
 style=display,
@@ -1373,21 +1373,20 @@ label={lst:controles-main},
 
 Vejamos agora a operação da \en{callback} \C{bus_cb}, cujo código é
 apresentado na Listagem~\ref{lst:controles-cb}.  A cada mensagem postada no
-\en{bus}, o \en{loop} de eventos chama essa \en{callback} com os seguintes
+\en{bus}, o \en{loop} de eventos chama essa \en{callback} com três
 argumentos: o \en{bus}, a mensagem postada e o dado adicional passado à
 função \C{gst_bus_add_watch} (linha~31 da Listagem~\ref{lst:controles-main})
 no momento do registro da \en{callback} (no caso, \C{NULL}).
 
 Na Listagem~\ref{lst:controles-cb}, as chamadas das linhas~3 e~4 obtém as
-referências, respectivamente, para o \en{pipeline} e para o \en{loop}
-armazenadas na \en{hash} do \en{bus}.  O comando \C{switch} seguinte
-(linhas~5--37) trata a mensagem recebida de acordo com o seu tipo.  Há três
-possibilidades:
+referências para o \en{pipeline} e para o \en{loop} armazenadas na \en{hash}
+do \en{bus}.  E o comando \C{switch} seguinte (linhas~5--37) trata a
+mensagem recebida de acordo com o seu tipo.  Há três possibilidades:
 \begin{enumerate}
 \item Se a mensagem indica um erro ou o fim do fluxo (EOS), a \en{callback}
   termina o \en{loop} de eventos (linha~40) e remove a si mesmo da lista de
-  tratadores (linha~41).
-\item Se a mensagem é uma mensagem de elemento (linha~10), é também mensagem
+  tratadores (instrução ``\C{return FALSE}'' na linha~41).
+\item Se a mensagem é proveniente de um elemento (linha~10), é uma mensagem
   de evento de navegação (linhas~14--15) e indica um evento de
   pressionamento de tecla (linhas~18--19), então a \en{callback} executa a
   operação associada à tecla pressionada.  Ou seja, a \en{callback} chama a
@@ -1418,15 +1417,15 @@ A função \C{seek} (linhas~14--23) requisita um salto de \C{offset}
 nanosegundos (ns) na reprodução do conteúdo a partir do seu ponto atual.
 A chamada da linha~17 obtém o tempo absoluto do \en{pipeline} (ns) e
 armazena-o em \C{from}.  A atribuição seguinte calcula o tempo absoluto (ns)
-em que o \en{pipeline} deve estar após o salto e armazena em \C{to}.
-Finalmente, a chamada \C{gst_element_seek_simple} (linhas~19--22) requisita
-o salto para o novo tempo absoluto~\C{to}.  A função
-\C{gst_element_seek_simple} recebe quatro argumentos: o elemento alvo da
-operação, o formato do deslocamento, \en{flags} opcionais e o valor do
-deslocamento.  O formato (segundo argumento) indica o formato em que o
-descolocamento está especificado---no caso, usamos \C{GST_FORMAT_TIME} para
-indicar um deslocamento no tempo.  As \en{flags} (terceiro argumento)
-determinam as características da operação: a \en{flag}
+em que o \en{pipeline} deve estar após o salto e armazena-o em \C{to}.  E a
+chamada \C{gst_element_seek_simple} (linhas~19--22) posta um evento de
+\en{seek} no \en{pipeline} que requisita um salto na reprodução para o novo
+tempo absoluto~\C{to}.  A função \C{gst_element_seek_simple} recebe quatro
+argumentos: o elemento alvo da operação, o formato do deslocamento,
+\en{flags} opcionais e o valor do deslocamento.  O formato (segundo
+argumento) indica o formato em que o descolocamento está especificado---no
+caso, \C{GST_FORMAT_TIME} indica um deslocamento no tempo.  As \en{flags}
+(terceiro argumento) determinam as características da operação: a \en{flag}
 \C{GST_SEEK_FLAG_ACCURATE} indica que a operação deve ter uma precisão
 razoável, a \en{flag} \C{GST_SEEK_FLAG_FLUSH} indica que \en{caches}
 internos de elementos subsequentes devem ser descartados e a \en{flag}
@@ -1435,19 +1434,19 @@ quadros chave (\en{key~frames}) devem ser decodificados.
 
 A última função, \C{speed}, (linhas~25--49) requisita uma mudança na taxa de
 reprodução do \en{pipeline} de acordo com o parâmetro \en{rate}.  Esse tipo
-de mudança de taxa é feita por meio da função \C{gst_element_seek}, que é
-também utilizada para realizar operações de \en{seek} complexas.  Essa
-função recebe oito argumentos: (1)~o elemento alvo; (2)~a nova taxa de
-reprodução; (3)~o formato dos deslocamentos; (4)~\en{flags} opcionais; (5)~o
-tipo do início do desolamento; (6)~o novo inicio; (7)~o tipo do fim do
-deslocamento; e~(8) o novo fim.  Como aqui nosso objetivo é apenas alterar a
-taxa de reprodução o deslocamento é a própria posição atual do \en{fluxo}
-(variável \C{from} preenchida na linha~31).  Se a taxa é positiva, o
-deslocamento é relativo ao início (linhas~32--38), caso contrário
-ele é relativo ao fim (linhas~39--45).  Na prática, valores de taxa
-superiores a~1 aumentam a velocidade de reprodução.  Valores entre~0 e~1
-fazem o conteúdo tocar em câmera lenta.  E valores negativos fazem o
-conteúdo tocar ao contrário.
+de mudança de taxa é feita por meio da função \C{gst_element_seek}, também
+utilizada para realizar operações de \en{seek} complexas.  Essa função
+recebe oito argumentos: (1)~o elemento alvo; (2)~a nova taxa de reprodução;
+(3)~o formato dos deslocamentos; (4)~\en{flags} opcionais; (5)~o tipo do
+início do desolamento; (6)~o novo inicio; (7)~o tipo do fim do deslocamento;
+e~(8) o novo fim.  Como aqui nosso objetivo é apenas alterar a taxa de
+reprodução o deslocamento é a própria posição atual do \en{fluxo} (variável
+\C{from} preenchida na linha~31).  Se a taxa é positiva, o deslocamento é
+relativo ao início (linhas~34--37), caso contrário ele é relativo ao fim
+(linhas~41--44).  Na prática, valores de taxa superiores a~1 aceleram a
+reprodução, valores entre~0 e~1 desaceleram a reprodução produzindo um
+efeito de ``câmera lenta'', e valores negativos aplicam uma aceleração
+negativa, o que faz com que o conteúdo seja tocado ao contrário.
 
 \lstinputlisting[
 style=display,
@@ -1458,14 +1457,370 @@ do programa ``Olá mundo'' com controles.},
 label={lst:controles-aux},
 ]{src/controls.c}
 
-
-\input{plugins.tex}
+Finalmente, observe que o programa anterior usa as declarações do cabeçalho
+``gstnavigation.h'' (Listagem~\ref{lst:controles-main}, linha~3) instalado
+pelo pacote \en{gst-plugins-base}.  Ou seja, para compilar o programa é
+necessário informar ao pré-processador o caminho do diretório contendo esse
+cabeçalho e ao \en{linker} os nomes e os caminhos dos diretórios contendo as
+bibliotecas correspondentes.  Para tal basta adicionar o módulo
+``gstreamer-video-1.0'' à variável \C{MODULES} (linha~2) do \en{makefile} da
+Listagem~\ref{lst:makefile}.
 
 
-\input{conclusao.tex}
+\section{Plugins}
+\label{sec:plugins}
+
+Nesta seção, vamos discutir como novos elementos podem ser criados,
+encapsulados em \en{plugins} (bibliotecas dinâmicas), instalados e usados
+por aplicações GStreamer.  Mais especificamente, vamos escrever dois
+elementos: ``myfilter'' e ``myvideofilter''.  O elemento ``myfilter'' é um
+filtro genérico que lê uma amostra de vídeo da sua \en{sink pad}, imprime o
+seu tamanho na saída padrão e repassa-a à sua \en{source pad}.  Já o
+elemento ``myvideofilter'' é um filtro de vídeo que aplica um efeito de
+ondulação aos quadros que o atravessam.
 
 
-\bibliographystyle{plain}
+\subsection*{Elemento ``myfilter''}
+
+A Listagem~\ref{lst:myfilter} apresenta o código do elemento ``myfilter'' e
+do \en{plugin} correspondente (também chamado ``myfilter'').  Na listagem, a
+estrutura \C{GstMyFilter} (linhas~4--7) contém os dados de uma instância de
+um elemento ``myfilter'', a saber, os dados do tipo pai (\C{GstElement}) e
+ponteiros para as \en{pads} do filtro.  A diretiva da linha~9 define uma
+constante simbólica com o tipo do novo elemento, e as macros seguintes
+(linhas~10 e~11) declaram e definem o tipo propriamente dito
+(\C{GstMyFilter}).
+
+\lstinputlisting[
+escapechar={},
+style=display,
+caption={Código do elemento ``myfilter'' e \en{plugin} correspondente.},
+label={lst:myfilter},
+]{src/myfilter2.c}
+\clearpage
+
+A macro \C{GST_DECLARE_FINAL_TYPE} (linha~10) recebe cinco argumentos---o
+nome do novo tipo (\C{GstMyFilter}), o prefixo das funções do tipo
+(\C{gst_my_filter}), o prefixo das macros do tipo (\C{GST}), o sufixo das
+macros do tipo (\C{MY_FILTER}) e o tipo pai \C{GstElement}---e usa esses
+argumentos para emitir as declarações necessárias.  Já a macro
+\C{GST_DEFINE_TYPE} (linha~11) recebe três argumentos---o nome do novo tipo,
+o prefixo das funções do tipo e o código (\C{GType}) do tipo pai---e define
+a função \C{gst_my_filter_get_type} que retorna o código \C{GType} do novo
+tipo.  Ambas as macros fazem parte do \en{framework} de objetos da GLib.
+
+Continuando, as instruções das linhas~13--18 declaram e inicializam duas
+variáveis estáticas, \C{src_template} e \C{sink_template}, com os
+\en{templates} para as \en{pads} do filtro---no caso, ambas as \en{pads}
+terão disponibilidade \en{always} e \en{caps} ``any'' (aceitarão qualquer
+formato de \en{buffers}).
+
+A função~\C{gst_my_filter_chain} (linhas~21--25) é a função que processa os
+\en{buffers} recebidos pela \en{sink pad} do filtro e os repassa à
+\en{source pad}.  A função recebe três argumentos: um ponteiro para a
+\en{sink pad}, um ponteiro para o objeto filtro e um ponteiro para o
+\en{buffer}; e retorna um código de \en{status} correspondente.  Nesse
+exemplo, a função apenas imprime o tamanho do \en{buffer} na saída padrão
+(linha~24) e repassa-o à \en{source pad} do elemento via a chamada
+\C{gst_pad_push}.
+
+A função~\C{gst_my_filter_class_init} (linhas~28--38) é utilizada pela GLib
+para inicializar o tipo (classe) \C{GstMyFilter}.  Ele é chamada uma única
+vez (antes de o primeiro objeto do tipo ser instanciado) e, no caso,
+registra os metadados do novo elemento ``myfilter'' (linhas~31--33) e
+adiciona à classe do elemento os \en{templates} das suas futuras \en{pads}
+(linhas~34--37).
+
+A função~\C{gst_my_filter_init} (linhas~40--51) é utilizada pela GLib para
+inicializar cada instância (objeto) do tipo \C{GstMyFilter}.  A função,
+nesse caso, cria as \en{pads} do novo filtro (linhas~42--43), inicializa-as
+(linhas~45 e~48), adiciona-as ao elemento (linhas~46--47 e~49--50), e
+registra a função de encadeamento na \en{sink pad} (linha~44).  A função de
+encadeamento (\C{gst_my_filter_chain}, linhas~21--25) é chamada sempre que
+um \en{buffer} é recebido pela \en{sink pad} do elemento.
+
+O restante do código (linhas~53--63) contém o ponto de entrada do
+\en{plugin} (função~\C{my_filter_plugin_init}, linhas~53--56) e as
+declarações associadas.  O ponto de entrada, função
+\C{my_filter_plugin_init}, é executada assim que o \en{plugin} (biblioteca
+dinâmica) ``myfilter'' é processado pelo GStreamer (o que ocorre durante a
+chamada \C{gst_init}) e, nesse caso, simplesmente adiciona os dados do novo
+\en{plugin} ao registro do GStreamer.  Já a macro \C{GST_PLUGIN_DEFINE}
+(linhas~58--63) emite as declarações do \en{plugin} a partir dos argumentos
+fornecidos, a saber, versão mínima do GStreamer requirida, nome simbólico do
+\en{plugin}, descrição, ponto de entrada, versão, licença, pacote e origem).
+
+
+\subsection*{Compilando e usando o elemento ``myfilter''}
+
+Um \en{plugin} GStreamer é uma biblioteca dinâmica carregada em tempo de
+execução pelo \en{framework}.  O código da Listagem~\ref{lst:myfilter}
+define um \en{plugin} chamado~``myfilter'' contendo apenas um elemento,
+também chamado ``myfilter''.  Para gerar uma biblioteca dinâmica a partir
+desse código é necessário informar ao compilador os diretórios contendo os
+cabeçalhos utilizados (diretivas~\en{include}) e ao \en{linker} os nomes e
+diretórios das bibliotecas utilizadas.  Além disso, é preciso instruir o
+\en{linker} a produzir uma biblioteca dinâmica, ao invés de um executável.
+No GNU/Linux, isso pode ser feito através do comando:
+\begin{lstlisting}[style=command]
+@\$@ cc myfilter.c -o myfilter.so -shared -fPIC\
+     `pkg-config --cflags --libs gstreamer-1.0 gstreamer-base-1.0`
+\end{lstlisting}
+Esse comando compila e \en{link}-edita uma biblioteca dinâmica (arquivo
+``myfilter.so'') contendo o \en{plugin} da Listagem~\ref{lst:myfilter}.
+
+Finalmente, para construir um \en{pipeline} usando o \en{plugin}
+``myfilter'' basta instalá-lo num dos diretórios de \en{plugins} do
+GStreamer ou indicar ao GStreamer que esse \en{plugin} deve ser carregado.
+Por exemplo, assumindo que o arquivo ``myfilter.so'' gerado pelo comando
+anterior está no diretório atual, o seguinte comando monta um \en{pipeline}
+contendo o elemento ``myfilter'':
+\begin{lstlisting}[style=command]
+@\$@ gst-launch --gst-plugin-path=.\
+     videotestsrc ! myfilter ! ximagesink
+\end{lstlisting}
+
+O valor ``.'' para a opção ``-\,-gst-plugin-path'' informa ao
+\en{gst-launch} que, além dos diretórios padrão, \en{plugins} também devem
+ser buscados no diretório corrente (``.'').  Por conta disso, assim que é
+iniciado o \en{gst-launch} carrega o \en{plugin} ``myfilter'' que adiciona
+elemento ``myfilter'' ao registro do GStreamer, tornando-o ``visível'' à
+aplicação.  Como o elemento ``myfilter'' consome e produz dados de qualquer
+tipo (isto é, as \en{caps} de ambas as suas \en{pads} são ``any'') podemos
+utilizá-lo entre quaisquer elementos.  O comando anterior utiliza-o entre os
+elementos ``videotestsrc'', que produz \en{buffers} de teste de vídeo, e
+``autovideosink'', que mostra esses \en{buffers} na tela.  Se tudo der
+certo, quando o comando é executado os \en{buffers} de teste são exibidos na
+tela e o tamanho de cada \en{buffer} é impresso pelo ``myfilter'' na saída
+padrão.
+
+
+\section*{Elemento ``myvideofilter''}
+
+O próximo exemplo, elemento ``myvideofilter'', é um filtro de vídeo.
+A diferença desse elemento em relação ao anterior (``myfilter'') é que aqui
+estamos interessados em filtrar apenas quadros de vídeo.  Dessa forma, ao
+invés de herdar diretamente do tipo \C{GstElement}, vamos herdar do tipo
+especializado \C{GstVideoFilter}, que já trata as tarefas comuns envolvidas
+no processamento de quadros de vídeo.  Além desse tipo, o GStreamer possui
+tipos especializados para construção de \en{sources} (\C{GstBaseSrc}),
+\en{sinks} (\C{GstBaseSink}), filtros em geral (\C{GstBase}\-\C{Transform}),
+filtros de áudio (\C{GstAudioFilter}), etc.
+
+O elemento ``myvideofilter'' é um filtro de vídeo que aplica um efeito de
+ondulação aos amostras que o atravessam.  Mais precisamente, o elemento
+transforma cada pixel~$(u,v)$ do quadro recebido num pixel~$(x,y)$ no quadro
+resultante, de acordo com a fórmula:
+\begin{align*}
+  x(u,v)&=u+20\times\sin(\,\mathit{factor}\times{v})\\
+  y(u,v)&=v\,,
+\end{align*}
+em que~$\mathit{factor}$ é o valor da propriedade ``factor'' (número real)
+do elemento.
+
+A Listagem~\ref{lst:myfilter} apresenta o código do elemento
+``myvideofilter'' e do \en{plugin} correspondente.  Na listagem, a estrutura
+\C{GstMyVideoFilter} (linhas~8--11) contém os dados de uma instância de um
+elemento ``myvideofilter'', a saber, os dados do tipo pai
+\C{GstVideo}\-\C{Filter} e o valor corrente da propriedade ``factor'' do
+elemento.  As diretivas das linhas~15--18 declaram e definem o novo tipo
+(\C{GstMyVideoFilter}), que agora herda de \C{GstVideoFilter}, e as
+instruções seguintes (linhas~20--26) declaram e inicializam variáveis
+contendo os \en{templates} das \en{pads} do elemento---ambas as \en{pads}
+esperam \en{buffers} de vídeo nos formatos RGBx ou RGB\null.
+
+\lstinputlisting[
+escapechar={},
+style=display,
+caption={Código do elemento ``myvideofilter'' e \en{plugin} correspondente.},
+label={lst:myvideofilter},
+]{src/myvideofilter2.c}
+\clearpage
+
+Na Listagem~\ref{lst:myvideofilter}, a declaração \en{enum} da linha~13 cria
+uma constante simbólica para representar a propriedade factor
+(\C{PROP_FACTOR}).  A lógica de obtenção e atribuição de valores de
+propriedades está contida nas funções \C{gst_my_video_filter_get_property}
+(linhas~28--40) e \C{gst_my_video_filter_set_property} (linhas~42--54).
+Nesse caso, o elemento reconhece apenas uma propriedade, ``factor'', cujo
+valor é armazenado ou obtido a partir do campo correspondente da estrutura
+\C{GstMyVideoFilter}.
+
+A função \C{gst_my_video_filter_class_init} (linhas~85--107) inicializa o
+tipo (classe) \C{GstMyVideoFilter}.  Aqui, além de registrar os metadados do
+elemento (linhas~98--100) e os \en{templates} das futuras \en{caps}, a
+função sobrescreve as funções para manipulação de propriedades (herdadas de
+\C{GObject}, linhas~91--92), ``instala'' na classe os metadados da
+propriedade ``factor'' (linhas~93--96) e sobrescreve a função que processa
+os \en{buffers} de vídeo recebidos (herdada de \C{GstVideoFilter},
+linha~106).  Já a função \C{gst_my_video_filter_init} (linhas~109--112),
+nesse caso, apenas inicializa a propriedade ``factor'' com o seu valor
+\en{default}.
+
+A função \C{gst_my_video_transform} (linhas~56--83) é a função principal do
+exemplo.  Ela manipula os \en{pixels} do quadro de entrada transformando-os
+de acordo com a fórmula anterior, e produz um efeito de ondulação no quadro
+de saída.  Observe que diferentemente da função \C{gst_my_filter_chain} da
+Listagem~\ref{lst:myfilter} que recebia um \en{buffer} (\C{GstBuffer}), a
+função \C{gst_my_video_transform} recebe e devolve (via parâmetros) quadros
+de vídeo (\C{GstVideoFrame}).
+
+Finalmente, as linhas~114--125 são análogas às linhas correspondentes da
+Listagem~\ref{lst:myfilter}.  Ou seja, contém o ponto de entrada do
+\en{plugin} (linhas~114--118) e as declarações associadas (linhas~120--125).
+
+
+\subsection*{Compilando e usando o elemento ``myvideofilter''}
+
+O comando seguinte compila e \en{link}-edita o \en{plugin} ``myvideofilter''
+no GNU/Linux:
+\begin{lstlisting}[style=command]
+@\$@ cc myvideofilter.c -o myvideofilter.so -shared -fPIC\
+     `pkg-config --cflags --libs\
+         gstreamer-1.0 gstreamer-base-1.0 gstreamer-video-1.0`
+\end{lstlisting}
+Observe que além dos módulos ``gstreamer-1.0'' e ``gstreamer-base-1.0'' o
+\en{plugin} ``myvideofilter'' depende do módulo ``gstreamer-video-1.0'', que
+contém cabeçalhos e bibliotecas para manipulação de \en{buffers} de vídeo.
+
+O comando seguinte construí um \en{pipeline} que aplica o novo elemento ao
+vídeo \en{Big Buck Bunny}.  O resultado do comando com diferentes valores
+para a propriedade ``factor'' é apresentado na
+Figura~\ref{fig:bunny-myvideofilter}.
+\begin{lstlisting}[style=command]
+@\$@ gst-launch --gst-plugin-path=.\
+               uridecodebin uri="file://@\$@PWD/bunny.ogg"\
+               ! videoconvert\
+               ! myvideofilter factor=.10\
+               ! videoconvert\
+               ! autovideosink
+\end{lstlisting}
+
+\begin{figure}[H]
+  \centering
+  \subfigure[$\mathit{factor}=0.01$]{
+    \includegraphics[width=0.3\textwidth]{pics/myvideofilter}
+  }
+  \subfigure[$\mathit{factor}=0.05$]{
+    \includegraphics[width=0.3\textwidth]{pics/myvideofilter2}
+  }
+  \subfigure[$\mathit{factor}=0.1$]{
+    \includegraphics[width=0.3\textwidth]{pics/myvideofilter3}
+  }
+  \caption{Efeito de ondulação produzido pelo filtro ``myvideofilter''.}
+  \label{fig:bunny-myvideofilter}
+\end{figure}
+
+
+\section{Conclusão}
+\label{sec:conclusao}
+
+Neste minicurso apresentamos uma introdução ao \en{framework} multimídia
+GStreamer.  Discutimos o modelo de computação \en{dataflow} e, em
+particular, a forma como esse modelo é instanciado no \en{framework}.  Além
+disso, através de exemplos incrementais, apresentamos os principais
+conceitos da API~C básica do GStreamer.  Mais especificamente, mostramos
+como aplicações simples para reprodução de conteúdo multimídia podem ser
+programadas, e discutimos brevemente a criação de novos \en{plugins}
+contendo elementos processadores.
+
+Apesar dos exemplos discutidos serem relativamente simples, com o que vimos
+já é possível que criar aplicações multimídia avançadas.  Por exemplo,
+usando as mesmas APIs podemos usar elementos \en{mixers} (elementos
+``audiomixer'' e ``compositor'') para compor diversos fluxos de áudio e
+vídeo num mesmo \en{pipeline}.  Outra possibilidade é usar o \en{framework}
+para transcodificar fluxos de mídia, ou seja, montar \en{pipelines} que
+decodificam e re-codificam (em outro formato) um ou mais fluxos de mídia.
+Nesse caso, o \en{sink} ``filesink'' pode ser usado para escrever o fluxo
+resultante no disco.
+
+Alguns tópicos avançados, porém, foram deliberadamente omitidos.  No
+restante desta seção discutimos brevemente alguns desses tópicos com o
+objetivo de direcionar os leitores a aprofundamentos futuros.
+
+Um dos temas desafiadores em sistemas multimídia é a transmissão e recepção
+de dados multimídia em tempo real.  Embora não tratados aqui, o GStreamer
+possui diversos elementos que permitem transmitir e receber fluxos da rede.
+Por exemplo, o pacote \en{gst-plugins-good} contém elementos que podem ser
+usados para criar servidores e clientes~RTP, RTCP e~RTSP\null.  No
+Gstreamer, um servidor RTP pode ser implementado como um \en{pipeline} que
+fragmenta fluxos codificados, encapsula esses fragmentos em pacotes RTP e
+transmite-os na rede via UDP, conforme ilustrado no \en{pipeline} da
+Figura~\ref{fig:pipe-rtp}a.  Na figura, o elemento ``rtptheorapay'' recebe
+um fluxo de vídeo Theora e o encapsula em pacotes RTP que são transmitidos
+na rede via UDP pelo elemento seguinte, ``udpsink''.  De forma análoga,
+podemos implementar um cliente RTP usando os elementos \en{udpsrc}, que
+recebe um fluxo de dados via UDP, e \en{rtptheorapay}, que desempacota um
+fluxo RTP e gera um fluxo codificado resultante, como ilustrado no
+\en{pipeline} da Figura~\ref{fig:pipe-rtp}b.  Além de elementos que
+encapsulam e desencapsulam formatos específicos de fluxos em pacotes RTP, o
+GStreamer possui diversos outros elementos que facilitam a implementação
+desse tipo de aplicação, por exemplo, \en{rtpmanager}, \en{rtpbin},
+\en{rtpjitterbuffer}, etc.
+
+\begin{figure}[H]
+  \centering
+  \subfigure[{\scriptsize\sffamily Servidor RTP}]
+  {
+    \begin{tikzpicture}
+      \node (filesrc) [element] {filesrc};
+      \node (oggdemux) [element, right of=filesrc] {oggdemux};
+      \node (rtptheorapay) [element, right of=oggdemux] {rtptheorapay};
+      \node (udpsink) [element, right of=rtptheorapay] {udpsink};
+      \draw [->, arrow] (filesrc) -- (oggdemux);
+      \draw [->, arrow] (oggdemux) -- (rtptheorapay);
+      \draw [->, arrow] (rtptheorapay) -- (udpsink);
+    \end{tikzpicture}
+    \label{fig:rtp-server}
+  }
+  \subfigure [{\scriptsize\sffamily Cliente RTP}]
+  {
+    \begin{tikzpicture}
+      \node (udpsrc) [element] {udpsrc};
+      \node (rtptheoradepay) [element, right of=udpsrc] {rtptheoradepay};
+      \node (theoradec) [element, right of=rtptheoradepay] {theoradec};
+      \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
+      \draw [->, arrow] (udpsrc) -- (rtptheoradepay);
+      \draw [->, arrow] (rtptheoradepay) -- (theoradec);
+      \draw [->, arrow] (theoradec) -- (xvimagesink);
+    \end{tikzpicture}
+    \label{fig:rtp-client}
+  }
+  \caption{Servidor e cliente RTP para vídeos Ogg/Theora.}
+  \label{fig:pipe-rtp}
+\end{figure}
+
+Outro tema importante que não discutimos é QoS (qualidade de serviço).  De
+fato, mencionamos rapidamente eventos de QoS na Seção~\ref{sec:intro}.  Além
+desses eventos, o GStreamer possui outras funcionalidades que visam manter a
+QoS de aplicações multimídia.  Por exemplo, internamente todo \en{pipeline}
+mantém um relógio (\C{GstClock}) que é usado para sincronizar a exibição dos
+\en{buffers} que o percorrem.  Elementos \en{sink} usam esse relógio tanto
+para controlar a apresentação das amostras quanto para descartar amostras
+atrasadas.  Dependendo da aplicação, se necessário, podemos sincronizar o
+relógio de \en{pipelines} diferentes (mesmo em máquinas separadas) via
+objetos \C{GstNetTimeProvider}, que expõe o tempo de um \C{GstClock} para a
+rede, ou \C{GstNetClientClock}, que sincroniza o relógio de um \en{pipeline}
+a um objeto provedor de tempo (\C{GstNetTimeProvider}), e podemos ainda
+criar relógios sincronizados com um servidor NTP (\C{GstNtpClock}) ou PTP
+(\C{GstPtpClock}).  Dessa forma, é possível usar o GStreamer para
+implementar aplicações que requerem a sincronização de mídias em múltiplos
+destinos ou em múltiplas origens---cenários comuns em ambientes híbridos
+de~TV digital~\cite{Cesar-2016}.
+
+Há certamente mais temas importantes que não abordamos.  Todavia,
+acreditamos que a partir da base apresentada aqui os leitores estejam aptos
+a atacar esses temas.  No site oficial do GStreamer~\cite{gstreamer} há
+diversos materiais detalhando o funcionamento interno do \en{framework}.
+Além disso, apesar de não ser essencial, àqueles que querem trabalhar
+diretamente no código do GStreamer, ou mesmo estendê-lo por meio de
+\en{plugins}, recomendamos a documentação do \en{framework} de objetos
+GObject~\cite{glib}.  Finalmente, caso~C não seja a sua linguagem favorita,
+existem~\en{bindings} do GStreamer para outras linguagens e ambientes, por
+exemplo, Lua, Python, Java, C++, Qt, Android, Vala, Ruby, Haskell, etc.
+
+
+\bibliographystyle{acm}
 \bibliography{bib}
 \end{document}
 
@@ -1498,4 +1853,17 @@ label={lst:controles-aux},
 %  LocalWords:  audiodynamic audiopanorama freeverb soundtouch pitch speed
 %  LocalWords:  coloreffects effectv shagadelictv dicetv edgetv revtv delay
 %  LocalWords:  videocrop videofilter videobalance videoscale script preset
-%  LocalWords:  videoconvert intensity room-size level
+%  LocalWords:  videoconvert intensity room-size level pré-processador play
+%  LocalWords:  background cl SPC NAVIGATION EVENT loop new GstBus hash run
+%  LocalWords:  watch listener quit switch return toggle space right left
+%  LocalWords:  offset ns from simple FORMAT ACCURATE key frames myfilter
+%  LocalWords:  gstnavigation gstreamer-video myvideofilter GstMyFilter my
+%  LocalWords:  GType any chain buffer push class so gst-plugin-path factor
+%  LocalWords:  videotestsrc GstVideoFilter GstBaseSrc GstBaseSink GstBase
+%  LocalWords:  Transform GstAudioFilter GstMyVideoFilter GstVideo RGBx NTP
+%  LocalWords:  default enum PROP property transform GstBuffer APIs mixers
+%  LocalWords:  GstVideoFrame gstreamer-base audiomixer re-codificam RTCP
+%  LocalWords:  filesink RTSP rtptheorapay udpsink udpsrc rtpmanager rtpbin
+%  LocalWords:  rtpjitterbuffer GstClock GstNetTimeProvider GstNtpClock PTP
+%  LocalWords:  GstNetClientClock GstPtpClock bindings Python Qt Android
+%  LocalWords:  Ruby Haskell
