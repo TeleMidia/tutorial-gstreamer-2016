@@ -165,6 +165,7 @@ consomem e produzem dados, e consumidores apenas consomem dados.
   \caption{Um \en{pipeline} GStreamer que reproduz um arquivo de vídeo Ogg.}
   \label{fig:pipe-tipico}
 \end{figure}
+\vskip-\baselineskip
 
 Na Figura~\ref{fig:pipe-tipico} há um elemento produtor (``filesrc''), três
 processadores (``oggdemux'', ``vorbisdec'' e ``theoradec'') e dois
@@ -184,14 +185,13 @@ simples.  Basta instanciar os elementos necessários, interconectar suas
 Figura~\ref{fig:pipe-tipico}, por exemplo, após iniciado opera da seguinte
 forma.
 \begin{enumerate}
-\item O elemento ``filesrc'' lê um arquivo Ogg armazenado no sistema de
-  arquivos e escreve o fluxo de bytes resultante na sua \en{source pad}.
-  Ogg é~\cite{ogg-rfc-3533} um formato para multiplexação de fluxos de
-  áudio, vídeo e texto.  Vamos assumir que o arquivo Ogg nesse caso contém
-  apenas dois fluxos multiplexados: um fluxo de áudio (sequência de amostras
-  de áudio) codificado no formato Vorbis~\cite{vorbis}; e um fluxo de vídeo
-  (sequência de quadros de imagem) codificado no formato
-  Theora~\cite{theora}.
+\item O elemento ``filesrc'' lê um arquivo Ogg do disco e escreve o fluxo de
+  bytes resultante na sua \en{source pad}.  Ogg é~\cite{ogg-rfc-3533} um
+  formato para multiplexação de fluxos de áudio, vídeo e texto.  Vamos
+  assumir que o arquivo Ogg nesse caso contém apenas dois fluxos
+  multiplexados: um fluxo de áudio (sequência de amostras de áudio)
+  codificado no formato Vorbis~\cite{vorbis}; e um fluxo de vídeo (sequência
+  de quadros de imagem) codificado no formato Theora~\cite{theora}.
 \item O elemento ``oggdemux'' lê da sua \en{sink pad} um fluxo de bytes
   codificado no formato Ogg, demultiplexa-o e escreve os fluxos Vorbis
   (áudio) e Theora (vídeo) resultantes nas \en{source pads} correspondentes.
@@ -1638,7 +1638,7 @@ label={lst:myvideofilter},
 \clearpage
 
 Na Listagem~\ref{lst:myvideofilter}, a declaração \en{enum} da linha~13 cria
-uma constante simbólica para representar a propriedade factor
+uma constante simbólica para representar a propriedade ``factor''
 (\C{PROP_FACTOR}).  A lógica de obtenção e atribuição de valores de
 propriedades está contida nas funções \C{gst_my_video_filter_get_property}
 (linhas~28--40) e \C{gst_my_video_filter_set_property} (linhas~42--54).
