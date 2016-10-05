@@ -28,6 +28,7 @@ words:= $(words)|downstream
 words:= $(words)|end-of-stream
 words:= $(words)|equalizers?
 words:= $(words)|events?
+words:= $(words)|factors?
 words:= $(words)|fast-forward
 words:= $(words)|flags?
 words:= $(words)|flags?
