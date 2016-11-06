@@ -1,0 +1,120 @@
+\mode<presentation>
+\RequirePackage{graphicx}
+\RequirePackage{tikz}
+\RequirePackage[small,OT1]{eulervm}
+%-
+% Misc.
+\newcommand{\TecMF}{\mbox{Tec$\mathcal{MF}$}}
+%-
+% Colors.
+\definecolor{charcoal}{RGB}{80,80,80}
+\definecolor{crimsonred}{RGB}{153,29,29}
+\definecolor{darkcharcoal}{RGB}{25,25,25}
+\definecolor{jeans}{RGB}{20,30,150}
+\definecolor{lager}{RGB}{140,110,10}
+\definecolor{paleale}{RGB}{204,204,102}
+\definecolor{paleblue}{RGB}{0,102,102}
+\definecolor{regal}{RGB}{90,0,120}
+\definecolor{turtlegreen}{RGB}{51,153,0}
+%
+\setbeamercolor*{section in head/foot}{fg=white,bg=charcoal}
+\setbeamercolor*{titlelike}{fg=crimsonred}
+\setbeamercolor{structure}{fg=crimsonred}
+\setbeamercolor{block title example}{fg=crimsonred}
+\setbeamercolor{itemize item}{fg=crimsonred}
+\setbeamercolor{enumerate item}{fg=crimsonred}
+%-
+% Margins.
+\newlength{\beamerpuc@m}
+\setlength{\beamerpuc@m}{.06\paperwidth}
+\setbeamersize{text margin left=\beamerpuc@m}
+\setbeamersize{text margin right=\beamerpuc@m}
+\setlength\leftmargini{.6\beamerpuc@m}
+\setlength\leftmarginii{.6\beamerpuc@m}
+\setlength\leftmarginiii{.6\beamerpuc@m}
+%-
+% Bullets.
+\defbeamertemplate{itemize item}{circlealt}%
+  {\small\raise.2ex\hbox{\donotcoloroutermaths$\bullet$}}
+\defbeamertemplate{itemize subitem}{circlealt}%
+  {\small\raise.1ex\hbox{\donotcoloroutermaths$\circ$}}
+\defbeamertemplate{itemize subsubitem}{circlealt}%
+  {\scriptsize\raise.1ex\hbox{\donotcoloroutermaths$\bullet$}}
+\setbeamertemplate{items}[circlealt]
+%-
+% Title page.
+\titlegraphic{\includegraphics[scale=.5]{beamerthemepuc}}
+%% \setbeamertemplate{title page}{%
+%%   \vbox{}
+%%   \vfill
+%%   \begingroup
+%%     \centering
+%%     \begin{beamercolorbox}[center]{title}
+%%       \usebeamerfont{title}\inserttitle\par%
+%%       \ifx\insertsubtitle\@empty%
+%%       \else%
+%%         \vskip0.25em%
+%%         {\usebeamerfont{subtitle}
+%%           \usebeamercolor[fg]{subtitle}\insertsubtitle\par}%
+%%       \fi%
+%%     \end{beamercolorbox}%
+%%     \vskip1em\par
+%%     \begin{beamercolorbox}[sep=8pt,center]{author}
+%%       \usebeamerfont{author}\insertauthor
+%%     \end{beamercolorbox}
+%%     \begin{beamercolorbox}[sep=8pt,center]{institute}
+%%       \usebeamerfont{institute}\insertinstitute
+%%     \end{beamercolorbox}
+%%     \begin{beamercolorbox}[sep=8pt,center]{date}
+%%       \usebeamerfont{date}\insertdate
+%%     \end{beamercolorbox}\vskip0.5em
+%%     {\usebeamercolor[fg]{titlegraphic}\inserttitlegraphic\par}
+%%   \endgroup
+%%   \vfill}
+%-
+% Table of contents.
+\setbeamertemplate{section in toc}[sections numbered]
+\AtBeginSection[]{%
+  \begin{frame}<beamer>{\contentsname}
+    \tableofcontents[currentsection]
+  \end{frame}}
+\AtBeginSubsection[]{%
+  \begin{frame}<beamer>{\contentsname}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}}
+%-
+% Header.
+\setbeamerfont{section in head/foot}{series=\bfseries}
+\setbeamertemplate{headline}{%
+  %% \begin{beamercolorbox}{section in head/foot}
+  %%   \vskip1pt
+  %%   \strut\insertnavigation{\paperwidth}
+  %%   \vskip1pt
+  %% \end{beamercolorbox}
+  \begin{tikzpicture}[overlay]
+    % Fix small gap between footer and frame border.
+    \usebeamercolor[bg]{section in head/foot}
+    \draw[thick] (\paperwidth,9pt) -- (\paperwidth,0pt);
+    % Draw top decoration.
+    \usebeamercolor[fg]{titlelike}
+    \draw[fill] (0,0) rectangle (1.05\paperwidth,-3pt);
+  \end{tikzpicture}}
+%-
+% Footer.
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}{%
+  \begin{beamercolorbox}{section in head/foot}
+    \vskip1pt
+    \hfill\hbox{\strut\insertframenumber/\inserttotalframenumber\,}%
+    \vskip1pt
+  \end{beamercolorbox}%
+  \begin{tikzpicture}[overlay]
+    % Fix small gap between footer and frame border.
+    \usebeamercolor[bg]{section in head/foot}
+    \draw[thick] (0,0) -- (\paperwidth,0);
+    \draw[thick] (\paperwidth,9pt) -- (\paperwidth,-2pt);
+  \end{tikzpicture}}
+%-
+% Epilogue.
+\mode<all>
+\endinput
