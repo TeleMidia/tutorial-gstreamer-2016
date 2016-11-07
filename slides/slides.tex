@@ -672,8 +672,8 @@
   GStreamer.
 \end{frame}
 
-\section{Primeira Aplicação GStreamer: Olá mundo}
-\begin{frame}[fragile]{Olá mundo -- playbin}
+\section{Hands on}
+\begin{frame}[fragile]{Primeira Aplicação: Olá mundo}
   Tocando um vídeo no GStreamer usando o elemento ``playbin''.
   \begin{itemize}
     \item Arquivo: src/hello.c
@@ -685,6 +685,64 @@
   $ cc hello.c -o hello `pkg-config --cflags --libs 
         glib-2.0 gstreamer-1.0`
   \end{lstlisting}
+\end{frame}
+
+\begin{frame}[c]{Tocando áudio e vídeo a partir de elementos básicos}
+  Player MP3.
+  \begin{figure}[t]
+    \centering
+    \begin{tikzpicture}
+      \node (filesrc) [element] {filesrc};
+      \node (mad) [element, right of=filesrc] {mad};
+      \node (alsasink) [element, right of=mad] {alasink};
+      \coordinate (A) at ($(filesrc.north west)+(-.5\odim,.5\odim)$);
+      \coordinate (B) at ($(alsasink.south east)+(.5\odim,-.5\odim)$);
+      \path [bin] (A) rectangle node [binlabel] {pipeline} (B);
+      \draw [->, arrow] (filesrc) -- (mad);
+      \draw [->, arrow] (mad) -- (alsasink);
+    \end{tikzpicture}
+  \end{figure}
+  \en{Pipeline} que reproduz um arquivo de áudio~MP3.
+  ~
+  \begin{itemize}
+    \item Arquivo: src/mp3.c
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]{Máquinas de Estado de um GstElement}
+  \begin{itemize}
+    \item Todo elemento possui um estado, que pode ser: 
+      \begin{itemize}
+        \item GST\_STATE\_NULL (nulo)
+        \item GST\_STATE\_READY (pronto)
+        \item GST\_STATE\_PAUSED (pausado)
+        \item GST\_STATE\_PLAYING (tocando)
+      \end{itemize}
+    \item Mudanças de estado são propagadas para elementos filhos (\en{bins})
+      \begin{itemize}
+        \item Direção de propagação é sempre dos \en{sinks} para 
+          os \en{sources}
+        \item Isso evita que dados sejam gerados antes que elementos 
+          posteriores no \en{pipeline} estejam prontos para recebê-los
+      \end{itemize}
+  \end{itemize}
+
+  \begin{figure}[h]
+    \centering
+    \begin{tikzpicture}[node distance=1.5\hdim+\odim]
+      \node [state] (NULL) {null};
+      \node [state, right of=NULL] (READY) {ready};
+      \node [state, right of=READY] (PAUSED) {paused};
+      \node [state, right of=PAUSED] (PLAYING) {playing};
+      \draw [->] (NULL) to [bend left=20] (READY);
+      \draw [->] (READY) to [bend left=20] (PAUSED);
+      \draw [->] (PAUSED) to [bend left=20] (PLAYING);
+      \draw [->] (PLAYING) to [bend left=20] (PAUSED);
+      \draw [->] (PAUSED) to [bend left=20] (READY);
+      \draw [->] (READY) to [bend left=20] (NULL);
+    \end{tikzpicture}
+  \end{figure}
+
 
 \end{frame}
 
