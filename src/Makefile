@@ -8,6 +8,3 @@ all: $(PROGRAMS)
 clean:
 	-rm -f $(PROGRAMS)
 .PHONY: all clean
-
-# $(PROGRAMS):
-# 	$(CC) $(CFLAGS) -o $@ $(LDLIBS) $(@:=.c)
