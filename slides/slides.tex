@@ -1097,4 +1097,256 @@ $ gst-launch filesrc location=bunny.mp3\
   \end{itemize}
 \end{frame}
 
+\section{Plugins}
+\begin{frame}[c]{\en{Plugins} no GStreamer}
+  \begin{itemize}
+    \item Plugin: componente de software que estende funcionalidades de 
+      um programa/\en{framework}
+    \item Elementos GStreamer são encapsulados em \en{plugins} 
+      \begin{itemize}
+        \item Um \en{plugin} pode implementar diversos elementos
+      \end{itemize}
+    \item \en{Plugins} geram bibliotecas dinâmicas (.dll, .so) que são
+      carregadas na chamada \C{gst_init()}
+    \item A API de \en{plugins} é fortemente baseada no sistema de tipos
+      do framework GLib/GObject
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]{GLib/GObject}
+  \begin{block}{GLib}
+    \begin{itemize}
+      \item \en{Framework} multiplataforma da GNOME 
+      \item Implementação em C de diversas estruturas de dados (listas 
+        encadeadas, tabelas hash, árvores binárias, \ldots)
+      \item Sistema de tipos dinâmico (GType) 
+      \item Implementação de orientação a objetos em C (GObject)
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{GObject}<2>
+    \begin{itemize}
+      \item Tipo fundamental (superclasse) da GLib 
+      \item Gerenciamento de memória (contador de referências)
+      \item Funções para construção/destruição de instâncias 
+      \item Sistema genérico de propriedades
+      \item Sinais
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Elemento ``myfilter''}
+  \begin{itemize}
+    \item Filtro genérico que lê uma amostra da sua \en{sink pad}, imprime 
+      o seu tamanho na saída padrão e repassa-a à sua \en{source pad}
+    \item Arquivo: src/myfilter2.c
+  \end{itemize}
+
+  Compilação:
+  \begin{lstlisting}[style=command, breaklines=true]
+$ cc myfilter.c -o myfilter.so -shared -fPIC
+  `pkg-config --cflags --libs gstreamer-1.0 gstreamer-base-1.0`
+  \end{lstlisting}
+
+  Teste:
+  \begin{lstlisting}[style=command, breaklines=true]
+$ gst-launch --gst-plugin-path=.
+  videotestsrc ! myfilter ! ximagesink
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[c]{Elemento ``myvideofilter''}
+  Efeito de ondulação produzido pelo filtro ``myvideofilter''.
+  \begin{figure}[H]
+    \centering
+    \subfigure[$\mathit{factor}=0.01$]{
+      \includegraphics[width=0.3\textwidth]{../pics/myvideofilter}
+    }
+    \subfigure[$\mathit{factor}=0.05$]{
+      \includegraphics[width=0.3\textwidth]{../pics/myvideofilter2}
+    }
+    \subfigure[$\mathit{factor}=0.1$]{
+      \includegraphics[width=0.3\textwidth]{../pics/myvideofilter3}
+    }
+  \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Elemento ``myvideofilter''}
+  \begin{itemize}
+    \item Filtro de vídeo
+      \begin{itemize}
+        \item As \en{pads} desse filtro só aceitam amostras de vídeo
+      \end{itemize}
+    \item Herda do tipo \C{GstVideoFilter}
+      \begin{itemize}
+        \item Superclasse que trata as tarefas comuns envolvidas
+          no processamento de quadros de vídeo
+        \item O GStreamer possui tipos especializados para construção de 
+          \en{sources} (\C{GstBaseSrc}),\en{sinks} (\C{GstBaseSink}), 
+          filtros em geral (\C{GstBase}\-\C{Transform}), 
+          filtros de áudio (\C{GstAudioFilter}), etc.
+      \end{itemize}
+    \item Aplica um efeito de ondulação aos amostras que o atravessam:
+  \end{itemize}
+  \begin{align*}
+    x(u,v)&=u+20\times\sin(\,\mathit{factor}\times{v})\\
+    y(u,v)&=v\,,
+  \end{align*}
+\end{frame}
+
+\begin{frame}[fragile]{Ellemento ``myvideofilter''}
+  \begin{itemize}
+    \item Arquivo: src/myvideofilter2.c
+  \end{itemize}
+
+  Compilação:
+\begin{lstlisting}[style=command, breaklines=true]
+$ cc myvideofilter.c -o myvideofilter.so -shared -fPIC `pkg-config --cflags --libs gstreamer-1.0 gstreamer-base-1.0 gstreamer-video-1.0
+\end{lstlisting}
+
+  ~
+  Teste:
+\begin{lstlisting}[style=command]
+$gst-launch --gst-plugin-path=. \
+             uridecodebin uri=<URI> \
+             ! videoconvert \
+             ! myvideofilter factor=.10 \
+             ! videoconvert \
+             ! autovideosink
+\end{lstlisting}
+\end{frame}
+
+\section{Considerações Finais}
+
+\begin{frame}[fragile]{Considerações Finais}
+  Compondo múltiplos fluxos de vídeo num mesmo pipeline
+\begin{lstlisting}[style=command, breaklines=true]
+$ gst-launch uridecodebin uri=<URI> ! \
+    compositor name=comp              \
+               sink_0::zorder=2       \
+               sink_0::xpos=100       \
+               sink_0::ypos=100       \
+               sink_1::zorder=1 !     \
+    videoconvert ! xvimagesink        \
+    videotestsrc ! comp. 
+
+\end{lstlisting}
+
+  \begin{adjustbox}{max totalsize={.8\textwidth}{\textheight},center}
+    \begin{tikzpicture}
+      \node (uridecodebin) [element] {uridecodebin};
+      \node (videotestsrc) [element, below of=uridecodebin] {videotestsrc};
+
+      \node (compositor) [element, right of=uridecodebin] at ($(uridecodebin)!0.5!(videotestsrc)$) {compositor} ;
+      \node (videofilter) [element, right of=compositor] {videofilter};
+      \node (xvimagesink) [element, right of=videofilter] {xvimagesink};
+
+      \draw [->, arrow] (uridecodebin) -- (compositor);
+      \draw [->, arrow] (videotestsrc) -- (compositor);
+      \draw [->, arrow] (compositor) -- (videofilter);
+      \draw [->, arrow] (videofilter) -- (xvimagesink);
+    \end{tikzpicture}
+  \end{adjustbox}
+\end{frame}
+
+\begin{frame}[fragile]{Considerações Finais}
+  Compondo múltiplos fluxos de áudio num mesmo pipeline
+\begin{lstlisting}[style=command, breaklines=true]
+$ gst-launch uridecodebin uri=<URI> !       \
+    audioconvert ! audio/x-raw,rate=48000 ! \
+    audiomixer name=mix !                   \
+    audioconvert ! alsasink                 \
+    audiotestsrc !                          \
+    audioconvert ! audio/x-raw,rate=48000 ! \
+    mix.
+\end{lstlisting}
+
+  \begin{adjustbox}{max totalsize={.8\textwidth}{\textheight},center}
+    \begin{tikzpicture}
+      \node (uridecodebin) [element] {uridecodebin};
+      \node (audioconvert1) [element, right of=uridecodebin] {audioconvert};
+      \node (audiotestsrc) [element, below of=uridecodebin] {audiotestsrc};
+      \node (audioconvert2) [element, right of=audiotestsrc] {audioconvert};
+
+      \node (compositor) [element, right of=audioconvert1] at ($(audioconvert1)!0.5!(audioconvert2)$) {compositor} ;
+      \node (audioconvert3) [element, right of=compositor] {audioconvert};
+      \node (alsasink) [element, right of=audioconvert3] {alsasink};
+
+      \draw [->, arrow] (uridecodebin) -- (audioconvert1);
+      \draw [->, arrow] (audiotestsrc) -- (audioconvert2);
+      \draw [->, arrow] (audioconvert1) -- (compositor);
+      \draw [->, arrow] (audioconvert2) -- (compositor);
+      \draw [->, arrow] (compositor) -- (audioconvert3);
+      \draw [->, arrow] (audioconvert3) -- (alsasink);
+    \end{tikzpicture}
+  \end{adjustbox}
+\end{frame}
+
+\begin{frame}[fragile]{Considerações Finais}
+  Transmissão de vídeos Ogg/Theora usando o protocolo RTP:
+
+  ~\\
+  Servidor
+  \begin{figure}[H]
+    \centering
+    \subfigure
+    {
+      \begin{tikzpicture}
+        \node (filesrc) [element] {filesrc};
+        \node (oggdemux) [element, right of=filesrc] {oggdemux};
+        \node (rtptheorapay) [element, right of=oggdemux] {rtptheorapay};
+        \node (udpsink) [element, right of=rtptheorapay] {udpsink};
+        \draw [->, arrow] (filesrc) -- (oggdemux);
+        \draw [->, arrow] (oggdemux) -- (rtptheorapay);
+        \draw [->, arrow] (rtptheorapay) -- (udpsink);
+      \end{tikzpicture}
+    }
+    \subfigure 
+    {
+      \begin{tikzpicture}
+        \node (udpsrc) [element] {udpsrc};
+        \node (rtptheoradepay) [element, right of=udpsrc] {rtptheoradepay};
+        \node (theoradec) [element, right of=rtptheoradepay] {theoradec};
+        \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
+        \draw [->, arrow] (udpsrc) -- (rtptheoradepay);
+        \draw [->, arrow] (rtptheoradepay) -- (theoradec);
+        \draw [->, arrow] (theoradec) -- (xvimagesink);
+      \end{tikzpicture}
+    }
+  \end{figure}
+  Cliente 
+\end{frame}
+
+\begin{frame}[c]{Considerações Finais}
+  \begin{itemize}
+    \item Sincronização de relógios entre \en{pipelines}
+      \begin{itemize}
+        \item \C{GstNetTimeProvider} + \C{GstNetClientClock}
+      \end{itemize}
+    \item Sincronização de relógios com um servidor NTP 
+      (\en{Network Time Protocol})
+      \begin{itemize}
+        \item \C{GstNtpClock}
+      \end{itemize}
+    \item Sincronização de relógios com um servidor PTP 
+      (\en{Precision Time Protocol})
+      \begin{itemize}
+        \item \C{GstPtpClock}
+      \end{itemize}
+    \item \en{Bindings} para outras linguagens/plataformas
+      \begin{itemize}
+        \item Lua, Python, Java, C++, Qt, Android, Vala, Ryby, 
+          Haskell, \ldots.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[plain,c]
+  \begin{center}
+    \Huge Obrigado! 
+  \end{center}
+
+\end{frame}
+
+
 \end{document}
