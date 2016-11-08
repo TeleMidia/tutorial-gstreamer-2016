@@ -6,10 +6,11 @@ PLUGINS= myfilter.so myvideofilter.so
 all: $(PLUGINS)
 clean:
 	rm -f myfilter.so
+	rm -f myvideofilter.so
 .PHONY: all clean
 
 myfilter.so: myfilter2.c
-	cc $(CFLAGS) $(LDFLAGS) myfilter2.c -o $@
+	cc $(CFLAGS) myfilter2.c -o $@ $(LDFLAGS)
 
 myvideofilter.so: myvideofilter2.c
-	cc $(CFLAGS) $(LDFLAGS) myvideofilter2.c -o $@
+	cc $(CFLAGS) myvideofilter2.c -o $@ $(LDFLAGS)
