@@ -16,6 +16,9 @@
 \usepackage{color}
 \usepackage[normalem]{ulem}
 \usepackage{textcomp}
+\usepackage{adjustbox}
+\usepackage{booktabs}
+\usepackage{subfigure}
 \usepackage{tikz}
 \usetikzlibrary{arrows,calc,positioning,shadows,shapes,trees}
 \newdimen\hdim                  % element height
@@ -99,6 +102,9 @@
   \tikz[baseline=(key.base)]\node[keystroke](key) {#1\strut};
 }
 
+\let\C\lstinline
+\def\<#1>{\ensuremath{\left<#1\right>}}
+
 \def\en#1{\foreignlanguage{english}{\emph{#1}}}
 
 \lstset{
@@ -148,7 +154,7 @@
 }
 \institute[TeleMídia Lab.]
 {
-  Pontifícia Universidade Católica -- PUC-Rio\\ 
+  Pontifícia Universidade Católica -- PUC-Rio\\
   TeleMídia Lab., Dep. de Informática.
 
   \medskip
@@ -164,14 +170,14 @@
     \begin{itemize}
       \item Doutor em Informática pela PUC-Rio (2015)
       \item Interesses de Pesquisa: linguagens de programação e modelos
-        para sincronismo multimídia. 
+        para sincronismo multimídia.
     \end{itemize}
   \end{block}
   \begin{block}{Rodrigo Costa}
     \begin{itemize}
       \item Doutorando em Informática na PUC-Rio
       \item Interesses de Pesquisa: sistemas multimídia distribuídos
-      e modelos síncronos para autoria multimídia. 
+      e modelos síncronos para autoria multimídia.
     \end{itemize}
   \end{block}
   \begin{block}{Roberto Gerson}
@@ -187,11 +193,11 @@
   \url{https://github.com/TeleMidia/minicurso-webmedia16}
 
   \begin{itemize}
-    \item Pasta \en{src} 
+    \item Pasta \en{src}
       \begin{itemize}
         \item códigos fonte utilizados neste minicurso
       \end{itemize}
-    \item Pasta \en{slides} 
+    \item Pasta \en{slides}
       \begin{itemize}
         \item slides utilizados neste minicurso
       \end{itemize}
@@ -207,7 +213,7 @@
 
 \begin{frame}[c]{GStreamer}
   \begin{itemize}
-    \item Um dos principais \en{frameworks} de código aberto 
+    \item Um dos principais \en{frameworks} de código aberto
       para processamento de dados multimídia
       \begin{itemize}
         \item Projeto com mais de 15 anos
@@ -228,12 +234,12 @@
 
 \begin{frame}[c]{GStreamer}
   \begin{itemize}
-    \item Multiplataforma 
+    \item Multiplataforma
     \item Robusto
     \item Flexível
     \item Extensível por Plugins
     \item APIs de alto e baixo nível
-    \item Baseado no modelo de computação \en{dataflow} 
+    \item Baseado no modelo de computação \en{dataflow}
       \begin{itemize}
         \item \en{``Pipeline"} na terminologia do GStreamer
       \end{itemize}
@@ -264,7 +270,7 @@
     \item Estrutura de grafo dirigido
       \begin{itemize}
         \item Nós representam elementos de processamento (atores)
-        \item Arestas representam conexões unidirecionais por onde fluem 
+        \item Arestas representam conexões unidirecionais por onde fluem
           os dados
       \end{itemize}
     \item Atores recebem dados em portas de entrada e emitem dados através
@@ -311,8 +317,8 @@
     \item Portas por onde entram e saem dados dos elementos são chamados de
       \en{pads}
       \begin{itemize}
-        \item \en{Sink pad} -- portas de entrada 
-        \item \en{Source pad} -- portas de saída 
+        \item \en{Sink pad} -- portas de entrada
+        \item \en{Source pad} -- portas de saída
       \end{itemize}
     \item Tipos de elementos
       \begin{itemize}
@@ -324,7 +330,7 @@
 \end{frame}
 
 \begin{frame}[c]{Pipelines no GStreamer}
-  Um \en{pipeline} GStreamer simplificado que reproduz um arquivo de 
+  Um \en{pipeline} GStreamer simplificado que reproduz um arquivo de
   vídeo Ogg.
 
   \begin{itemize}
@@ -335,15 +341,15 @@
 
     \item<3> Processadores
       \begin{itemize}
-        \item oggdemux 
+        \item oggdemux
         \item vorbisdec
-        \item theoradec 
+        \item theoradec
       \end{itemize}
 
     \item<4> \en{Sinks}
       \begin{itemize}
-        \item alsasink 
-        \item xvimagesink 
+        \item alsasink
+        \item xvimagesink
       \end{itemize}
   \end{itemize}
   \newcommand*\overlaytwo{}
@@ -385,7 +391,7 @@
 
 \begin{frame}[c]{Pipelines no GStreamer}
   \begin{block}{filesrc}
-    Lê um arquivo do disco (vamos assumir um arquivo Ogg) e escreve o 
+    Lê um arquivo do disco (vamos assumir um arquivo Ogg) e escreve o
     fluxo de bytes resultante na sua \en{source pad}
   \end{block}
 
@@ -421,8 +427,8 @@
 
 \begin{frame}[c]{Pipelines no GStreamer}
   \begin{block}{oggdemux}
-    Lê da sua \en{sink pad} um fluxo de bytes codificado no formato Ogg, 
-    demultiplexa-o e escreve os fluxos Vorbis (áudio) e Theora (vídeo) 
+    Lê da sua \en{sink pad} um fluxo de bytes codificado no formato Ogg,
+    demultiplexa-o e escreve os fluxos Vorbis (áudio) e Theora (vídeo)
     resultantes nas \en{source pads} correspondentes
   \end{block}
 
@@ -495,8 +501,8 @@
 
 \begin{frame}[c]{Pipelines no GStreamer}
   \begin{block}{theoradec}
-    Lê da sua \en{sink pad} um fluxo de bytes codificado no formato 
-    Theora, decodifica-o e escreve o fluxo de vídeo \en{raw} descomprimido 
+    Lê da sua \en{sink pad} um fluxo de bytes codificado no formato
+    Theora, decodifica-o e escreve o fluxo de vídeo \en{raw} descomprimido
     resultante na sua \en{source pad}
   \end{block}
 
@@ -532,8 +538,8 @@
 
 \begin{frame}[c]{Pipelines no GStreamer}
   \begin{block}{alsasink}
-    Lê um fluxo de áudio descomprimido da sua \en{sink pad} e utiliza 
-    a biblioteca ALSA para reproduzir as amostras do fluxo 
+    Lê um fluxo de áudio descomprimido da sua \en{sink pad} e utiliza
+    a biblioteca ALSA para reproduzir as amostras do fluxo
     nos alto-falantes
   \end{block}
 
@@ -569,7 +575,7 @@
 
 \begin{frame}[c]{Pipelines no GStreamer}
   \begin{block}{xvimagesink}
-    Lê um fluxo de vídeo descomprimido da sua \en{sink pad} e utiliza 
+    Lê um fluxo de vídeo descomprimido da sua \en{sink pad} e utiliza
     a biblioteca X11 para reproduzir os quadros do fluxo na tela
   \end{block}
 
@@ -605,18 +611,18 @@
 
 \begin{frame}[c]{Sincronização}
   \begin{itemize}
-    \item \en{Pipelines} possuem um relógio para controlar a sincronização 
+    \item \en{Pipelines} possuem um relógio para controlar a sincronização
       dos fluxos
     \item Cada amostra de áudio e vídeo possuem um tempo de apresentação
       (PTS -- \en{presentation timestamp}) e uma duração
     \item Elementos \en{sink} controlam a taxa de reprodução de cada
       fluxo
       \begin{itemize}
-        \item Amostras recebidas antes do seu tempo de apresentação são 
-          armazenadas em uma fila interna para serem exibidas no 
+        \item Amostras recebidas antes do seu tempo de apresentação são
+          armazenadas em uma fila interna para serem exibidas no
           tempo adequado
-        \item Amostras recebidas após o seu tempo de apresentação são 
-          descartadas 
+        \item Amostras recebidas após o seu tempo de apresentação são
+          descartadas
       \end{itemize}
     \item Todos os outros elementos do \en{pipeline} operam livremente
       \begin{itemize}
@@ -637,16 +643,16 @@
         \item Dados (\en{buffers})
           \begin{itemize}
             \item Amostras de áudio/vídeo
-            \item Fluem exclusivamente na direção das conexões 
+            \item Fluem exclusivamente na direção das conexões
           \end{itemize}
         \item Eventos (\en{events})
           \begin{itemize}
-            \item Informações de controle 
-            \item Podem fluir em ambos os sentidos das conexões 
+            \item Informações de controle
+            \item Podem fluir em ambos os sentidos das conexões
             \item Ex: QoS, seek, flush, \ldots
           \end{itemize}
       \end{itemize}
-    \item Dados e eventos podem percorrer as conexões em paralelo 
+    \item Dados e eventos podem percorrer as conexões em paralelo
   \end{itemize}
 
   \begin{figure}[H]
@@ -672,29 +678,61 @@
   GStreamer.
 \end{frame}
 
+\begin{frame}[c]{Bins -- Agrupando Elementos em Contêineres}
+  \begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{figs/bin}
+  \end{figure}
+
+  \begin{itemize}
+    \item Bins são contêineres que agrupam elementos
+      \begin{itemize}
+        \item \en{Pipelines} também são \en{bins}
+      \end{itemize}
+    \item Dois elementos só podem ser ligados se e somente se eles estiverem
+      dentro do mesmo contêiner
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]{Bus -- Barramento de Comunicação}
+  \begin{figure}
+    \centering
+    \includegraphics[scale=0.5]{figs/bus}
+  \end{figure}
+
+  \begin{itemize}
+    \item Elementos postam mensagens no barramento de comunicação (\en{bus})
+      para se comunicarem com a aplicação
+  \end{itemize}
+\end{frame}
+
 \section{Hands on}
+\subsection{Olá Mundo}
+
 \begin{frame}[fragile]{Primeira Aplicação: Olá mundo}
   Tocando um vídeo no GStreamer usando o elemento ``playbin''.
   \begin{itemize}
     \item Arquivo: src/hello.c
   \end{itemize}
   ~
-  
+
   Compilando o código fonte hello.c:
   \begin{lstlisting}[style=command]
-  $ cc hello.c -o hello `pkg-config --cflags --libs 
+  $ cc hello.c -o hello `pkg-config --cflags --libs
         glib-2.0 gstreamer-1.0`
   \end{lstlisting}
 \end{frame}
 
-\begin{frame}[c]{Tocando áudio e vídeo a partir de elementos básicos}
+\subsection{Player MP3}
+
+\begin{frame}[c]{Tocando um Arquivo MP3}
   Player MP3.
   \begin{figure}[t]
     \centering
     \begin{tikzpicture}
       \node (filesrc) [element] {filesrc};
       \node (mad) [element, right of=filesrc] {mad};
-      \node (alsasink) [element, right of=mad] {alasink};
+      \node (alsasink) [element, right of=mad] {alsasink};
       \coordinate (A) at ($(filesrc.north west)+(-.5\odim,.5\odim)$);
       \coordinate (B) at ($(alsasink.south east)+(.5\odim,-.5\odim)$);
       \path [bin] (A) rectangle node [binlabel] {pipeline} (B);
@@ -711,7 +749,7 @@
 
 \begin{frame}[c]{Máquinas de Estado de um GstElement}
   \begin{itemize}
-    \item Todo elemento possui um estado, que pode ser: 
+    \item Todo elemento possui um estado, que pode ser:
       \begin{itemize}
         \item GST\_STATE\_NULL (nulo)
         \item GST\_STATE\_READY (pronto)
@@ -720,9 +758,9 @@
       \end{itemize}
     \item Mudanças de estado são propagadas para elementos filhos (\en{bins})
       \begin{itemize}
-        \item Direção de propagação é sempre dos \en{sinks} para 
+        \item Direção de propagação é sempre dos \en{sinks} para
           os \en{sources}
-        \item Isso evita que dados sejam gerados antes que elementos 
+        \item Isso evita que dados sejam gerados antes que elementos
           posteriores no \en{pipeline} estejam prontos para recebê-los
       \end{itemize}
   \end{itemize}
@@ -742,8 +780,321 @@
       \draw [->] (READY) to [bend left=20] (NULL);
     \end{tikzpicture}
   \end{figure}
+\end{frame}
 
+\subsection{Player Ogg}
 
+\begin{frame}[c]{Um pouco mais sobre \en{pads}}
+  Cada \en{pad} possui três atributos importantes de serem considerados
+  para ligar dois elementos
+  \begin{itemize}
+    \item<2-> Direção
+      \begin{itemize}
+        \item \en{Sink}
+        \item \en{Source}
+      \end{itemize}
+    \item<3-> Capacidade
+      \begin{itemize}
+        \item \en{Caps} -- determina os tipos de \en{buffers} que podem
+          atravessá-la
+      \end{itemize}
+    \item<4-> Disponibilidade
+      \begin{itemize}
+        \item \en{Always} (sempre)
+        \item \en{Sometimes} (às vezes)
+        \item \en{Request} (sob requisição)
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]{Disponibilidade de \en{Pads}}
+  \begin{itemize}
+    \item<1-> \en{Always}
+      \begin{itemize}
+        \item Criadas assim que o elemento é criado
+        \item \C{gst_element_get_static_pad ()}
+      \end{itemize}
+    \item<2-> \en{Sometimes}
+      \begin{itemize}
+        \item Criada pelo próprio elemento sob condições específicas que
+          normalmente envolvem o conteúdo processado
+      \end{itemize}
+    \item<3-> \en{Request}
+      \begin{itemize}
+        \item Criada apenas quando requisitadas pela aplicação
+        \item \C{gst_element_get_request_pad()}
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]{Tocando um Arquivo Ogg}
+  Pipeline de um player Ogg
+  \begin{adjustbox}{max totalsize={.9\textwidth}{\textheight},center}
+    \begin{tikzpicture}
+      \node (filesrc) [element] {filesrc};
+      \coordinate [above=.5\hdim of filesrc] (A);
+      \coordinate [below=.5\hdim of filesrc] (B);
+      %%
+      \node (oggdemux) [element, right of=filesrc] {oggdemux};
+      \coordinate [right of=oggdemux] (C);
+      %%
+      \node (vorbisdec) [element] at (C|-A) {vorbisdec};
+      \node (audioconvert) [element, right of=vorbisdec] {audioconvert};
+      \node (alsasink) [element, right of=audioconvert] {alsasink};
+      \node (queue) [element] at (C|-B) {queue};
+      \node (theoradec) [element, right of=queue] {theoradec};
+      \node (xvimagesink) [element, right of=theoradec] {xvimagesink};
+      %%
+      \draw [->, arrow] (filesrc) -- (oggdemux);
+      \coordinate (X) at ($(oggdemux.east)+(0,.25\hdim)$);
+      \coordinate (Y) at ($(oggdemux.east)+(0,-.25\hdim)$);
+      \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+      -- ($(vorbisdec.west)-(\odim/3,0)$)
+      -- (vorbisdec.west);
+      \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+      -- ($(queue.west)-(\odim/3,0)$)
+      -- (queue.west);
+      \draw [->, arrow] (vorbisdec) -- (audioconvert);
+      \draw [->, arrow] (audioconvert) -- (alsasink);
+      \draw [->, arrow] (queue) -- (theoradec);
+      \draw [->, arrow] (theoradec) -- (xvimagesink);
+    \end{tikzpicture}
+  \end{adjustbox}
+  \begin{itemize}
+    \item Um contêiner Ogg pode conter múltiplos fluxos multiplexados
+    \item O demultiplexador \en{oggdemux} cria \en{source pads} para
+      cada fluxo multiplexado no arquivo
+      \begin{itemize}
+        \item \en{Source pads} possuem disponibilidade \en{sometimes}
+      \end{itemize}
+    \item Só podemos conectar o elemento \en{oggdemux} ao resto do
+      \en{pipeline} quando as \en{source pads} forem criadas
+    \item Notificação assíncrona (sinais)
+      \begin{itemize}
+        \item O elemento \en{oggdemux} emite o sinal \en{pad-added} sempre
+          que uma nova \en{source pad} é criada
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]{Tocando um Arquivo Ogg}
+  Player Ogg:
+  \begin{itemize}
+    \item Arquivo: src/ogg2.c
+  \end{itemize}
+\end{frame}
+
+\subsection{Comandos gst-launch e gst-inspect}
+\begin{frame}[fragile]{gst-launch}
+  \begin{itemize}
+    \item Permite construir pipelines estáticos (que não mudam após montados) tipo diretamente na linha de comando
+    \item Particularmente útil para depurar ou testar a
+      viabilidade de \en{pipelines} antes de implementá-los em C
+    \item Em algumas instalações o nome do comando é \C{gst-launch-1.0}
+  \end{itemize}
+
+  \begin{lstlisting}[style=command,breaklines=true]
+gst-launch playbin uri="file://$PWD/bunny.ogg"
+gst-launch filesrc location=bunny.mp3 ! mad ! alsasink
+gst-launch filesrc location=bunny.ogg ! oggdemux name=demux\
+   demux. ! vorbisdec ! audioconvert ! alsasink\
+   demux. ! queue     ! theoradec    ! xvimagesink
+ \end{lstlisting}
+\end{frame}
+
+\begin{frame}[fragile]{Um \en{Pipeline} Genérico}
+  \begin{lstlisting}[style=command,breaklines=true]
+gst-launch uridecodebin uri="<URI>" name=decbin\
+  decbin.@@ ! audioconvert ! autoaudiosink\
+  decbin.@@ ! autovideosink
+ \end{lstlisting}
+
+ \begin{figure}[H]
+   \centering
+   \begin{tikzpicture}
+     \node (uridecodebin) [element] {uridecodebin};
+     \coordinate [above=.5\hdim of uridecodebin] (A);
+     \coordinate [below=.5\hdim of uridecodebin] (B);
+     %%
+     \coordinate [right of=uridecodebin] (C);
+     \node (audioconvert) [element] at (C|-A) {audioconvert};
+     \node (autoaudiosink) [element, right of=audioconvert] {autoaudiosink};
+     %%
+     \coordinate [right of=audioconvert] (D);
+     \node (autovideosink) [element] at (D|-B) {autovideosink};
+     %%
+     \coordinate (X) at ($(uridecodebin.east)+(0,.25\hdim)$);
+     \coordinate (Y) at ($(uridecodebin.east)+(0,-.25\hdim)$);
+     \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+     -- ($(audioconvert.west)-(\odim/3,0)$)
+     -- (audioconvert.west);
+     \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+     -- ($(audioconvert.west|-B)-(\odim/3,0)$)
+     -- (autovideosink.west);
+     \draw [->, arrow] (audioconvert) -- (autoaudiosink);
+   \end{tikzpicture}
+ \end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{gst-inspect}
+  \begin{itemize}
+    \item Permite inspecionar os \en{plugins} e elementos disponíveis
+      no sistema
+    \item Em algumas instalações o nome do comando é \en{gst-inspect-1.0}
+  \end{itemize}
+
+  Exemplo: \$ gst-inspect equalizer
+
+  \lstinputlisting[
+  language={},
+  style=display,
+  ]{../src/equalizer.out}
+\end{frame}
+
+\subsection{Filtros}
+\begin{frame}[fragile]{Filtros}
+  \begin{itemize}
+    \item Aplicam transformações sobre um fluxo de amostras descomprimidas
+    \item Altera o fluxo original, produzindo efeitos sonoros ou visuais
+  \end{itemize}
+  ~
+  Alguns filtros de áudio e vídeo disponíveis no GStreamer:
+  \begin{table}[h]
+    \sffamily
+    \scriptsize
+    \centering
+    \begin{tabular}{llll}
+      \toprule
+      &\textbf{Plugin}
+      &\textbf{Elemento}
+      &\textbf{Descrição (controle)}\\
+      \midrule
+      \textbf{Áudio}
+      &audiofx    & audiodynamic & Compressão ou expansão\\
+      &audiofx    & audioecho    & Eco\\
+      &equalizer  & equalizer-nbands& Equalização~($n$~bandas)\\
+      &freeverb   & freeverb     & Reverberação\\
+      &soundtouch & pitch        & Tonalidade e tempo\\
+      &speed      & speed        & Velocidade\\
+      &volume     & volume       & Volume\\
+      \multicolumn{4}{l}{\dotfill}\\
+      \textbf{Vídeo}
+      &coloreffects& coloreffects& Efeito de colorização\\
+      &effectv     & revtv       & Efeito de relevo\\
+      &effectv     & shagadelictv& Efeito de espiral caleidoscópica\\
+      &videocrop   & videocrop   & Recorte\\
+      &videofilter & videobalance& Brilho, cor e saturação\\
+      &videoscale  & videoscale  & Redimensionamento\\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}[fragile]{Aplicando filtros}
+  Exemplo simples usando gst-launch:
+  \begin{lstlisting}[style=command]
+$ gst-launch filesrc location=bunny.mp3\
+      ! mad ! volume volume=.5 ! alsasink
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[c]{Aplicando filtros}
+  Exemplo mais complexo:
+
+  \begin{adjustbox}{max totalsize={.9\textwidth}{\textheight},center}
+    \begin{tikzpicture}
+      \node (uridecodebin) [element] {uridecodebin};
+      \coordinate [above=.5\hdim of uridecodebin] (A);
+      \coordinate [below=.5\hdim of uridecodebin] (B);
+      %%
+      \coordinate [right of=uridecodebin] (C);
+      \node (videoconvert1) [element] at (C|-B) {videoconvert};
+      \node (videofilter) [element, right of=videoconvert1]
+      {$\<\text{\emph{video filter}}>$};
+      \node (videoconvert2) [element, right of=videofilter] {videoconvert};
+      \node (autovideosink) [element, right of=videoconvert2] {autovideosink};
+      %%
+      \coordinate [above of=videofilter] (D);
+      \node (audiofilter) [element] at (D|-A)
+      {$\<\text{\emph{audio filter}}>$};
+      \node (audioconvert) [element, right of=audiofilter] {audioconvert};
+      \node (autoaudiosink) [element, right of=audioconvert] {autoaudiosink};
+      %%
+      \coordinate (X) at ($(uridecodebin.east)+(0,.25\hdim)$);
+      \coordinate (Y) at ($(uridecodebin.east)+(0,-.25\hdim)$);
+      \draw [->, arrow] (X) -- node [arrowlabel, above] {A} ++(\odim/3,0)
+      -- ($(videoconvert1.west|-A)-(\odim/3,0)$)
+      -- (audiofilter.west);
+      \draw [->, arrow] (Y) -- node [arrowlabel, below] {V} ++(\odim/3,0)
+      -- ($(videoconvert1.west)-(\odim/3,0)$)
+      -- (videoconvert1.west);
+      \draw [->, arrow] (audiofilter) -- (audioconvert);
+      \draw [->, arrow] (audioconvert) -- (autoaudiosink);
+      \draw [->, arrow] (videoconvert1) -- (videofilter);
+      \draw [->, arrow] (videofilter) -- (videoconvert2);
+      \draw [->, arrow] (videoconvert2) -- (autovideosink);
+    \end{tikzpicture}
+  \end{adjustbox}
+
+  \begin{itemize}
+    \item Arquivo: src/filter.c
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[c]{Aplicando filtros}
+  Efeitos de vídeo aplicados pelo programa anterior:
+  \begin{figure}[h]
+    \centering
+    \subfigure[Quadro original.]{
+      \includegraphics[width=0.3\textwidth]{../media/bird}
+    }
+    \subfigure[Filtro ``coloreffects''.]{
+      \includegraphics[width=0.3\textwidth]{../media/bird-coloreffects}
+    }
+    \subfigure[Filtro ``dicetv''.]{
+      \includegraphics[width=0.3\textwidth]{../media/bird-dicetv}
+    }
+    \subfigure[Filtro ``shagadelictv''.]{
+      \includegraphics[width=0.3\textwidth]{../media/bird-shagadelictv}
+    }
+    \subfigure[Filtro ``edgetv''.]{
+      \includegraphics[width=0.3\textwidth]{../media/bird-edgetv}
+    }
+    \subfigure[Filtro ``revtv''.]{
+      \includegraphics[width=0.3\textwidth]{../media/bird-revtv}
+    }
+  \end{figure}
+\end{frame}
+
+\subsection{Play, pause, stop, seek, fast-forward, rewind}
+\begin{frame}[c]{Controles avançados}
+  Vamos incrementar o programa ``Olá mundo'' para que ele responda aos
+  seguintes comandos:
+
+  \begin{center}
+    \begin{tabular}{cl}
+      \keystroke{SPC} & pausa ou resume a reprodução
+      (\en{pause} e \en{play})\\[2\jot]
+      \keystroke{$\to$} & avança~5s (\en{seek})\\[2\jot]
+      \keystroke{$\leftarrow$} & retrocede~5s (\en{seek})\\[2\jot]
+      \keystroke{F} & reproduz~2x mais rápido (\en{fast-foward})\\[2\jot]
+      \keystroke{R} & reproduz ao contrário~2x mais rápido
+      (\en{rewind})\\[2\jot]
+      \keystroke{N} & reproduz na velocidade original\\[2\jot]
+      \keystroke{Q} & para a reprodução e termina o programa (\en{stop})
+    \end{tabular}
+  \end{center}
+\end{frame}
+
+\begin{frame}[c]{Controles avançados}
+  \begin{itemize}
+    \item Elementos \en{sink} postam mensagens de eventos de navegação
+      \C{GST_NAVIGATION_MESSAGE_EVENT} no \en{bus} para informar eventos
+      de tecla e de mouse
+    \item A postagem de eventos de \en{seek} (\C{GST_EVENT_SEEK}) requisitam
+      mudanças na posição e na taxa de reprodução de um fluxo
+    \item Arquivo: src/controls.c
+  \end{itemize}
 \end{frame}
 
 \end{document}
