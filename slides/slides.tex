@@ -152,10 +152,10 @@
   \textcolor{red}{Rodrigo Costa}  \quad
   Roberto Gerson
 }
-\institute[TeleMídia Lab.]
+\institute[Lab.~TeleMídia]
 {
   Pontifícia Universidade Católica -- PUC-Rio\\
-  TeleMídia Lab., Dep. de Informática.
+  Lab.~TeleMídia, Dep. de Informática.
 
   \medskip
   \textit{\{gflima,rodrigocosta,robertogerson\}@telemidia.puc-rio.br}
@@ -241,7 +241,7 @@
     \item APIs de alto e baixo nível
     \item Baseado no modelo de computação \en{dataflow}
       \begin{itemize}
-        \item \en{``Pipeline"} na terminologia do GStreamer
+        \item ``\en{Pipeline}'' na terminologia do GStreamer
       \end{itemize}
     \item Desenvolvido em C
       \begin{itemize}
@@ -251,8 +251,8 @@
 
   \begin{block}{O que o GStreamer NÃO é}
     \begin{itemize}
-      \item Uma implementação de CODEC
-      \item Uma aplicação \en{standalone}
+      \item Implementação de codec
+      \item Aplicação \en{standalone}
     \end{itemize}
   \end{block}
 \end{frame}
@@ -331,7 +331,7 @@
 
 \begin{frame}[c]{Pipelines no GStreamer}
   Um \en{pipeline} GStreamer simplificado que reproduz um arquivo de
-  vídeo Ogg.
+  vídeo Ogg
 
   \begin{itemize}
     \item<2> \en{Source}
@@ -689,8 +689,8 @@
       \begin{itemize}
         \item \en{Pipelines} também são \en{bins}
       \end{itemize}
-    \item Dois elementos só podem ser ligados se e somente se eles estiverem
-      dentro do mesmo contêiner
+    \item Dois elementos só podem ser ligados se estiverem dentro do mesmo
+      contêiner
   \end{itemize}
 \end{frame}
 
@@ -710,7 +710,7 @@
 \subsection{Olá Mundo}
 
 \begin{frame}[fragile]{Primeira Aplicação: Olá mundo}
-  Tocando um vídeo no GStreamer usando o elemento ``playbin''.
+  Tocando um vídeo no GStreamer usando o elemento ``playbin''
   \begin{itemize}
     \item Arquivo: src/hello.c
   \end{itemize}
@@ -726,7 +726,7 @@
 \subsection{Player MP3}
 
 \begin{frame}[c]{Tocando um Arquivo MP3}
-  Player MP3.
+  Player MP3
   \begin{figure}[t]
     \centering
     \begin{tikzpicture}
@@ -740,7 +740,7 @@
       \draw [->, arrow] (mad) -- (alsasink);
     \end{tikzpicture}
   \end{figure}
-  \en{Pipeline} que reproduz um arquivo de áudio~MP3.
+  \en{Pipeline} que reproduz um arquivo de áudio~MP3
   ~
   \begin{itemize}
     \item Arquivo: src/mp3.c
@@ -756,12 +756,13 @@
         \item GST\_STATE\_PAUSED (pausado)
         \item GST\_STATE\_PLAYING (tocando)
       \end{itemize}
-    \item Mudanças de estado são propagadas para elementos filhos (\en{bins})
+    \item Mudanças de estado são propagadas para elementos filhos
+      (\en{bins})
       \begin{itemize}
-        \item Direção de propagação é sempre dos \en{sinks} para
-          os \en{sources}
-        \item Isso evita que dados sejam gerados antes que elementos
-          posteriores no \en{pipeline} estejam prontos para recebê-los
+      \item Direção de propagação é sempre dos \en{sinks} para os
+        \en{sources}
+      \item Isso evita que dados sejam gerados antes que elementos
+        posteriores no \en{pipeline} estejam prontos para recebê-los
       \end{itemize}
   \end{itemize}
 
@@ -905,8 +906,8 @@ gst-launch filesrc location=bunny.ogg ! oggdemux name=demux\
 \begin{frame}[fragile]{Um \en{Pipeline} Genérico}
   \begin{lstlisting}[style=command,breaklines=true]
 gst-launch uridecodebin uri="<URI>" name=decbin\
-  decbin.@@ ! audioconvert ! autoaudiosink\
-  decbin.@@ ! autovideosink
+  decbin. ! audioconvert ! autoaudiosink\
+  decbin. ! autovideosink
  \end{lstlisting}
 
  \begin{figure}[H]
@@ -943,7 +944,7 @@ gst-launch uridecodebin uri="<URI>" name=decbin\
     \item Em algumas instalações o nome do comando é \en{gst-inspect-1.0}
   \end{itemize}
 
-  Exemplo: \$ gst-inspect equalizer
+  Exemplo: \texttt{\$ gst-inspect equalizer}
 
   \lstinputlisting[
   language={},
@@ -955,10 +956,9 @@ gst-launch uridecodebin uri="<URI>" name=decbin\
 \begin{frame}[fragile]{Filtros}
   \begin{itemize}
     \item Aplicam transformações sobre um fluxo de amostras descomprimidas
-    \item Altera o fluxo original, produzindo efeitos sonoros ou visuais
+    \item Alteram o fluxo original, produzindo efeitos sonoros ou visuais
   \end{itemize}
-  ~
-  Alguns filtros de áudio e vídeo disponíveis no GStreamer:
+  \par Alguns filtros de áudio e vídeo disponíveis no GStreamer:
   \begin{table}[h]
     \sffamily
     \scriptsize
@@ -1091,7 +1091,7 @@ $ gst-launch filesrc location=bunny.mp3\
     \item Elementos \en{sink} postam mensagens de eventos de navegação
       \C{GST_NAVIGATION_MESSAGE_EVENT} no \en{bus} para informar eventos
       de tecla e de mouse
-    \item A postagem de eventos de \en{seek} (\C{GST_EVENT_SEEK}) requisitam
+    \item A postagem de eventos \en{seek} (\C{GST_EVENT_SEEK}) requisita
       mudanças na posição e na taxa de reprodução de um fluxo
     \item Arquivo: src/controls.c
   \end{itemize}
