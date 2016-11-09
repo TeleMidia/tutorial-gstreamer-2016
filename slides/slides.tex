@@ -218,7 +218,7 @@
       \begin{itemize}
         \item Projeto com mais de 15 anos
       \end{itemize}
-    \item Projetado facilitar o desenvolvimento de aplicações que apresentam
+    \item Projetado para facilitar o desenvolvimento de aplicações que apresentam
       ou processam conteúdo audiovisual
     \item Softwares que usam o GStreamer:
       \begin{itemize}
@@ -1268,15 +1268,15 @@ $ gst-launch uridecodebin uri=<URI> !       \
       \node (audiotestsrc) [element, below of=uridecodebin] {audiotestsrc};
       \node (audioconvert2) [element, right of=audiotestsrc] {audioconvert};
 
-      \node (compositor) [element, right of=audioconvert1] at ($(audioconvert1)!0.5!(audioconvert2)$) {compositor} ;
-      \node (audioconvert3) [element, right of=compositor] {audioconvert};
+      \node (audiomixer) [element, right of=audioconvert1] at ($(audioconvert1)!0.5!(audioconvert2)$) {audiomixer} ;
+      \node (audioconvert3) [element, right of=audiomixer] {audioconvert};
       \node (alsasink) [element, right of=audioconvert3] {alsasink};
 
       \draw [->, arrow] (uridecodebin) -- (audioconvert1);
       \draw [->, arrow] (audiotestsrc) -- (audioconvert2);
-      \draw [->, arrow] (audioconvert1) -- (compositor);
-      \draw [->, arrow] (audioconvert2) -- (compositor);
-      \draw [->, arrow] (compositor) -- (audioconvert3);
+      \draw [->, arrow] (audioconvert1) -- (audiomixer);
+      \draw [->, arrow] (audioconvert2) -- (audiomixer);
+      \draw [->, arrow] (audiomixer) -- (audioconvert3);
       \draw [->, arrow] (audioconvert3) -- (alsasink);
     \end{tikzpicture}
   \end{adjustbox}
