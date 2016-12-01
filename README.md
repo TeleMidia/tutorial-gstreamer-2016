@@ -14,12 +14,13 @@ conhecimento básico da linguagem de programação C. Ao final do minicurso, esp
 mos que os participantes tenham uma visão geral do GStreamer, e estejam aptos a criar
 aplicações simples e explorar os recursos mais avançados do framework.
 
-##Material
-* [Apostila](https://github.com/TeleMidia/minicurso-webmedia16/blob/master/chapter.pdf)
+## Material
+* [Apostila](https://github.com/TeleMidia/minicurso-webmedia16/blob/master/chapter/chapter.pdf)
 * [Slides](https://github.com/TeleMidia/minicurso-webmedia16/blob/master/slides/slides.pdf)
 
 
-##Autores
+## Autores
 * [Guilherme F. Lima](https://github.com/gflima)
 * [Rodrigo Costa M. Santos](https://github.com/rodrimc)
 * [Roberto Gerson de A. Azevedo](https://github.com/robertogerson)
+

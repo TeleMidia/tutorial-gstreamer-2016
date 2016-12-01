@@ -1,0 +1,181 @@
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[utf8]{inputenc}
+\usepackage[english,brazilian]{babel}
+\usepackage[protrusion=true,expansion]{microtype}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,allcolors=black}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{float}
+\usepackage{subfigure}
+\usepackage{booktabs}
+\usepackage{multicol}
+\usepackage{multirow}
+\usepackage{paralist}
+\usepackage{xargs}
+\usepackage{color}
+\usepackage{soulutf8}
+\usepackage{breakcites}
+\usepackage{graphicx}
+\graphicspath{{../}}
+% \usepackage{natbib}
+% \setlength{\bibsep}{0.0pt}
+%% -------------------------------------------------------------------------
+\usepackage{tikz}
+\usetikzlibrary{arrows,calc,positioning,shadows,shapes,trees}
+\newdimen\hdim                  % element height
+\newdimen\wdim                  % element width
+\newdimen\odim                  % offset distance
+\hdim=2.25em
+\wdim=2.36\hdim
+\odim=\hdim
+\tikzstyle{element}=[
+  draw=black!60,
+  font={\scriptsize\sffamily},
+  inner sep=0pt,
+  minimum height=\hdim,
+  minimum width=\wdim,
+  outer sep=0pt,
+  rectangle,
+  rounded corners=\wdim/10,
+  text centered,
+  thick,
+  top color=white,
+  bottom color=black!20,
+]
+\tikzstyle{arrow}=[
+  color=black!60,
+  draw=black!60,
+  thick,
+]
+\tikzstyle{arrowlabel}=[
+  color=black!60,
+  font={\tiny\sffamily\bfseries},
+]
+\tikzstyle{bin}=[
+  dashed,
+  draw=black!60,
+  font={\tiny\sffamily\bfseries},
+  rounded corners=\wdim/12,
+]
+\tikzstyle{binlabel}=[
+  anchor=west,
+  color=black!60,
+  inner sep=0pt,
+  outer sep=0pt,
+  pos=0,
+  xshift=.25em,
+  yshift=-.45em,
+]
+\tikzstyle{state}=[
+  circle,
+  draw,
+  font={\scriptsize\sffamily},
+  inner sep=0pt,
+  minimum height=1.5\hdim,
+  minimum width=1.5\hdim,
+  text width=\hdim,
+  outer sep=0pt,
+  text centered,
+]
+\tikzstyle{keystroke}=[
+  draw,
+  drop shadow={
+    shadow xshift=0.25ex,
+    shadow yshift=-0.25ex,
+    fill=black,
+    opacity=0.75,
+  },
+  fill=white,
+  font=\scriptsize\sffamily,
+  inner sep=2.5pt,
+  line width=0.5pt,
+  minimum width={1.7em},
+  rectangle,
+  rounded corners=2pt,
+]
+\tikzset{
+  node distance=\wdim+\odim,
+  >=stealth,
+  shorten >=.5pt,
+}
+\newcommand*\keystroke[1]{%
+  \tikz[baseline=(key.base)]\node[keystroke](key) {#1\strut};
+}
+%% -------------------------------------------------------------------------
+\usepackage{listings}
+\lstset{%
+  basicstyle=\small\ttfamily,
+  columns=fullflexible,
+  keepspaces=true,
+  keywordstyle=\ttfamily,
+  language=C,
+  escapechar={@},
+  mathescape=true,
+  showstringspaces=false,
+  texcl=true,
+  upquote=true,
+  extendedchars=true,
+  inputpath=../,
+  literate=%
+    {á}{{\'a}}1%
+    {é}{{\'e}}1%
+    {í}{{\'i}}1%
+    {ó}{{\'o}}1%
+    {ú}{{\'u}}1%
+    {â}{{\^a}}1%
+    {ê}{{\^e}}1%
+    {ô}{{\^o}}1%
+    {ã}{{\~a}}1%
+    {õ}{{\~o}}1%
+    {ç}{{\c{c}}}1%
+    {€}{\euro}1%
+    {§}{\S}1%
+    {°}{\textdegree{}}1%
+    {ß}{{\ss}}1%
+    {Ä}{{\"A}}1%
+    {Ö}{{\"O}}1%
+    {Ü}{{\"U}}1%
+    {µ}{\textmu}1%
+    {¹}{{\textsuperscript{1}}}1%
+    {²}{{\textsuperscript{2}}}1%
+    {³}{{\textsuperscript{3}}}1%
+    {¼}{\textonequarter}1%
+    {½}{\textonehalf}1%
+    {¢}{\textcent}1%
+    {“}{``}1%
+    {”}{''}1%
+    {‘}{`}1%
+    {’}{'}1%
+    {←}{$\leftarrow$}1%
+    {→}{$\rightarrow$}1%
+}
+\renewcommand{\lstlistingname}{Listagem}
+\newdimen\xdim
+\xdim=-.5\baselineskip
+\lstdefinestyle{command}{
+  basicstyle=\small\ttfamily,
+  aboveskip=\abovedisplayskip,
+  belowskip=.5\belowdisplayskip,
+}
+\lstdefinestyle{display}{
+  aboveskip=\abovedisplayskip,
+  basicstyle=\scriptsize\ttfamily,
+  belowskip=0pt,
+  captionpos=b,
+  frame=tb,
+  numbers=left,
+  numberstyle={\tiny\sffamily},
+}
+%% -------------------------------------------------------------------------
+\def\en#1{\foreignlanguage{english}{\emph{#1}}}
+\let\C\lstinline
+\def\<#1>{\ensuremath{\left<#1\right>}}
+
+\setlength{\marginparwidth}{2.5cm}
+\newcommandx{\rc}[2]{{\sethlcolor{red}\hl{#1}}\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red]{#2}}
+\newcommandx{\rg}[1]{\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan]{#1}}
+%\newcommandx{\rghl}[2]{{\sethlcolor{cyan}\hl{#1}}\todo[linecolor=cyan,backgroundcolor=cyan!25,bordercolor=cyan]{#2}}
+\newcommandx{\rghl}[2]{#1}
+
