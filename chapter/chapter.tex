@@ -334,7 +334,7 @@ A Listagem~\ref{lst:hello} apresenta um programa~C que faz exatamente isso.
 style=display,
 caption={Tocando um vídeo no GStreamer usando o elemento ``playbin''.},
 label={lst:hello},
-]{src/hello.c}
+]{src/01-hello.c}
 
 Vejamos o propósito de cada linha da Listagem~\ref{lst:hello}.  A linha~1
 inclui as declarações da GLib~\cite{glib}, a biblioteca de portabilidade do
@@ -547,7 +547,7 @@ float={h},
 style=display,
 caption={Tocando um arquivo de áudio MP3.},
 label={lst:mp3},
-]{src/mp3.c}
+]{src/02-mp3.c}
 
 Na Seção~\ref{sec:intro}, discutimos a operação dos elementos ``filesrc'' e
 ``alsasink''.  O primeiro lê um arquivo do disco e gera um fluxo de bytes
@@ -903,7 +903,7 @@ as chamadas seguintes (linhas~50--53) liberam as referências utilizadas.
 style=display,
 caption={Tocando um arquivo de vídeo Ogg usando elementos básicos.},
 label={lst:ogg},
-]{src/ogg2.c}
+]{src/03-ogg.c}
 
 Quando iniciado, o programa da Listagem~\ref{lst:ogg} demultiplexa o arquivo
 Ogg fornecido e reproduz os primeiros subfluxos Vorbis e Theora que
@@ -1282,7 +1282,7 @@ lastline=99,
 caption={Trecho do programa~C equivalente ao \en{script}
 da Listagem~\ref{lst:filtros-sh}.},
 label={lst:filtros},
-]{src/filter.c}
+]{src/04-filter.c}
 
 
 \section{Adicionando os controles~\en{play}, \en{pause},
@@ -1369,7 +1369,7 @@ style=display,
 lastline=40,
 caption={Função~\texttt{main} do programa ``Olá mundo'' com controles.},
 label={lst:controles-main},
-]{src/controls.c}
+]{src/05-controls.c}
 
 Vejamos agora a operação da \en{callback} \C{bus_cb}, cujo código é
 apresentado na Listagem~\ref{lst:controles-cb}.  A cada mensagem postada no
@@ -1402,7 +1402,7 @@ style=display,
 firstline=92,
 caption={Função~\texttt{bus\_cb} do programa ``Olá mundo'' com controles.},
 label={lst:controles-cb},
-]{src/controls.c}
+]{src/05-controls.c}
 
 A Listagem~\ref{lst:controles-aux} apresenta o código das funções
 auxiliares~\C{toggle_pause}, \C{seek} e~\C{resume} chamadas pela
@@ -1455,7 +1455,7 @@ lastline=90,
 caption={Funções~\texttt{toggle\_paused}, \texttt{seek} e~\texttt{speed}
 do programa ``Olá mundo'' com controles.},
 label={lst:controles-aux},
-]{src/controls.c}
+]{src/05-controls.c}
 
 Finalmente, observe que o programa anterior usa as declarações do cabeçalho
 ``gstnavigation.h'' (Listagem~\ref{lst:controles-main}, linha~3) instalado
@@ -1496,7 +1496,7 @@ escapechar={},
 style=display,
 caption={Código do elemento ``myfilter'' e \en{plugin} correspondente.},
 label={lst:myfilter},
-]{src/myfilter2.c}
+]{src/06-myfilter.c}
 \clearpage
 
 A macro \C{GST_DECLARE_FINAL_TYPE} (linha~10) recebe cinco argumentos---o
@@ -1634,7 +1634,7 @@ escapechar={},
 style=display,
 caption={Código do elemento ``myvideofilter'' e \en{plugin} correspondente.},
 label={lst:myvideofilter},
-]{src/myvideofilter2.c}
+]{src/07-myvideofilter.c}
 \clearpage
 
 Na Listagem~\ref{lst:myvideofilter}, a declaração \en{enum} da linha~13 cria
